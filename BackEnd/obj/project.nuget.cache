@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "wClm0lK0mHs=",
+  "success": true,
+  "projectFilePath": "E:\\3rd year- 2nd term\\IA\\ASP .NET\\IA-ProjectFR\\Faculty-Team-2026\\IA-library-management-system\\BackEnd\\BackEnd.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\antec\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.2\\microsoft.aspnetcore.openapi.9.0.2.nupkg.sha512",
+    "C:\\Users\\antec\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
