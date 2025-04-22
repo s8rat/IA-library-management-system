@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace BackEnd.Models
 {
@@ -10,22 +11,34 @@ namespace BackEnd.Models
         public long Id { get; set; }
 
         [Required]
+        [StringLength(50)]
         public string Username { get; set; }
 
         [Required]
+        [StringLength(255)] // Adequate length for hashed passwords
         public string Password { get; set; }
 
         [Required]
-        public string Role { get; set; } // "Admin", "Librarian", "User"
+        [StringLength(20)]
+        public string Role { get; set; } = "User"; // Default to "User"
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [EmailAddress]
+        [StringLength(100)]
         public string? Email { get; set; }
 
-        public ICollection<BorrowRequest> BorrowRequests { get; set; }
-        public ICollection<BorrowRecord> BorrowRecords { get; set; }
-        public ICollection<LibrarianRequest> LibrarianRequests { get; set; }
+        // Navigation properties
+        public virtual ICollection<BorrowRequest> BorrowRequests { get; set; } = new List<BorrowRequest>();
+        public virtual ICollection<BorrowRecord> BorrowRecords { get; set; } = new List<BorrowRecord>();
+        public virtual ICollection<LibrarianRequest> LibrarianRequests { get; set; } = new List<LibrarianRequest>();
+
+        // Memberships where this user is the primary member
+        public virtual ICollection<UserMembership> UserMemberships { get; set; } = new List<UserMembership>();
+
+        // Family memberships where this user is the parent
+        [InverseProperty("ParentUser")]
+        public virtual ICollection<UserMembership> FamilyMembers { get; set; } = new List<UserMembership>();
     }
 
 }

@@ -7,95 +7,102 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Register Services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IBorrowService, BorrowService>();
-builder.Services.AddScoped<ILibrarianService, LibrarianService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
-// Add Controllers
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
-
-
-// JWT Authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
-
-// Authorization Policies
-builder.Services.AddAuthorizationBuilder()
-                             // Authorization Policies
-                             .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"))
-                             // Authorization Policies
-                             .AddPolicy("LibrarianOnly", policy => policy.RequireRole("Librarian"))
-                             // Authorization Policies
-                             .AddPolicy("UserOnly", policy => policy.RequireRole("User"));
-
-
-
-var app = builder.Build();
-
-
-if (app.Environment.IsDevelopment())
+internal class Program
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
+    private static async Task Main(string[] args)
     {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        await context.Database.MigrateAsync();
+        var builder = WebApplication.CreateBuilder(args);
 
-        if (!await context.Users.AnyAsync(u => u.Username == "admin"))
-        {
-            context.Users.Add(new User
+        // Add DbContext
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+        // Register Services
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IBookService, BookService>();
+        builder.Services.AddScoped<IBorrowService, BorrowService>();
+        builder.Services.AddScoped<ILibrarianService, LibrarianService>();
+        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IMembershipService, MembershipService>();
+
+        // Add Controllers
+        builder.Services.AddControllers();
+        builder.Services.AddOpenApi();
+
+
+        // JWT Authentication
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
             {
-                Username = "admin",
-                Password = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                Role = "Admin",
-                Email = "admin@library.com",
-                CreatedAt = DateTime.UtcNow
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
             });
-            await context.SaveChangesAsync();
+
+        // Authorization Policies
+        builder.Services.AddAuthorizationBuilder()
+                                     // Authorization Policies
+                                     .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"))
+                                     // Authorization Policies
+                                     .AddPolicy("LibrarianOnly", policy => policy.RequireRole("Librarian"))
+                                     // Authorization Policies
+                                     .AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+
+
+
+        var app = builder.Build();
+
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapOpenApi();
+            app.MapScalarApiReference();
         }
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred during migration and seeding.");
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            try
+            {
+                var context = services.GetRequiredService<ApplicationDbContext>();
+                await context.Database.MigrateAsync();
+
+                if (!await context.Users.AnyAsync(u => u.Username == "admin"))
+                {
+                    context.Users.Add(new User
+                    {
+                        Username = "admin",
+                        Password = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                        Role = "Admin",
+                        Email = "admin@library.com",
+                        CreatedAt = DateTime.UtcNow
+                    });
+                    await context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred during migration and seeding.");
+            }
+        }
+
+        await app.RunAsync();
     }
 }
-
-await app.RunAsync();

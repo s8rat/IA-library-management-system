@@ -24,7 +24,7 @@ namespace BackEnd.Models
 
         public int Quantity { get; set; } = 1;
 
-        public ICollection<BorrowRequest> BorrowRequests { get; set; }
+        public BorrowRequest BorrowRequest { get; set; }
         public ICollection<BorrowRecord> BorrowRecords { get; set; }
     }
 

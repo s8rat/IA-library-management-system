@@ -124,7 +124,8 @@ namespace BackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
+                    b.HasIndex("BookId")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -168,19 +169,23 @@ namespace BackEnd.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -192,6 +197,97 @@ namespace BackEnd.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("BackEnd.Models.UserMembership", b =>
+                {
+                    b.Property<int>("UserMembershipId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserMembershipId"));
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCanceled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MembershipId")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("ParentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("UserMembershipId");
+
+                    b.HasIndex("MembershipId");
+
+                    b.HasIndex("ParentUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserMemberships");
+                });
+
+            modelBuilder.Entity("Membership", b =>
+                {
+                    b.Property<int>("MembershipId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MembershipId"));
+
+                    b.Property<int>("BorrowLimit")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("DurationInDays")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsFamilyPlan")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MaxFamilyMembers")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MembershipType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("RequiresApproval")
+                        .HasColumnType("bit");
+
+                    b.HasKey("MembershipId");
+
+                    b.ToTable("Memberships");
                 });
 
             modelBuilder.Entity("BackEnd.Models.BorrowRecord", b =>
@@ -224,8 +320,8 @@ namespace BackEnd.Migrations
             modelBuilder.Entity("BackEnd.Models.BorrowRequest", b =>
                 {
                     b.HasOne("BackEnd.Models.Book", "Book")
-                        .WithMany("BorrowRequests")
-                        .HasForeignKey("BookId")
+                        .WithOne("BorrowRequest")
+                        .HasForeignKey("BackEnd.Models.BorrowRequest", "BookId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -251,11 +347,38 @@ namespace BackEnd.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BackEnd.Models.UserMembership", b =>
+                {
+                    b.HasOne("Membership", "Membership")
+                        .WithMany("UserMemberships")
+                        .HasForeignKey("MembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.User", "ParentUser")
+                        .WithMany("FamilyMembers")
+                        .HasForeignKey("ParentUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("BackEnd.Models.User", "User")
+                        .WithMany("UserMemberships")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Membership");
+
+                    b.Navigation("ParentUser");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BackEnd.Models.Book", b =>
                 {
                     b.Navigation("BorrowRecords");
 
-                    b.Navigation("BorrowRequests");
+                    b.Navigation("BorrowRequest")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BackEnd.Models.BorrowRequest", b =>
@@ -269,7 +392,16 @@ namespace BackEnd.Migrations
 
                     b.Navigation("BorrowRequests");
 
+                    b.Navigation("FamilyMembers");
+
                     b.Navigation("LibrarianRequests");
+
+                    b.Navigation("UserMemberships");
+                });
+
+            modelBuilder.Entity("Membership", b =>
+                {
+                    b.Navigation("UserMemberships");
                 });
 #pragma warning restore 612, 618
         }
