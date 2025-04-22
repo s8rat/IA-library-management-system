@@ -1,34 +1,100 @@
+using BackEnd.Data;
+using BackEnd.Models;
+using BackEnd.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using System.Text;
 
-namespace BackEnd
-{
-    public class Program
+var builder = WebApplication.CreateBuilder(args);
+
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IBorrowService, BorrowService>();
+builder.Services.AddScoped<ILibrarianService, LibrarianService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Add Controllers
+builder.Services.AddControllers();
+builder.Services.AddOpenApi();
+
+
+// JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        public static void Main(string[] args)
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            var builder = WebApplication.CreateBuilder(args);
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
 
-            // Add services to the container.
+// Authorization Policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("LibrarianOnly", policy => policy.RequireRole("Librarian"));
+    options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+});
 
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
 
-            var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+var app = builder.Build();
+
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        await context.Database.MigrateAsync();
+
+        if (!await context.Users.AnyAsync(u => u.Username == "admin"))
+        {
+            context.Users.Add(new User
             {
-                app.MapOpenApi();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
+                Username = "admin",
+                Password = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                Role = "Admin",
+                Email = "admin@library.com",
+                CreatedAt = DateTime.UtcNow
+            });
+            await context.SaveChangesAsync();
         }
     }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred during migration and seeding.");
+    }
 }
+
+await app.RunAsync();
