@@ -43,12 +43,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // Authorization Policies
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("LibrarianOnly", policy => policy.RequireRole("Librarian"));
-    options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
-});
+builder.Services.AddAuthorizationBuilder()
+                             // Authorization Policies
+                             .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"))
+                             // Authorization Policies
+                             .AddPolicy("LibrarianOnly", policy => policy.RequireRole("Librarian"))
+                             // Authorization Policies
+                             .AddPolicy("UserOnly", policy => policy.RequireRole("User"));
 
 
 
