@@ -4,6 +4,7 @@ using BackEnd.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424041135_updatingChatMessageModel")]
+    partial class updatingChatMessageModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,28 +60,6 @@ namespace BackEnd.Migrations
                         .HasFilter("[ISBN] IS NOT NULL");
 
                     b.ToTable("Books");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Author = "John Doe",
-                            Available = true,
-                            ISBN = "978-3-16-148410-0",
-                            PublishedDate = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Quantity = 5,
-                            Title = "C# Programming"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Author = "Jane Smith",
-                            Available = true,
-                            ISBN = "978-1-23-456789-0",
-                            PublishedDate = new DateTime(2021, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Quantity = 3,
-                            Title = "ASP.NET Core Guide"
-                        });
                 });
 
             modelBuilder.Entity("BackEnd.Models.BorrowRecord", b =>
@@ -357,33 +338,6 @@ namespace BackEnd.Migrations
                     b.HasKey("MembershipId");
 
                     b.ToTable("Memberships");
-
-                    b.HasData(
-                        new
-                        {
-                            MembershipId = 1,
-                            BorrowLimit = 5,
-                            CreatedAt = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Standard membership with a borrow limit of 5 books.",
-                            DurationInDays = 30,
-                            IsFamilyPlan = false,
-                            MembershipType = "Standard",
-                            Price = 9.99m,
-                            RequiresApproval = false
-                        },
-                        new
-                        {
-                            MembershipId = 2,
-                            BorrowLimit = 10,
-                            CreatedAt = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Family membership with a borrow limit of 10 books.",
-                            DurationInDays = 30,
-                            IsFamilyPlan = true,
-                            MaxFamilyMembers = 4,
-                            MembershipType = "Family",
-                            Price = 19.99m,
-                            RequiresApproval = true
-                        });
                 });
 
             modelBuilder.Entity("BackEnd.Models.BorrowRecord", b =>

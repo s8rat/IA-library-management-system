@@ -4,6 +4,7 @@ using BackEnd.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424044256_seedingSomeDataAndFixngChats")]
+    partial class seedingSomeDataAndFixngChats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -363,7 +366,7 @@ namespace BackEnd.Migrations
                         {
                             MembershipId = 1,
                             BorrowLimit = 5,
-                            CreatedAt = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2025, 4, 24, 4, 42, 56, 320, DateTimeKind.Utc).AddTicks(4473),
                             Description = "Standard membership with a borrow limit of 5 books.",
                             DurationInDays = 30,
                             IsFamilyPlan = false,
@@ -375,7 +378,7 @@ namespace BackEnd.Migrations
                         {
                             MembershipId = 2,
                             BorrowLimit = 10,
-                            CreatedAt = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2025, 4, 24, 4, 42, 56, 320, DateTimeKind.Utc).AddTicks(4647),
                             Description = "Family membership with a borrow limit of 10 books.",
                             DurationInDays = 30,
                             IsFamilyPlan = true,
