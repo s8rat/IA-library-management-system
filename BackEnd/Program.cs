@@ -91,7 +91,11 @@ internal class Program
                         Password = BCrypt.Net.BCrypt.HashPassword("admin123"),
                         Role = "Admin",
                         Email = "admin@library.com",
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        FirstName = "Admin",
+                        LastName = "User",
+                        SSN = "123-45-6789",
+                        PhoneNumber = "123-456-7890"
                     });
                     await context.SaveChangesAsync();
                 }

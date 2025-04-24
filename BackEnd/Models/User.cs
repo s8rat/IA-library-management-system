@@ -28,6 +28,22 @@ namespace BackEnd.Models
         [StringLength(100)]
         public string? Email { get; set; }
 
+        [Required]
+        [StringLength(50)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string LastName { get; set; }
+
+        [Required]
+        [StringLength(11)] // Format: XXX-XX-XXXX
+        public string SSN { get; set; }
+
+        [Phone]
+        [StringLength(15)] // Allows for international formats
+        public string? PhoneNumber { get; set; }
+
         // Navigation properties
         public virtual ICollection<BorrowRequest> BorrowRequests { get; set; } = new List<BorrowRequest>();
         public virtual ICollection<BorrowRecord> BorrowRecords { get; set; } = new List<BorrowRecord>();

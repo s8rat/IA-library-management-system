@@ -25,7 +25,11 @@ namespace BackEnd.Services
                     Username = u.Username,
                     Role = u.Role,
                     CreatedAt = u.CreatedAt,
-                    Email = u.Email
+                    Email = u.Email,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    SSN = u.SSN,
+                    PhoneNumber = u.PhoneNumber
                 })
                 .ToListAsync();
         }
@@ -44,7 +48,11 @@ namespace BackEnd.Services
                 Username = user.Username,
                 Role = user.Role,
                 CreatedAt = user.CreatedAt,
-                Email = user.Email
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                SSN = user.SSN,
+                PhoneNumber = user.PhoneNumber
             };
         }
 
@@ -66,7 +74,11 @@ namespace BackEnd.Services
                 Password = BCrypt.Net.BCrypt.HashPassword("defaultPassword"), // Admin should set a proper password
                 Role = userDTO.Role,
                 Email = userDTO.Email,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                FirstName = userDTO.FirstName,
+                LastName = userDTO.LastName,
+                SSN = userDTO.SSN,
+                PhoneNumber = userDTO.PhoneNumber
             };
 
             _context.Users.Add(user);
@@ -78,7 +90,11 @@ namespace BackEnd.Services
                 Username = user.Username,
                 Role = user.Role,
                 CreatedAt = user.CreatedAt,
-                Email = user.Email
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                SSN = user.SSN,
+                PhoneNumber = user.PhoneNumber
             };
         }
 
@@ -117,7 +133,11 @@ namespace BackEnd.Services
                 Username = user.Username,
                 Role = user.Role,
                 CreatedAt = user.CreatedAt,
-                Email = user.Email
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                SSN = user.SSN,
+                PhoneNumber = user.PhoneNumber
             };
         }
 

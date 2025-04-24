@@ -55,7 +55,11 @@ namespace BackEnd.Services
                 Password = BCrypt.Net.BCrypt.HashPassword(registerDTO.Password),
                 Role = "User",
                 Email = registerDTO.Email,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                FirstName = registerDTO.FirstName,
+                LastName = registerDTO.LastName,
+                SSN = registerDTO.SSN,
+                PhoneNumber = registerDTO.PhoneNumber
             };
 
             _context.Users.Add(user);
