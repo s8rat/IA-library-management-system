@@ -47,11 +47,11 @@ internal class Program
             {
                 //-------------------------------------- frontend url ---------------------------------------------//
                 policy
-                      .WithOrigins("http://127.0.0.1:5500")
+                      .WithOrigins("http://localhost:5173/")
                       //.AllowAnyOrigin()
                       .AllowAnyHeader()
-                      .AllowAnyMethod()
-                      .AllowCredentials(); // Needed for SignalR
+                      .AllowAnyMethod();
+                      //.AllowCredentials(); // Needed for SignalR
             });
         });
 
