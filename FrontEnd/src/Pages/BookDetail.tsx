@@ -3,7 +3,7 @@ import { books } from '../data/books';
 
 export const BookDetail = () => {
     const { id } = useParams();
-    const book = books.find(b => b.id === id);
+    const book = books.find(b => b.id === Number(id));
 
     if (!book) {
         return (
@@ -38,7 +38,7 @@ export const BookDetail = () => {
                         <span>{book.publishYear}</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        {book.genre.map((g, index) => (
+                        {(book.genre || []).map((g, index) => (
                             <span 
                                 key={index} 
                                 className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs"
