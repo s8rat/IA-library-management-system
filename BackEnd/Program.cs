@@ -3,6 +3,7 @@ using BackEnd.Hubs;
 using BackEnd.Models;
 using BackEnd.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -26,6 +27,14 @@ internal class Program
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IMembershipService, MembershipService>();
 
+
+
+        builder.Services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+        });
+
+
         // Add Controllers
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
@@ -37,7 +46,9 @@ internal class Program
             options.AddDefaultPolicy(policy =>
             {
                 //-------------------------------------- frontend url ---------------------------------------------//
-                policy.WithOrigins("http://127.0.0.1:5500")
+                policy
+                      .WithOrigins("http://127.0.0.1:5500")
+                      //.AllowAnyOrigin()
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials(); // Needed for SignalR
