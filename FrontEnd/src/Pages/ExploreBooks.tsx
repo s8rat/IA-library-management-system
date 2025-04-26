@@ -1,21 +1,41 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { books } from '../data/books';
+import { useState, useEffect } from 'react';
+import { Book } from '../types/book';
+import api from '../Services/api';
+import { BookCard } from '../components/BookCard';
 
 export const ExploreBooks = () => {
+    const [books, setBooks] = useState<Book[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedGenre, setSelectedGenre] = useState('All');
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
-    // Get unique genres from all books
-    const allGenres = ['All', ...new Set(books.flatMap(book => book.genre))];
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                setLoading(true);
+                const response = await api.get('/api/Books');
+                if (Array.isArray(response.data)) {
+                    setBooks(response.data);
+                } else {
+                    console.error('Expected an array of books, but received:', response.data);
+                    setError('Invalid data format received from server');
+                    setBooks([]);
+                }
+            } catch (error) {
+                console.error('Error fetching books:', error);
+                setError('Failed to fetch books. Please try again later.');
+                setBooks([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBooks();
+    }, []);
 
-    // Filter books based on search term and genre
-    const filteredBooks = books.filter(book => {
-        const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            book.author.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesGenre = selectedGenre === 'All' || book.genre.includes(selectedGenre);
-        return matchesSearch && matchesGenre;
-    });
+    const filteredBooks = books.filter(book => 
+        book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.author.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto">
@@ -31,63 +51,35 @@ export const ExploreBooks = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-w-md w-full"
                     />
-                    <select
-                        value={selectedGenre}
-                        onChange={(e) => setSelectedGenre(e.target.value)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-w-md w-full"
-                    >
-                        {allGenres.map(genre => (
-                            <option key={genre} value={genre}>{genre}</option>
-                        ))}
-                    </select>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredBooks.map((book) => (
-                    <div 
-                        key={book.id} 
-                        className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
+            {loading ? (
+                <div className="text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    <p className="mt-4 text-gray-600">Loading books...</p>
+                </div>
+            ) : error ? (
+                <div className="text-center py-12">
+                    <p className="text-red-500">{error}</p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                     >
-                        <div className="relative aspect-[2/3]">
-                            <img 
-                                src={book.cover} 
-                                alt={book.title}
-                                className="w-full h-full object-cover"
-                            />
-                            {!book.available && (
-                                <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-md text-sm">
-                                    Unavailable
-                                </div>
-                            )}
-                        </div>
-                        <div className="p-4">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-2">{book.title}</h3>
-                            <p className="text-gray-600 text-sm mb-3">{book.author}</p>
-                            <div className="flex gap-4 text-sm mb-3">
-                                <span className="text-yellow-500">★ {book.rating}</span>
-                                <span className="text-gray-500">{book.language}</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {book.genre.map((g, index) => (
-                                    <span 
-                                        key={index} 
-                                        className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs"
-                                    >
-                                        {g}
-                                    </span>
-                                ))}
-                            </div>
-                            <Link 
-                                to={`/book/${book.id}`}
-                                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                            >
-                                Learn More
-                            </Link>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                        Try Again
+                    </button>
+                </div>
+            ) : filteredBooks.length === 0 ? (
+                <div className="text-center py-12">
+                    <p className="text-gray-600">No books found matching your search.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredBooks.map((book) => (
+                        <BookCard key={book.id} book={book} />
+                    ))}
+                </div>
+            )}
         </div>
     );
-}; 
+};

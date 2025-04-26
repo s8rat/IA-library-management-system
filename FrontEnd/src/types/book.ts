@@ -6,13 +6,8 @@ export interface Book {
     publishedDate?: string;
     available: boolean;
     quantity: number;
-    cover?: string;
-    description?: string;
-    rating?: number;
-    genre?: string[];
-    language?: string;
-    pages?: number;
-    publishYear?: number;
+    coverImage?: string; // Base64 string for the cover image
+    coverImageContentType?: string; // MIME type for the cover image
 }
 
 export interface CreateBookDTO {
@@ -21,4 +16,5 @@ export interface CreateBookDTO {
     isbn?: string;
     publishedDate?: string;
     quantity: number;
-} 
+    coverImageFile?: File; // File object for uploading the cover image
+}

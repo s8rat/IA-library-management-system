@@ -1,14 +1,50 @@
 import { Link } from 'react-router-dom';
-import { books } from '../data/books';
+import { useState, useEffect } from 'react';
 import { BookCard } from '../components/BookCard';
+import { Book } from '../types/book';
+import api from '../Services/api';
 
 export const Home = () => {
-    // Sort books by rating (handling undefined ratings)
-    const sortedBooks = [...books].sort((a, b) => {
-        const ratingA = a.rating ?? 0;
-        const ratingB = b.rating ?? 0;
-        return ratingB - ratingA;
-    });
+    const [books, setBooks] = useState<Book[]>([]);
+    const [error, setError] = useState<string | null>(null);
+
+    // Define services array with proper syntax
+    const services = [
+        {
+            id: 'service-1',
+            icon: '📚',
+            title: 'Book Lending',
+            description: 'Borrow physical books from our extensive collection'
+        },
+        {
+            id: 'service-2',
+            icon: '📱',
+            title: 'E-Books',
+            description: 'Access digital books anytime, anywhere'
+        },
+        {
+            id: 'service-3',
+            icon: '👥',
+            title: 'Community',
+            description: 'Join our reading community and share your thoughts'
+        }
+    ];
+
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                const response = await api.get('/api/Books');
+                setBooks(response.data);
+            } catch (error) {
+                console.error('Error fetching books:', error);
+                setError('Failed to fetch books. Please try again later.');
+            }
+        };
+        fetchBooks();
+    }, []);
+
+    // Sort books alphabetically by title, with a fallback for undefined titles
+    const sortedBooks = [...books].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
 
     return (
         <div className="w-full min-h-screen bg-gray-50 justify-items-center">
@@ -46,13 +82,9 @@ export const Home = () => {
                         Our Services
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-                        {[
-                            { icon: '📚', title: 'Book Lending', description: 'Borrow physical books from our extensive collection' },
-                            { icon: '📱', title: 'E-Books', description: 'Access digital books anytime, anywhere' },
-                            { icon: '👥', title: 'Community', description: 'Join our reading community and share your thoughts' },
-                        ].map((service, index) => (
+                        {services.map((service) => (
                             <div 
-                                key={index}
+                                key={service.id}
                                 className="bg-gray-50 p-8 rounded-lg text-center shadow-md hover:shadow-lg transition-all w-full max-w-sm"
                             >
                                 <div className="text-5xl text-blue-600 mb-4">{service.icon}</div>
@@ -68,13 +100,17 @@ export const Home = () => {
             <section className="px-4 sm:px-6 lg:px-8 py-16">
                 <div className="max-w-6xl mx-auto">
                     <h2 className="text-3xl font-bold mb-12 text-center">Popular Books</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-                        {sortedBooks.slice(0, 6).map((book) => (
-                            <div className="w-full max-w-sm">
-                                <BookCard key={book.id} book={book} />
-                            </div>
-                        ))}
-                    </div>
+                    {error ? (
+                        <p className="text-center text-red-500">{error}</p>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+                            {sortedBooks.slice(0, 6).map((book) => (
+                                <div className="w-full max-w-sm" key={book.id}>
+                                    <BookCard book={book} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 

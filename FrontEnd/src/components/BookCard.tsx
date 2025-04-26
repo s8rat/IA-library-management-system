@@ -17,7 +17,7 @@ export const BookCard = ({ book }: BookCardProps) => {
             {/* Image Section */}
             <div className="h-48 w-full overflow-hidden rounded-t-xl bg-gray-100">
                 <img 
-                    src={book.cover || '/default-book-cover.jpg'} 
+                    src={book.coverImage ? `data:${book.coverImageContentType};base64,${book.coverImage}` : '/default-book-cover.jpg'} 
                     alt={`Cover of ${book.title}`}
                     className="w-full h-full object-cover"
                 />
@@ -52,4 +52,4 @@ export const BookCard = ({ book }: BookCardProps) => {
             </div>
         </div>
     );
-}; 
+};
