@@ -5,6 +5,7 @@ import { Login } from './Pages/Login';
 import { Register } from './Pages/Register';
 import { ExploreBooks } from './Pages/ExploreBooks';
 import { BookDetail } from './Pages/BookDetail';
+import { AdminDashboard } from './Pages/AdminDashboard';
 
 const App = () => {
     return (
@@ -18,6 +19,7 @@ const App = () => {
                         <Route path="/register" element={<Register />} />
                         <Route path="/explore" element={<ExploreBooks />} />
                         <Route path="/book/:id" element={<BookDetail />} />
+                        <Route path="/admin" element={<AdminDashboard />} />
                     </Routes>
                 </main>
                 <footer className="bg-white py-6 text-center text-gray-600 border-t border-gray-200">
