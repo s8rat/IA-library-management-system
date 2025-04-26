@@ -7,6 +7,7 @@ import { ExploreBooks } from '../Pages/ExploreBooks';
 import { Services } from '../Pages/Services';
 import { Navigation } from '../components/Navigation';
 import { Outlet } from 'react-router-dom';
+import { AdminDashboard } from '../Pages/AdminDashboard';
 
 export const router = createBrowserRouter([
     {
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
             {
                 path: '/register',
                 element: <Register />
+            },
+            {
+                path: '/admin',
+                element: <AdminDashboard />
             }
         ]
     }
