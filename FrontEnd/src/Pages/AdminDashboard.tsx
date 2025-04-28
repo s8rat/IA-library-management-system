@@ -1,52 +1,57 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUser,
+  faCog,
+  faChartBar,
+  faCrown,
+} from "@fortawesome/free-solid-svg-icons";
+import AdminCard from "../Components/AdminCard";
+import ViewBoard from "../Components/ViewBoard";
+
 export const AdminDashboard = () => {
-    return (
-        <div className="p-8 max-w-7xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Quick Stats */}
-                <div className="bg-white p-6 rounded-xl shadow-md">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Stats</h2>
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Total Books</span>
-                            <span className="font-semibold">0</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Available Books</span>
-                            <span className="font-semibold">0</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Total Users</span>
-                            <span className="font-semibold">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Recent Activity */}
-                <div className="bg-white p-6 rounded-xl shadow-md">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
-                    <div className="text-gray-600">
-                        No recent activity
-                    </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="bg-white p-6 rounded-xl shadow-md">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
-                    <div className="space-y-3">
-                        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                            Add New Book
-                        </button>
-                        <button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                            Manage Users
-                        </button>
-                        <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                            View Reports
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}; 
+  return (
+    <div className="max-w-7xl mx-auto grid grid-cols-3">
+      <div className="bg-gray-100 h-screen col-span-1 flex flex-col items-center justify-center border-r border-gray-500">
+        <AdminCard
+          name="Manage Users"
+          icon={
+            <FontAwesomeIcon
+              className="size-5 mr-2 text-gray-600"
+              icon={faUser}
+            />
+          }
+        />
+        <AdminCard
+          name="Settings"
+          icon={
+            <FontAwesomeIcon
+              className="size-5 mr-2 text-gray-600"
+              icon={faCog}
+            />
+          }
+        />
+        <AdminCard
+          name="Reports"
+          icon={
+            <FontAwesomeIcon
+              className="size-5 mr-2 text-gray-600"
+              icon={faChartBar}
+            />
+          }
+        />
+        <AdminCard
+          name="Manage Memeberships"
+          icon={
+            <FontAwesomeIcon
+              className="size-5 mr-2 text-gray-600"
+              icon={faCrown}
+            />
+          }
+        />
+      </div>
+      <div className="bg-gray-100 h-screen col-span-2 flex items-center justify-center">
+        <ViewBoard name="Users"></ViewBoard>
+      </div>
+    </div>
+  );
+};
