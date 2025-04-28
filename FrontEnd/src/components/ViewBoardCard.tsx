@@ -2,17 +2,18 @@ interface IViewBoardCard {
   name: string;
 }
 
-const ViewBoardCard = ({ name }: IViewBoardCard) => {
-  return (
-    <div>
-      <div className="flex flex-col items-center justify-start w-full min-h-screen py-10">
-        <div className="w-11/12 max-w-5xl bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">{name}</h1>
-          <div className="flex flex-col gap-4"></div>
-        </div>
-      </div>
+const ViewBoardCard = ({ name }: IViewBoardCard) => (
+  <div className="flex items-center justify-between bg-gray-50 rounded-lg border shadow-sm px-6 py-4">
+    <span className="text-gray-700 font-medium">{name}</span>
+    <div className="flex gap-2">
+      <button className="px-4 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition">
+        Edit
+      </button>
+      <button className="px-4 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition">
+        Delete
+      </button>
     </div>
-  );
-};
+  </div>
+);
 
 export default ViewBoardCard;

@@ -5,7 +5,7 @@ import { Login } from "./Pages/Login";
 import { Register } from "./Pages/Register";
 import { ExploreBooks } from "./Pages/ExploreBooks";
 import { BookDetail } from "./Pages/BookDetail";
-import { AdminDashboard } from "./Pages/AdminDashboard";
+import AdminDashboard from "./Pages/AdminDashboard";
 
 const App = () => {
   return (
