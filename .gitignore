@@ -2,10 +2,19 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+# Ignore Visual Studio files
 /.vs
-/BackEnd/.vs/BackEnd
-/BackEnd/.vs/ProjectEvaluation
-/BackEnd/bin/Debug/net9.0
-/BackEnd/obj
+/BackEnd/.vs/
+
+# Ignore build outputs
+/BackEnd/bin/
+/BackEnd/obj/
+
+# Ignore lock files
 FrontEnd/yarn.lock
+
+# Ignore sensitive configuration files
 BackEnd/appsettings.json
+
+# Optional: Add a template for appsettings.json
+# !BackEnd/appsettings.json.template
