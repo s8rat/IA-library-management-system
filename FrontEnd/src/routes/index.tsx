@@ -5,9 +5,9 @@ import { Login } from "../Pages/Login";
 import { Register } from "../Pages/Register";
 import { ExploreBooks } from "../Pages/ExploreBooks";
 import { Services } from "../Pages/Services";
-import { Navigation } from "../Components/Navigation";
+import { Navigation } from "../components/Navigation";
 import { Outlet } from "react-router-dom";
-import AdminDashboard from "../Pages/AdminDashboard";
+import { AdminDashboard } from "../Pages/AdminDashboard";
 
 export const router = createBrowserRouter([
   {
