@@ -18,3 +18,5 @@ BackEnd/appsettings.json
 
 # Optional: Add a template for appsettings.json
 # !BackEnd/appsettings.json.template
+
+.fake
