@@ -5,9 +5,10 @@ import { Login } from '../Pages/Login';
 import { Register } from '../Pages/Register';
 import { ExploreBooks } from '../Pages/ExploreBooks';
 import { Services } from '../Pages/Services';
-import { Navigation } from '../components/Navigation';
+import { Navigation } from '../Components/Navigation';
 import { Outlet } from 'react-router-dom';
 import { AdminDashboard } from '../Pages/AdminDashboard';
+import { Library } from '../Pages/Library';
 
 export const router = createBrowserRouter([
     {
@@ -19,7 +20,7 @@ export const router = createBrowserRouter([
                     <Outlet />
                 </main>
                 <footer className="bg-white py-6 text-center text-gray-600 border-t border-gray-200">
-                    <p>&copy; 2024 Aalam Al-Kutub. All rights reserved.</p>
+                    <p>&copy; 2025 Aalam Al-Kutub. All rights reserved.</p>
                 </footer>
             </div>
         ),
@@ -51,6 +52,10 @@ export const router = createBrowserRouter([
             {
                 path: '/admin',
                 element: <AdminDashboard />
+            },
+            {
+                path: '/library',
+                element: <Library />
             }
         ]
     }
