@@ -47,7 +47,7 @@ internal class Program
             {
                 //-------------------------------------- frontend url ---------------------------------------------//
                 policy
-                      .WithOrigins("http://localhost:5173","https://localhost:7229/scalar/")
+                      .WithOrigins("http://localhost:5173")
                       //.AllowAnyOrigin()
                       .AllowAnyHeader()
                       .AllowAnyMethod();
