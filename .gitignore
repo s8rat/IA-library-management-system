@@ -6,5 +6,6 @@
 /BackEnd/.vs/BackEnd
 /BackEnd/.vs/ProjectEvaluation
 /BackEnd/bin/Debug/net9.0
-FrontEnd/yarn.lock
-BackEnd/appsettings.json
+/BackEnd/obj
+/rontEnd/yarn.lock
+/BackEnd/appsettings.json

@@ -2,21 +2,6 @@
   "format": 1,
   "restore": {
 <<<<<<< HEAD
-    "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj": {}
-  },
-  "projects": {
-    "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj",
-        "projectName": "BackEnd",
-        "projectPath": "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj",
-        "packagesPath": "/Users/ahmedhazem/.nuget/packages/",
-        "outputPath": "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/obj/",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "/Users/ahmedhazem/.nuget/NuGet/NuGet.Config"
-=======
     "D:\\2-Mozakra\\1-SWE 22-26\\Year 3\\Semester 2\\Internet Application\\project\\IA-library-management-system\\BackEnd\\BackEnd.csproj": {}
   },
   "projects": {
@@ -31,7 +16,22 @@
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\lolko7ol\\AppData\\Roaming\\NuGet\\NuGet.Config"
->>>>>>> 3e24f2bde6dc0d968be9402db6aecbe98c76d9d5
+=======
+    "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj": {}
+  },
+  "projects": {
+    "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj",
+        "projectName": "BackEnd",
+        "projectPath": "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj",
+        "packagesPath": "/Users/ahmedhazem/.nuget/packages/",
+        "outputPath": "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/ahmedhazem/.nuget/NuGet/NuGet.Config"
+>>>>>>> a45c55398588f116d938e4f73af877f866b93309
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -134,10 +134,10 @@
             }
           },
 <<<<<<< HEAD
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
-=======
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
->>>>>>> 3e24f2bde6dc0d968be9402db6aecbe98c76d9d5
+=======
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+>>>>>>> a45c55398588f116d938e4f73af877f866b93309
         }
       }
     }
