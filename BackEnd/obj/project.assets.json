@@ -6061,11 +6061,25 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
+    "C:\\Users\\lolko7ol\\.nuget\\packages\\": {}
+=======
     "/Users/ahmedhazem/.nuget/packages/": {}
+>>>>>>> a45c55398588f116d938e4f73af877f866b93309
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
+      "projectUniqueName": "D:\\2-Mozakra\\1-SWE 22-26\\Year 3\\Semester 2\\Internet Application\\project\\IA-library-management-system\\BackEnd\\BackEnd.csproj",
+      "projectName": "BackEnd",
+      "projectPath": "D:\\2-Mozakra\\1-SWE 22-26\\Year 3\\Semester 2\\Internet Application\\project\\IA-library-management-system\\BackEnd\\BackEnd.csproj",
+      "packagesPath": "C:\\Users\\lolko7ol\\.nuget\\packages\\",
+      "outputPath": "D:\\2-Mozakra\\1-SWE 22-26\\Year 3\\Semester 2\\Internet Application\\project\\IA-library-management-system\\BackEnd\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\lolko7ol\\AppData\\Roaming\\NuGet\\NuGet.Config"
+=======
       "projectUniqueName": "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj",
       "projectName": "BackEnd",
       "projectPath": "/Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/BackEnd.csproj",
@@ -6074,6 +6088,7 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/ahmedhazem/.nuget/NuGet/NuGet.Config"
+>>>>>>> a45c55398588f116d938e4f73af877f866b93309
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -6175,7 +6190,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+=======
         "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+>>>>>>> a45c55398588f116d938e4f73af877f866b93309
       }
     }
   },
@@ -6184,7 +6203,11 @@
       "code": "Undefined",
       "level": "Warning",
       "warningLevel": 1,
+<<<<<<< HEAD
+      "message": "Problem reading the cache file D:\\2-Mozakra\\1-SWE 22-26\\Year 3\\Semester 2\\Internet Application\\project\\IA-library-management-system\\BackEnd\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+=======
       "message": "Problem reading the cache file /Users/ahmedhazem/Desktop/My Files/IA/IA-library-management-system/BackEnd/obj/project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+>>>>>>> a45c55398588f116d938e4f73af877f866b93309
     },
     {
       "code": "NU1701",
