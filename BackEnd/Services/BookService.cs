@@ -1,8 +1,8 @@
-﻿using BackEnd.Data;
+﻿using Azure.Core;
+using BackEnd.Data;
 using BackEnd.DTOs;
 using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace BackEnd.Services
 {
@@ -26,7 +26,9 @@ namespace BackEnd.Services
                     ISBN = b.ISBN,
                     PublishedDate = b.PublishedDate,
                     Available = b.Available,
-                    Quantity = b.Quantity
+                    Quantity = b.Quantity,
+                    CoverImage = b.CoverImage != null ? Convert.ToBase64String(b.CoverImage) : null,
+                    CoverImageContentType = b.CoverImageContentType
                 })
                 .ToListAsync();
         }
@@ -47,12 +49,24 @@ namespace BackEnd.Services
                 ISBN = book.ISBN,
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
-                Quantity = book.Quantity
+                Quantity = book.Quantity,
+                CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
+                CoverImageContentType = book.CoverImageContentType
             };
         }
 
         public async Task<BookDTO> AddBook(CreateBookDTO bookDTO)
         {
+
+            
+            // Replace the following line in the AddBook method:
+            
+
+            // With the following corrected code:
+            var contentType = bookDTO.CoverImageFile?.ContentType;
+            Console.WriteLine($"Received Content-Type: {contentType}");
+            Console.WriteLine($"Received Content-Type: {contentType}");
+
             if (await _context.Books.AnyAsync(b => b.ISBN == bookDTO.ISBN))
             {
                 throw new Exception("A book with this ISBN already exists");
@@ -68,8 +82,21 @@ namespace BackEnd.Services
                 Quantity = bookDTO.Quantity
             };
 
+            // Handle image upload
+            if (bookDTO.CoverImageFile != null && bookDTO.CoverImageFile.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await bookDTO.CoverImageFile.CopyToAsync(memoryStream);
+                    book.CoverImage = memoryStream.ToArray();
+                    book.CoverImageContentType = bookDTO.CoverImageFile.ContentType;
+                }
+            }
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
+
+
 
             return new BookDTO
             {
@@ -79,7 +106,9 @@ namespace BackEnd.Services
                 ISBN = book.ISBN,
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
-                Quantity = book.Quantity
+                Quantity = book.Quantity,
+                CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
+                CoverImageContentType = book.CoverImageContentType
             };
         }
 
@@ -91,7 +120,6 @@ namespace BackEnd.Services
                 throw new Exception("Book not found");
             }
 
-            // Check if ISBN is being changed to one that already exists
             if (book.ISBN != bookDTO.ISBN && await _context.Books.AnyAsync(b => b.ISBN == bookDTO.ISBN))
             {
                 throw new Exception("A book with this ISBN already exists");
@@ -104,6 +132,17 @@ namespace BackEnd.Services
             book.Quantity = bookDTO.Quantity;
             book.Available = bookDTO.Quantity > 0;
 
+            // Update image if new one is provided
+            if (bookDTO.CoverImageFile != null && bookDTO.CoverImageFile.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await bookDTO.CoverImageFile.CopyToAsync(memoryStream);
+                    book.CoverImage = memoryStream.ToArray();
+                    book.CoverImageContentType = bookDTO.CoverImageFile.ContentType;
+                }
+            }
+
             _context.Books.Update(book);
             await _context.SaveChangesAsync();
 
@@ -115,7 +154,9 @@ namespace BackEnd.Services
                 ISBN = book.ISBN,
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
-                Quantity = book.Quantity
+                Quantity = book.Quantity,
+                CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
+                CoverImageContentType = book.CoverImageContentType
             };
         }
 
@@ -127,7 +168,6 @@ namespace BackEnd.Services
                 throw new Exception("Book not found");
             }
 
-            // Check if book is currently borrowed
             var isBorrowed = await _context.BorrowRecords
                 .AnyAsync(br => br.BookId == id && br.Status == "Borrowed");
 
@@ -155,7 +195,9 @@ namespace BackEnd.Services
                     ISBN = b.ISBN,
                     PublishedDate = b.PublishedDate,
                     Available = b.Available,
-                    Quantity = b.Quantity
+                    Quantity = b.Quantity,
+                    CoverImage = b.CoverImage != null ? Convert.ToBase64String(b.CoverImage) : null,
+                    CoverImageContentType = b.CoverImageContentType
                 })
                 .ToListAsync();
         }

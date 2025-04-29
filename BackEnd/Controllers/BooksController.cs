@@ -41,9 +41,10 @@ namespace BackEnd.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpPost]
-        public async Task<IActionResult> AddBook([FromBody] CreateBookDTO bookDTO)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> AddBook([FromForm] CreateBookDTO bookDTO)
         {
             try
             {
@@ -56,9 +57,9 @@ namespace BackEnd.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(long id, [FromBody] CreateBookDTO bookDTO)
+        public async Task<ActionResult<BookDTO>> UpdateBook(long id, [FromForm] CreateBookDTO bookDTO)
         {
             try
             {
@@ -67,11 +68,11 @@ namespace BackEnd.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ex.Message);
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(long id)
         {

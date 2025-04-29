@@ -17,10 +17,14 @@ namespace BackEnd.Data
         public DbSet<LibrarianRequest> LibrarianRequests { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<UserMembership> UserMemberships { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+
 
             // User configurations
             modelBuilder.Entity<User>(entity =>
@@ -105,6 +109,66 @@ namespace BackEnd.Data
                 entity.Property(um => um.Status)
                     .HasDefaultValue("Pending");
             });
+
+            SeedData(modelBuilder);
         }
+
+        private void SeedData(ModelBuilder modelBuilder)
+        {
+            // Seed Books
+            modelBuilder.Entity<Book>().HasData(
+                new Book
+                {
+                    Id = 1,
+                    Title = "C# Programming",
+                    Author = "John Doe",
+                    ISBN = "978-3-16-148410-0",
+                    PublishedDate = new DateTime(2020, 1, 1),
+                    Available = true,
+                    Quantity = 5
+                },
+                new Book
+                {
+                    Id = 2,
+                    Title = "ASP.NET Core Guide",
+                    Author = "Jane Smith",
+                    ISBN = "978-1-23-456789-0",
+                    PublishedDate = new DateTime(2021, 5, 15),
+                    Available = true,
+                    Quantity = 3
+                }
+            );
+
+            // Seed Memberships
+            modelBuilder.Entity<Membership>().HasData(
+                new Membership
+                {
+                    MembershipId = 1,
+                    MembershipType = "Standard",
+                    BorrowLimit = 5,
+                    DurationInDays = 30,
+                    Price = 9.99m,
+                    Description = "Standard membership with a borrow limit of 5 books.",
+                    IsFamilyPlan = false,
+                    MaxFamilyMembers = null,
+                    RequiresApproval = false,
+                    CreatedAt = new DateTime(2025, 4, 1) // Static value
+                },
+                new Membership
+                {
+                    MembershipId = 2,
+                    MembershipType = "Family",
+                    BorrowLimit = 10,
+                    DurationInDays = 30,
+                    Price = 19.99m,
+                    Description = "Family membership with a borrow limit of 10 books.",
+                    IsFamilyPlan = true,
+                    MaxFamilyMembers = 4,
+                    RequiresApproval = true,
+                    CreatedAt = new DateTime(2025, 4, 1) // Static value
+                }
+            );
+        }
+
     }
 }

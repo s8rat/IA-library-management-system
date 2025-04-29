@@ -37,6 +37,12 @@ namespace BackEnd.Migrations
                     b.Property<bool>("Available")
                         .HasColumnType("bit");
 
+                    b.Property<byte[]>("CoverImage")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("CoverImageContentType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ISBN")
                         .HasColumnType("nvarchar(450)");
 
@@ -57,6 +63,28 @@ namespace BackEnd.Migrations
                         .HasFilter("[ISBN] IS NOT NULL");
 
                     b.ToTable("Books");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Author = "John Doe",
+                            Available = true,
+                            ISBN = "978-3-16-148410-0",
+                            PublishedDate = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Quantity = 5,
+                            Title = "C# Programming"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Author = "Jane Smith",
+                            Available = true,
+                            ISBN = "978-1-23-456789-0",
+                            PublishedDate = new DateTime(2021, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Quantity = 3,
+                            Title = "ASP.NET Core Guide"
+                        });
                 });
 
             modelBuilder.Entity("BackEnd.Models.BorrowRecord", b =>
@@ -132,6 +160,34 @@ namespace BackEnd.Migrations
                     b.ToTable("BorrowRequests");
                 });
 
+            modelBuilder.Entity("BackEnd.Models.ChatMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("BackEnd.Models.LibrarianRequest", b =>
                 {
                     b.Property<long>("Id")
@@ -172,15 +228,34 @@ namespace BackEnd.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SSN")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -288,6 +363,33 @@ namespace BackEnd.Migrations
                     b.HasKey("MembershipId");
 
                     b.ToTable("Memberships");
+
+                    b.HasData(
+                        new
+                        {
+                            MembershipId = 1,
+                            BorrowLimit = 5,
+                            CreatedAt = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Standard membership with a borrow limit of 5 books.",
+                            DurationInDays = 30,
+                            IsFamilyPlan = false,
+                            MembershipType = "Standard",
+                            Price = 9.99m,
+                            RequiresApproval = false
+                        },
+                        new
+                        {
+                            MembershipId = 2,
+                            BorrowLimit = 10,
+                            CreatedAt = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Family membership with a borrow limit of 10 books.",
+                            DurationInDays = 30,
+                            IsFamilyPlan = true,
+                            MaxFamilyMembers = 4,
+                            MembershipType = "Family",
+                            Price = 19.99m,
+                            RequiresApproval = true
+                        });
                 });
 
             modelBuilder.Entity("BackEnd.Models.BorrowRecord", b =>
@@ -332,6 +434,17 @@ namespace BackEnd.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackEnd.Models.ChatMessage", b =>
+                {
+                    b.HasOne("BackEnd.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

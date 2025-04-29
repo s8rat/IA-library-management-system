@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd.Models
 {
-    // Models/Book.cs
     public class Book
     {
         [Key]
@@ -17,15 +16,18 @@ namespace BackEnd.Models
         public string Author { get; set; }
 
         public string? ISBN { get; set; }
-
         public DateTime? PublishedDate { get; set; }
-
         public bool Available { get; set; } = true;
-
         public int Quantity { get; set; } = 1;
+
+        // Photo properties
+        public byte[]? CoverImage { get; set; }
+        public string? CoverImageContentType { get; set; }
+
+        [NotMapped]
+        public IFormFile? CoverImageFile { get; set; }
 
         public BorrowRequest BorrowRequest { get; set; }
         public ICollection<BorrowRecord> BorrowRecords { get; set; }
     }
-
 }
