@@ -1,13 +1,14 @@
-import { createBrowserRouter } from "react-router";
-import { Home } from "../pages/Home";
-import { BookDetail } from "../pages/BookDetail";
-import { Login } from "../pages/auth/Login";
-import { Register } from "../pages/auth/Register";
-import { ExploreBooks } from "../pages/ExploreBooks";
-import { Services } from "../pages/Services";
-import RootLayout from "../pages/Layout";
-import AuthLayout from "../pages/auth/Layout";
-import AdminDashboard from "../pages/AdminDashboard";
+import { createBrowserRouter } from "react-router-dom";
+import { Home } from "../Pages/Home";
+import { BookDetail } from "../Pages/BookDetail";
+import { Login } from "../Pages/auth/Login";
+import { Register } from "../Pages/auth/Register";
+import { ExploreBooks } from "../Pages/ExploreBooks";
+import { Services } from "../Pages/Services";
+import RootLayout from "../Pages/Layout";
+import AuthLayout from "../Pages/auth/Layout";
+import AdminDashboard from "../Pages/AdminDashboard";
+import { Library } from "../Pages/Library";
 
 export const router = createBrowserRouter([
     {
@@ -34,6 +35,10 @@ export const router = createBrowserRouter([
                 path: "/admin",
                 element: <AdminDashboard />,
             },
+            {
+                path: "/library",
+                element: <Library />,
+            },
         ],
     },
     {
@@ -41,11 +46,11 @@ export const router = createBrowserRouter([
         element: <AuthLayout />,
         children: [
             {
-                path: "/login",
+                path: "login",
                 element: <Login />,
             },
             {
-                path: "/register",
+                path: "register",
                 element: <Register />,
             },
         ],

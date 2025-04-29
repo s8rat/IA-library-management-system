@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { Navigation } from "../components/Navigation";
+import { Navigation } from "../Components/Navigation";
 // The <Outlet /> component is a placeholder that renders the child routes defined in the router configuration.
 // It allows nested routes to display their components within the parent layout.
 const RootLayout = () => {
@@ -11,7 +11,7 @@ const RootLayout = () => {
                     <Outlet />
                 </main>
                 <footer className="bg-white py-6 text-center text-gray-600 border-t border-gray-200">
-                    <p>&copy; 2024 Aalam Al-Kutub. All rights reserved.</p>
+                    <p>&copy; 2025 Aalam Al-Kutub. All rights reserved.</p>
                 </footer>
             </div>
         </>
