@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Book } from '../types/book';
 import api from '../Services/api';
-import { BookCard } from '../Components/BookCard';
+import { BookCard } from '../components/BookCard';
 
 export const ExploreBooks = () => {
     const [books, setBooks] = useState<Book[]>([]);
