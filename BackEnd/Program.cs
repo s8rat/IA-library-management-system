@@ -13,7 +13,7 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-        //start
+        //start project
         var builder = WebApplication.CreateBuilder(args);
 
         // Add DbContext
