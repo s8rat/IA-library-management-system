@@ -10,6 +10,8 @@
 /BackEnd/bin/
 /BackEnd/obj/
 
+node_modules/
+
 # Ignore lock files
 FrontEnd/yarn.lock
 
