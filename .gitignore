@@ -20,3 +20,4 @@ BackEnd/appsettings.json
 # !BackEnd/appsettings.json.template
 
 .fake
+node_modules/
