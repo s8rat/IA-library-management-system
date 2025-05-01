@@ -14,7 +14,8 @@ export default {
         'fade-in': 'fade-in 0.3s ease-in-out',
       },
       colors: {
-          'primary': '#2c3e50'
+            'primary': '#2c3e50',
+            'secondary': '#16a085',
       }
     },
   },
