@@ -6061,31 +6061,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\antec\\.nuget\\packages\\": {},
-    "E:\\VSSharedComp\\NuGetPackages": {}
+    "C:\\Users\\lolko7ol\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\3rd year- 2nd term\\IA\\ASP .NET\\IA-ProjectFR\\Faculty-Team-2026\\IA-library-management-system\\BackEnd\\BackEnd.csproj",
+      "projectUniqueName": "D:\\2-Mozakra\\1-SWE 22-26\\Year 3\\Semester 2\\Internet Application\\project\\IA-library-management-system\\BackEnd\\BackEnd.csproj",
       "projectName": "BackEnd",
-      "projectPath": "E:\\3rd year- 2nd term\\IA\\ASP .NET\\IA-ProjectFR\\Faculty-Team-2026\\IA-library-management-system\\BackEnd\\BackEnd.csproj",
-      "packagesPath": "C:\\Users\\antec\\.nuget\\packages\\",
-      "outputPath": "E:\\3rd year- 2nd term\\IA\\ASP .NET\\IA-ProjectFR\\Faculty-Team-2026\\IA-library-management-system\\BackEnd\\obj\\",
+      "projectPath": "D:\\2-Mozakra\\1-SWE 22-26\\Year 3\\Semester 2\\Internet Application\\project\\IA-library-management-system\\BackEnd\\BackEnd.csproj",
+      "packagesPath": "C:\\Users\\lolko7ol\\.nuget\\packages\\",
+      "outputPath": "D:\\2-Mozakra\\1-SWE 22-26\\Year 3\\Semester 2\\Internet Application\\project\\IA-library-management-system\\BackEnd\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "E:\\VSSharedComp\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\antec\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\lolko7ol\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -6182,7 +6175,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   },

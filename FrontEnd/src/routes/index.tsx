@@ -9,6 +9,7 @@ import RootLayout from "../Pages/Layout";
 import AuthLayout from "../Pages/auth/Layout";
 import AdminDashboard from "../Pages/AdminDashboard";
 import { Library } from "../Pages/Library";
+import UserProfile from "../Pages/auth/UserProfile";
 
 export const router = createBrowserRouter([
     {
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
             {
                 path: "register",
                 element: <Register />,
+            },
+            {
+                path: "user/:id",
+                element: <UserProfile />,
             },
         ],
     }

@@ -222,115 +222,278 @@ const BookManage: React.FC = () => {
                     </Dialog.Panel>
                 </div>
             </Dialog>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f5f5f5' }}>
-                <div style={{ maxWidth: 600, width: '100%', margin: '40px auto', padding: 24, background: '#fafafa', borderRadius: 8, boxShadow: '0 2px 8px #eee', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <h1 style={{ textAlign: 'center', marginBottom: 32, width: '100%' }}>Book Management</h1>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20, gap: 12, width: '100%', justifyContent: 'center' }}>
+            <div style={{
+                minHeight: '100vh',
+                background: '#f5f5f5',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                paddingTop: 40,
+                paddingBottom: 40
+            }}>
+                <div style={{
+                    width: '100%',
+                    maxWidth: 700,
+                    background: '#fafafa',
+                    borderRadius: 12,
+                    boxShadow: '0 2px 12px #e0e0e0',
+                    padding: 32,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                }}>
+                    <h1 style={{
+                        textAlign: 'center',
+                        marginBottom: 8, // reduced from 32 to 8
+                        width: '100%',
+                        fontSize: 28,
+                        fontWeight: 700,
+                        letterSpacing: 1
+                    }}>Book Management</h1>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: 8, // reduced from 28 to 8
+                        gap: 16,
+                        width: '100%',
+                        justifyContent: 'center'
+                    }}>
                         <input
                             type="text"
                             placeholder="Search by title or author"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            style={{ flex: 1, padding: 8, borderRadius: 4, border: '1px solid #ccc', maxWidth: 350, background: '#fff', color: '#000' }}
+                            style={{
+                                flex: 1,
+                                minWidth: 0,
+                                padding: 10,
+                                borderRadius: 6,
+                                border: '1px solid #ccc',
+                                maxWidth: 350,
+                                background: '#fff',
+                                color: '#000',
+                                fontSize: 16
+                            }}
                         />
                         <button
                             onClick={() => setIsAddDialogOpen(true)}
-                            style={{ padding: '6px 18px', borderRadius: 4, background: '#1976d2', color: '#fff', border: 'none', cursor: 'pointer' }}
+                            style={{
+                                padding: '10px 28px',
+                                borderRadius: 6,
+                                background: '#1976d2',
+                                color: '#fff',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                                fontSize: 16,
+                                boxShadow: '0 1px 4px #1976d222'
+                            }}
                         >
                             Add Book
                         </button>
                     </div>
-                    {/* ...existing code for table and edit... */}
-                    <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0 1px 4px #eee', padding: 16, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <h2 style={{ marginBottom: 16, textAlign: 'center', width: '100%' }}>Book List</h2>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center' }}>
-                            <thead>
-                                <tr style={{ background: '#f0f0f0' }}>
-                                    <th style={{ padding: 8, borderBottom: '1px solid #ddd', textAlign: 'center' }}>Title</th>
-                                    <th style={{ padding: 8, borderBottom: '1px solid #ddd', textAlign: 'center' }}>Author</th>
-                                    <th style={{ padding: 8, borderBottom: '1px solid #ddd', textAlign: 'center' }}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredBooks.map((book) => (
-                                    <tr
-                                        key={book.id}
-                                        style={editingBook && editingBook.id === book.id ? { background: '#e3f2fd' } : {}}
-                                    >
-                                        <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'center', color: '#000' }}>
-                                            {editingBook && editingBook.id === book.id ? (
-                                                <input
-                                                    type="text"
-                                                    value={editingBook.title}
-                                                    placeholder={originalBook?.title || ''}
-                                                    onChange={e =>
-                                                        setEditingBook({ ...editingBook, title: e.target.value })
-                                                    }
-                                                    style={{ width: '90%', padding: 4, borderRadius: 4, border: '1px solid #ccc', background: '#fff', color: '#000' }}
-                                                />
-                                            ) : (
-                                                <strong>{book.title}</strong>
-                                            )}
-                                        </td>
-                                        <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'center', color: '#000' }}>
-                                            {editingBook && editingBook.id === book.id ? (
-                                                <input
-                                                    type="text"
-                                                    value={editingBook.author}
-                                                    placeholder={originalBook?.author || ''}
-                                                    onChange={e =>
-                                                        setEditingBook({ ...editingBook, author: e.target.value })
-                                                    }
-                                                    style={{ width: '90%', padding: 4, borderRadius: 4, border: '1px solid #ccc', background: '#fff', color: '#000' }}
-                                                />
-                                            ) : (
-                                                book.author
-                                            )}
-                                        </td>
-                                        <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'center' }}>
-                                            {editingBook && editingBook.id === book.id ? (
-                                                <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-                                                    <button
-                                                        onClick={handleSave}
-                                                        style={{ padding: '4px 12px', borderRadius: 4, background: '#1976d2', color: '#fff', border: 'none', cursor: 'pointer' }}
-                                                    >
-                                                        Save
-                                                    </button>
-                                                    <button
-                                                        onClick={handleCancelEdit}
-                                                        style={{ padding: '4px 12px', borderRadius: 4, background: '#aaa', color: '#fff', border: 'none', cursor: 'pointer' }}
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleEditBook(book)}
-                                                        style={{ marginRight: 8, padding: '4px 12px', borderRadius: 4, background: '#0288d1', color: '#fff', border: 'none', cursor: 'pointer' }}
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteBook(book.id)}
-                                                        style={{ padding: '4px 12px', borderRadius: 4, background: '#d32f2f', color: '#fff', border: 'none', cursor: 'pointer' }}
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </>
-                                            )}
-                                        </td>
+                    <div style={{
+                        background: '#fff',
+                        borderRadius: 8,
+                        boxShadow: '0 1px 6px #eee',
+                        padding: 20,
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
+                    }}>
+                        <h2 style={{
+                            marginBottom: 18,
+                            textAlign: 'center',
+                            width: '100%',
+                            fontSize: 20,
+                            fontWeight: 600
+                        }}>Book List</h2>
+                        <div style={{ width: '100%', overflowX: 'auto' }}>
+                            <table style={{
+                                width: '100%',
+                                borderCollapse: 'collapse',
+                                textAlign: 'center',
+                                minWidth: 400
+                            }}>
+                                <thead>
+                                    <tr style={{ background: '#f0f0f0' }}>
+                                        <th style={{
+                                            padding: 10,
+                                            borderBottom: '1px solid #ddd',
+                                            textAlign: 'center',
+                                            fontWeight: 600,
+                                            fontSize: 15
+                                        }}>Title</th>
+                                        <th style={{
+                                            padding: 10,
+                                            borderBottom: '1px solid #ddd',
+                                            textAlign: 'center',
+                                            fontWeight: 600,
+                                            fontSize: 15
+                                        }}>Author</th>
+                                        <th style={{
+                                            padding: 10,
+                                            borderBottom: '1px solid #ddd',
+                                            textAlign: 'center',
+                                            fontWeight: 600,
+                                            fontSize: 15
+                                        }}>Actions</th>
                                     </tr>
-                                ))}
-                                {filteredBooks.length === 0 && (
-                                    <tr>
-                                        <td colSpan={3} style={{ textAlign: 'center', padding: 16, color: '#888' }}>
-                                            No books found.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {filteredBooks.map((book) => (
+                                        <tr
+                                            key={book.id}
+                                            style={editingBook && editingBook.id === book.id ? { background: '#e3f2fd' } : {}}
+                                        >
+                                            <td style={{
+                                                padding: 10,
+                                                borderBottom: '1px solid #eee',
+                                                textAlign: 'center',
+                                                color: '#000'
+                                            }}>
+                                                {editingBook && editingBook.id === book.id ? (
+                                                    <input
+                                                        type="text"
+                                                        value={editingBook.title}
+                                                        placeholder={originalBook?.title || ''}
+                                                        onChange={e =>
+                                                            setEditingBook({ ...editingBook, title: e.target.value })
+                                                        }
+                                                        style={{
+                                                            width: '90%',
+                                                            padding: 6,
+                                                            borderRadius: 4,
+                                                            border: '1px solid #ccc',
+                                                            background: '#fff',
+                                                            color: '#000',
+                                                            fontSize: 15
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <strong>{book.title}</strong>
+                                                )}
+                                            </td>
+                                            <td style={{
+                                                padding: 10,
+                                                borderBottom: '1px solid #eee',
+                                                textAlign: 'center',
+                                                color: '#000'
+                                            }}>
+                                                {editingBook && editingBook.id === book.id ? (
+                                                    <input
+                                                        type="text"
+                                                        value={editingBook.author}
+                                                        placeholder={originalBook?.author || ''}
+                                                        onChange={e =>
+                                                            setEditingBook({ ...editingBook, author: e.target.value })
+                                                        }
+                                                        style={{
+                                                            width: '90%',
+                                                            padding: 6,
+                                                            borderRadius: 4,
+                                                            border: '1px solid #ccc',
+                                                            background: '#fff',
+                                                            color: '#000',
+                                                            fontSize: 15
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    book.author
+                                                )}
+                                            </td>
+                                            <td style={{
+                                                padding: 10,
+                                                borderBottom: '1px solid #eee',
+                                                textAlign: 'center'
+                                            }}>
+                                                {editingBook && editingBook.id === book.id ? (
+                                                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                                                        <button
+                                                            onClick={handleSave}
+                                                            style={{
+                                                                padding: '6px 16px',
+                                                                borderRadius: 4,
+                                                                background: '#1976d2',
+                                                                color: '#fff',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                fontWeight: 500,
+                                                                fontSize: 15
+                                                            }}
+                                                        >
+                                                            Save
+                                                        </button>
+                                                        <button
+                                                            onClick={handleCancelEdit}
+                                                            style={{
+                                                                padding: '6px 16px',
+                                                                borderRadius: 4,
+                                                                background: '#aaa',
+                                                                color: '#fff',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                fontWeight: 500,
+                                                                fontSize: 15
+                                                            }}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                                                        <button
+                                                            onClick={() => handleEditBook(book)}
+                                                            style={{
+                                                                padding: '6px 16px',
+                                                                borderRadius: 4,
+                                                                background: '#0288d1',
+                                                                color: '#fff',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                fontWeight: 500,
+                                                                fontSize: 15
+                                                            }}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteBook(book.id)}
+                                                            style={{
+                                                                padding: '6px 16px',
+                                                                borderRadius: 4,
+                                                                background: '#d32f2f',
+                                                                color: '#fff',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                fontWeight: 500,
+                                                                fontSize: 15
+                                                            }}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {filteredBooks.length === 0 && (
+                                        <tr>
+                                            <td colSpan={3} style={{
+                                                textAlign: 'center',
+                                                padding: 20,
+                                                color: '#888',
+                                                fontSize: 16
+                                            }}>
+                                                No books found.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
