@@ -27,18 +27,22 @@ export const Navigation = () => {
     ];
 
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-            isScrolled ? 'bg-white shadow-lg' : 'bg-white/90'
+        <nav className={`fixed top-0 left-0 right-0 z-50 text-white transition-all duration-300 ${
+            isScrolled ? 'bg-primary shadow-lg' : 'bg-primary'
         }`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-full mx-32 px-4 sm:px-6 lg:px-8">
                 <div className="relative flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
                     <Link 
                         to="/" 
-                        className="flex items-center gap-2 text-xl md:text-2xl font-bold transition-colors z-10"
+                        className="h-full flex items-center gap-2 text-xl md:text-2xl transition-colors z-10 text-white hover:text-white font-poppins"
                     >
-                        <span className="text-2xl md:text-3xl text-blue-600">📚</span>
-                        <span className="hidden sm:inline text-gray-800 hover:text-blue-600">Aalam Al-Kutub</span>
+                        <img 
+                            src="/Image/aalm-alkutub-logo.png" 
+                            alt="logo" 
+                            className="h-full relative after:content-[''] after:absolute after:top-0 after:right-[-8px] after:h-full after:w-[2px] after:bg-white"
+                        />
+                        <span className="hidden sm:inline font-extralight">Aalam Al-Kutub</span>
                     </Link>
 
                     {/* Navigation Links - Adaptive for both mobile and desktop */}
@@ -50,7 +54,7 @@ export const Navigation = () => {
                                 <Link
                                     key={link.to}
                                     to={link.to}
-                                    className={`text-gray-800 hover:text-blue-600 transition-colors py-2 md:py-0 ${
+                                    className={`text-white hover:text-gray-500  font-poppins transition-colors py-2 md:py-0 ${
                                         location.pathname === link.to ? 'text-blue-600 font-medium' : ''
                                     }`}
                                 >
@@ -59,7 +63,7 @@ export const Navigation = () => {
                             ))}
                             <Link 
                                 to="/auth/login" 
-                                className="mt-4 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-center"
+                                className="mt-4 md:mt-0 px-6 py-2 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl hover:text-gray-500 transition-all duration-300  text-center"
                             >
                                 Login
                             </Link>

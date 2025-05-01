@@ -2,7 +2,7 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{html,js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
@@ -13,6 +13,10 @@ export default {
       animation: {
         'fade-in': 'fade-in 0.3s ease-in-out',
       },
+      colors: {
+            'primary': '#2c3e50',
+            'secondary': '#16a085',
+      }
     },
   },
   plugins: [],
