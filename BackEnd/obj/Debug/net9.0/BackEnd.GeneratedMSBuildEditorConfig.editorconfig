@@ -17,21 +17,13 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BackEnd
 build_property.RootNamespace = BackEnd
-<<<<<<< HEAD
-build_property.ProjectDir = D:\2-Mozakra\1-SWE 22-26\Year 3\Semester 2\Internet Application\project\IA-library-management-system\BackEnd\
-=======
 build_property.ProjectDir = C:\Users\drago\Desktop\IA-Project\BackEnd\
->>>>>>> 6bc07ea5ad3a58e8ce72fd1a2789f775a8e3fb9a
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-<<<<<<< HEAD
-build_property.MSBuildProjectDirectory = D:\2-Mozakra\1-SWE 22-26\Year 3\Semester 2\Internet Application\project\IA-library-management-system\BackEnd
-=======
 build_property.MSBuildProjectDirectory = C:\Users\drago\Desktop\IA-Project\BackEnd
->>>>>>> 6bc07ea5ad3a58e8ce72fd1a2789f775a8e3fb9a
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
