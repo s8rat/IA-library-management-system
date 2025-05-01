@@ -66,7 +66,7 @@ export const Login = () => {
                         <p className="text-sm text-gray-600">
                             Don't have an account?{' '}
                             <Link 
-                                to="/register" 
+                                to="/auth/register" 
                                 className="font-medium text-blue-600 hover:text-blue-500"
                             >
                                 Register here

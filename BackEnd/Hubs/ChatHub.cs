@@ -83,23 +83,23 @@ namespace BackEnd.Hubs
         }
 
 
-        //    // Send a message to a specific group
-        //    public async Task SendMessageToGroup(string groupName, string user, string message)
+        // Send a message to a specific group
+        //public async Task SendMessageToGroup(string groupName, string user, string message)
+        //{
+        //    // Save the message to the database
+        //    var chatMessage = new ChatMessage
         //    {
-        //        // Save the message to the database
-        //        var chatMessage = new ChatMessage
-        //        {
-        //            User = user,
-        //            Message = message,
-        //            Timestamp = DateTime.UtcNow,
-        //            GroupName = groupName
-        //        };
-        //        _context.ChatMessages.Add(chatMessage);
-        //        await _context.SaveChangesAsync();
+        //        User = user,
+        //        Message = message,
+        //        Timestamp = DateTime.UtcNow,
+        //        GroupName = groupName
+        //    };
+        //    _context.ChatMessages.Add(chatMessage);
+        //    await _context.SaveChangesAsync();
 
-        //        // Broadcast the message to the group
-        //        await Clients.Group(groupName).SendAsync("ReceiveMessage", user, message);
-        //    }
+        //    // Broadcast the message to the group
+        //    await Clients.Group(groupName).SendAsync("ReceiveMessage", user, message);
+        //}
 
         //    // Join a specific group
         //    public async Task JoinGroup(string groupName)

@@ -13,6 +13,7 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
+        //start project
         var builder = WebApplication.CreateBuilder(args);
 
         // Add DbContext
@@ -50,8 +51,8 @@ internal class Program
                       .WithOrigins("http://localhost:5173")
                       //.AllowAnyOrigin()
                       .AllowAnyHeader()
-                      .AllowAnyMethod();
-                      //.AllowCredentials(); // Needed for SignalR
+                      .AllowAnyMethod()
+                      .AllowCredentials(); // Needed for SignalR
             });
         });
 
