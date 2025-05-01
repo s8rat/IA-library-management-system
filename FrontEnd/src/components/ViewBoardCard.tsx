@@ -1,12 +1,17 @@
+import { ReactNode } from "react";
 import Button from "./Button";
 
 interface IViewBoardCard {
   name: string;
+  description?: ReactNode;
 }
 
-const ViewBoardCard = ({ name }: IViewBoardCard) => (
+const ViewBoardCard = ({ name, description }: IViewBoardCard) => (
   <div className="flex items-center justify-between bg-gray-50 rounded-lg border shadow-sm px-6 py-4">
     <span className="text-gray-700 font-medium">{name}</span>
+    {description && (
+      <div className="text-gray-500 text-sm mt-1">{description}</div>
+    )}
     <div className="flex gap-2">
       <Button
         name="Edit"

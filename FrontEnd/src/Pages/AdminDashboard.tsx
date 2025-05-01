@@ -39,6 +39,11 @@ type Membership = {
   requireApproval: boolean;
 };
 
+const dummyRequests = [
+  { id: "1", status: "Pending", name: "Request from Alice" },
+  { id: "2", status: "Pending", name: "Request from Bob" },
+];
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("users");
   const [users, setUsers] = useState<User[]>([]);
@@ -46,7 +51,7 @@ const AdminDashboard = () => {
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch data for each tab
+  // Fetch data for each tab (except requests)
   useEffect(() => {
     setLoading(true);
     if (activeTab === "users") {
@@ -67,6 +72,8 @@ const AdminDashboard = () => {
         .then((res) => setMemberships(res.data))
         .catch(() => setMemberships([]))
         .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
   }, [activeTab]);
 
@@ -75,27 +82,61 @@ const AdminDashboard = () => {
   if (loading) {
     content = <div>Loading...</div>;
   } else if (activeTab === "users") {
-    content = users.map((user, idx) => (
+    content = users.map((user) => (
       <ViewBoardCard
-        key={user.id || idx}
-        name={user.username || user.firstName || "Unknown"}
-        // Add more props/actions as needed
+        key={user.id}
+        name={user.username}
+        description={
+          <div>
+            <div>
+              <strong>Full Name:</strong> {user.firstName} {user.lastname}
+            </div>
+            <div>
+              <strong>Email:</strong> {user.email}
+            </div>
+            <div>
+              <strong>Role:</strong> {user.role}
+            </div>
+            <div>
+              <strong>Phone:</strong> {user.phonenumber ?? "N/A"}
+            </div>
+          </div>
+        }
       />
     ));
   } else if (activeTab === "books") {
-    content = books.map((book, idx) => (
+    content = books.map((book) => (
       <ViewBoardCard
-        key={book.id || idx}
-        name={book.title || "Unknown Book"}
-        // Add more props/actions as needed
+        key={book.id}
+        name={book.title}
+        description={
+          <div>
+            <div>
+              <strong>Author:</strong> {book.author}
+            </div>
+            <div>
+              <strong>ISBN:</strong> {book.isbn}
+            </div>
+          </div>
+        }
+      />
+    ));
+  } else if (activeTab === "req") {
+    content = dummyRequests.map((req) => (
+      <ViewBoardCard
+        key={req.id}
+        name={req.name}
+        description={`Status: ${req.status}`}
       />
     ));
   } else if (activeTab === "memberships") {
     content = memberships.map((m, idx) => (
       <ViewBoardCard
         key={idx}
-        name={m.membershipType || "Membership"}
-        // Add more props/actions as needed
+        name={m.membershipType}
+        description={`Price: ${m.price ?? "N/A"} | Duration: ${
+          m.duration
+        } days | Limit: ${m.borrowLimit}`}
       />
     ));
   }
