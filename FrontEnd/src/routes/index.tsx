@@ -2,13 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 import { Home } from "../Pages/Home";
 import { BookDetail } from "../Pages/BookDetail";
 import { Login } from "../Pages/auth/Login";
-import { Register } from "../Pages/auth/Register";
 import { ExploreBooks } from "../Pages/ExploreBooks";
 import { Services } from "../Pages/Services";
 import RootLayout from "../Pages/Layout";
 import AuthLayout from "../Pages/auth/Layout";
 import AdminDashboard from "../Pages/AdminDashboard";
 import { Library } from "../Pages/Library";
+import Register from "../Pages/auth/Register";
 
 export const router = createBrowserRouter([
     {

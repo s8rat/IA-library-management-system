@@ -1,82 +1,87 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import InputField from '../../components/UI/InputField';
+import TelInput from '../../components/UI/TelInput';
 
-export const Register = () => {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
+const Register = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
-            alert('Passwords do not match');
-            return;
-        }
-        // TODO: Implement registration logic
-        console.log('Register:', formData);
-        navigate('/login');
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-                <input
+  return (
+    <div className="flex justify-center flex-1 gap-32">
+        <div className="p-8 self-center">
+            <div className="space-y-2 mb-5">
+                <h1 className="text-5xl font-poppins italic font-bold text-primary">Welcome To Aalam Al-Kutub</h1>
+                <p className="text-gray-600">
+                    Already have an account? {" "}
+                    <Link to="/signin" className="text-emerald-600 hover:underline">Log in</Link>
+                </p>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-6 flex flex-col">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <InputField
+                    label="First Name"
+                    name="firstName"
                     type="text"
-                    value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                <input
+                    />
+                    <InputField
+                    label="Last Name"
+                    name="lastName"
+                    type="text"
+                    required
+                    />
+                </div>
+
+                <InputField
+                    label="Email Address"
+                    name="email"
                     type="email"
-                    value={formData.email}
-                    onChange={e => setFormData({...formData, email: e.target.value})}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-            </div>
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-                <input
+
+                <TelInput />
+
+                <InputField
+                    label="National ID"
+                    name="nationalId"
+                    type="text"
+                    required
+                />
+
+                <InputField
+                    label="Password"
+                    name="password"
                     type="password"
-                    value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
                     required
-                    minLength={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-            </div>
-            <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Confirm Password:</label>
-                <input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
-                    required
-                    minLength={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
-            <div className="mb-4">
-                <button 
+
+                <div className="text-sm text-gray-600">
+                    By creating an account, you agree to our{" "}
+                    <Link to="/terms" className="text-emerald-600 hover:underline">
+                    Terms of use
+                    </Link>{" "}
+                    and{" "}
+                    <Link to="/privacy" className="text-emerald-600 hover:underline">
+                    Privacy Policy
+                    </Link>
+                </div>
+
+                <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
+                    className="w-fit px-8 bg-emerald-500 text-white rounded-full py-2.5 font-medium hover:bg-emerald-600 transition-colors"
                 >
-                    Register
+                    Sign Up
                 </button>
-            </div>
-            <p className="text-center text-gray-600">
-                Already have an account? <Link to="/auth/login" className="text-blue-500 hover:text-blue-600">Login here</Link>
-            </p>
-        </form>
-    );
-}; 
+            </form>
+        </div>
+        <div className='w-3/12 h-full'>
+            <img src="/Image/books_background.jpg" alt="books" className='h-full object-cover object-right' />
+        </div>
+    </div>
+  );
+};
+
+export default Register;
