@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   faUser,
   faBook,
@@ -8,7 +9,7 @@ import {
 import Sidebar from "../Components/Sidebar";
 import SearchBar from "../Components/SearchBar";
 import ViewBoardCard from "../Components/ViewBoardCard";
-import axios from "axios";
+import api from "../Services/api";
 import { Book } from "../types/book";
 
 const sidebarItems = [
@@ -18,27 +19,29 @@ const sidebarItems = [
   { key: "memberships", icon: faCrown, label: "Manage Membership plans" },
 ];
 
-type User = {
+interface User {
   id: string;
   username: string;
   role: string;
   email: string;
   firstName: string;
-  lastname: string;
-  phonenumber: string | null;
+  lastName: string;
+  phoneNumber?: string;
   ssn: string;
-};
+  createdAt: string;
+}
 
-type Membership = {
+interface Membership {
+  id: string;
   membershipType: string;
-  price: number | null;
-  duration: number;
   borrowLimit: number;
-  description: string;
-  isfamilyPlan: boolean;
-  maxFamilyMembers: number;
-  requireApproval: boolean;
-};
+  durationInDays: number;
+  price?: number;
+  description?: string;
+  isFamilyPlan: boolean;
+  maxFamilyMembers?: number;
+  requiresApproval: boolean;
+}
 
 const dummyRequests = [
   { id: "1", status: "Pending", name: "Request from Alice" },
@@ -46,53 +49,72 @@ const dummyRequests = [
 ];
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [originalUser, setOriginalUser] = useState<User | null>(null);
   const [books, setBooks] = useState<Book[]>([]);
   const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [newUser, setNewUser] = useState<User & { password: string }>({
-    id: "", // Remove this if backend generates IDs
+    id: "",
     username: "",
     role: "",
     email: "",
     firstName: "",
-    lastname: "",
-    phonenumber: "",
+    lastName: "",
+    phoneNumber: "",
     password: "",
     ssn: "",
+    createdAt: new Date().toISOString(),
   });
   const [addUserError, setAddUserError] = useState<string | null>(null);
 
-  // Fetch data for each tab (except requests)
+  // Check authentication and role
   useEffect(() => {
-    setLoading(true);
-    if (activeTab === "users") {
-      axios
-        .get("/api/Users")
-        .then((res) => setUsers(res.data))
-        .catch(() => setUsers([]))
-        .finally(() => setLoading(false));
-    } else if (activeTab === "books") {
-      axios
-        .get("/api/Books")
-        .then((res) => setBooks(res.data))
-        .catch(() => setBooks([]))
-        .finally(() => setLoading(false));
-    } else if (activeTab === "memberships") {
-      axios
-        .get("/api/Membership")
-        .then((res) => setMemberships(res.data))
-        .catch(() => setMemberships([]))
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole');
+    
+    if (!token || role !== 'Admin') {
+      navigate('/auth/login');
+      return;
     }
-  }, [activeTab]);
+
+    // Load data based on active tab
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        let response;
+        switch (activeTab) {
+          case 'users':
+            response = await api.get('/api/Users');
+            setUsers(response.data);
+            break;
+          case 'books':
+            response = await api.get('/api/Books');
+            setBooks(response.data);
+            break;
+          case 'memberships':
+            response = await api.get('/api/Membership');
+            setMemberships(response.data);
+            break;
+        }
+      } catch (err) {
+        setError('Failed to load data. Please try again.');
+        console.error('Error loading data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [activeTab, navigate]);
 
   // User actions
   const handleEditUser = (user: User) => {
@@ -107,7 +129,7 @@ const AdminDashboard = () => {
 
   const handleSaveUser = () => {
     if (editingUser && originalUser) {
-      axios
+      api
         .put(`/api/Users/${editingUser.id}`, editingUser)
         .then((response) => {
           const updated = response.data;
@@ -126,7 +148,7 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteUser = (id: string) => {
-    axios
+    api
       .delete(`/api/Users/${id}`)
       .then(() => {
         setUsers(users.filter((u) => u.id !== id));
@@ -138,9 +160,19 @@ const AdminDashboard = () => {
 
   const handleAddUser = () => {
     setAddUserError(null);
-    // Remove id from payload
-    const { id, ...userPayload } = newUser;
-    axios
+    // Create a new object without id and createdAt
+    const userPayload = {
+      username: newUser.username,
+      role: newUser.role,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      phoneNumber: newUser.phoneNumber,
+      password: newUser.password,
+      ssn: newUser.ssn
+    };
+    
+    api
       .post("/api/Users", userPayload)
       .then((response) => {
         setUsers([...users, response.data]);
@@ -151,10 +183,11 @@ const AdminDashboard = () => {
           role: "",
           email: "",
           firstName: "",
-          lastname: "",
-          phonenumber: "",
+          lastName: "",
+          phoneNumber: "",
           password: "",
           ssn: "",
+          createdAt: new Date().toISOString(),
         });
       })
       .catch((error) => {
@@ -169,10 +202,11 @@ const AdminDashboard = () => {
       role: "",
       email: "",
       firstName: "",
-      lastname: "",
-      phonenumber: "",
+      lastName: "",
+      phoneNumber: "",
       password: "",
       ssn: "",
+      createdAt: new Date().toISOString(),
     });
     setIsAddUserOpen(false);
   };
@@ -180,128 +214,160 @@ const AdminDashboard = () => {
   // Render content for each tab
   let content = null;
   if (loading) {
-    content = <div>Loading...</div>;
+    content = <div className="text-center py-8 text-gray-800">Loading...</div>;
   } else if (activeTab === "users") {
-    content = users.map((user) => (
-      <div
-        key={user.id}
-        className="bg-white rounded-lg shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-      >
-        <div className="flex-1">
-          {editingUser && editingUser.id === user.id ? (
-            <form
-              className="flex flex-col md:flex-row md:items-center gap-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSaveUser();
-              }}
-            >
-              <input
-                type="text"
-                value={editingUser.firstName}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, firstName: e.target.value })
-                }
-                className="border rounded px-2 py-1 mr-2 mb-1"
-                placeholder="First Name"
-                required
-              />
-              <input
-                type="text"
-                value={editingUser.lastname}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, lastname: e.target.value })
-                }
-                className="border rounded px-2 py-1 mr-2 mb-1"
-                placeholder="Last Name"
-                required
-              />
-              <input
-                type="email"
-                value={editingUser.email}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, email: e.target.value })
-                }
-                className="border rounded px-2 py-1 mr-2 mb-1"
-                placeholder="Email"
-                required
-              />
-              <input
-                type="text"
-                value={editingUser.role}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, role: e.target.value })
-                }
-                className="border rounded px-2 py-1 mr-2 mb-1"
-                placeholder="Role"
-                required
-              />
-              <input
-                type="text"
-                value={editingUser.phonenumber ?? ""}
-                onChange={(e) =>
-                  setEditingUser({
-                    ...editingUser,
-                    phonenumber: e.target.value,
-                  })
-                }
-                className="border rounded px-2 py-1 mr-2 mb-1"
-                placeholder="Phone"
-              />
-              <div className="flex gap-2 mt-2 md:mt-0">
-                <button
-                  type="submit"
-                  className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancelEdit}
-                  className="px-3 py-1 rounded bg-gray-400 text-white hover:bg-gray-500 transition"
-                >
-                  Cancel
-                </button>
+    content = (
+      <div className="space-y-4">
+        {users.map((user) => (
+          <div
+            key={user.id}
+            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200"
+          >
+            {editingUser && editingUser.id === user.id ? (
+              <form
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSaveUser();
+                }}
+              >
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-800">First Name</label>
+                  <input
+                    type="text"
+                    value={editingUser.firstName}
+                    onChange={(e) =>
+                      setEditingUser({ ...editingUser, firstName: e.target.value })
+                    }
+                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-800">Last Name</label>
+                  <input
+                    type="text"
+                    value={editingUser.lastName}
+                    onChange={(e) =>
+                      setEditingUser({ ...editingUser, lastName: e.target.value })
+                    }
+                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-800">Email</label>
+                  <input
+                    type="email"
+                    value={editingUser.email}
+                    onChange={(e) =>
+                      setEditingUser({ ...editingUser, email: e.target.value })
+                    }
+                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-800">Role</label>
+                  <select
+                    value={editingUser.role}
+                    onChange={(e) =>
+                      setEditingUser({ ...editingUser, role: e.target.value })
+                    }
+                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                    required
+                  >
+                    <option value="User">User</option>
+                    <option value="Librarian">Librarian</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-800">Phone</label>
+                  <input
+                    type="tel"
+                    value={editingUser.phoneNumber ?? ""}
+                    onChange={(e) =>
+                      setEditingUser({
+                        ...editingUser,
+                        phoneNumber: e.target.value,
+                      })
+                    }
+                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                  />
+                </div>
+                <div className="flex items-end space-x-2">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-800">Username:</span>
+                    <span className="font-medium text-gray-900">{user.username}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-800">Name:</span>
+                    <span className="text-gray-900">{user.firstName} {user.lastName}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-800">Email:</span>
+                    <span className="text-gray-900">{user.email}</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-800">Role:</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      user.role === 'Admin' ? 'bg-purple-100 text-purple-900' :
+                      user.role === 'Librarian' ? 'bg-blue-100 text-blue-900' :
+                      'bg-green-100 text-green-900'
+                    }`}>
+                      {user.role}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-800">Phone:</span>
+                    <span className="text-gray-900">{user.phoneNumber || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-800">Created:</span>
+                    <span className="text-gray-900">{new Date(user.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                <div className="col-span-2 flex justify-end space-x-2">
+                  <button
+                    onClick={() => handleEditUser(user)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteUser(user.id)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </form>
-          ) : (
-            <div>
-              <div>
-                <strong>Username:</strong> {user.username}
-              </div>
-              <div>
-                <strong>Full Name:</strong> {user.firstName} {user.lastname}
-              </div>
-              <div>
-                <strong>Email:</strong> {user.email}
-              </div>
-              <div>
-                <strong>Role:</strong> {user.role}
-              </div>
-              <div>
-                <strong>Phone:</strong> {user.phonenumber ?? "N/A"}
-              </div>
-            </div>
-          )}
-        </div>
-        {!editingUser || editingUser.id !== user.id ? (
-          <div className="flex gap-2 justify-end md:justify-center mt-2 md:mt-0">
-            <button
-              onClick={() => handleEditUser(user)}
-              className="px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 transition"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDeleteUser(user.id)}
-              className="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition"
-            >
-              Delete
-            </button>
+            )}
           </div>
-        ) : null}
+        ))}
       </div>
-    ));
+    );
   } else if (activeTab === "books") {
     content = books.map((book) => (
       <ViewBoardCard
@@ -333,7 +399,7 @@ const AdminDashboard = () => {
         key={idx}
         name={m.membershipType}
         description={`Price: ${m.price ?? "N/A"} | Duration: ${
-          m.duration
+          m.durationInDays
         } days | Limit: ${m.borrowLimit}`}
       />
     ));
@@ -377,9 +443,9 @@ const AdminDashboard = () => {
               <input
                 type="text"
                 placeholder="Last Name"
-                value={newUser.lastname}
+                value={newUser.lastName}
                 onChange={(e) =>
-                  setNewUser({ ...newUser, lastname: e.target.value })
+                  setNewUser({ ...newUser, lastName: e.target.value })
                 }
                 className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 required
@@ -417,11 +483,21 @@ const AdminDashboard = () => {
               <input
                 type="text"
                 placeholder="Phone"
-                value={newUser.phonenumber ?? ""}
+                value={newUser.phoneNumber ?? ""}
                 onChange={(e) =>
-                  setNewUser({ ...newUser, phonenumber: e.target.value })
+                  setNewUser({ ...newUser, phoneNumber: e.target.value })
                 }
                 className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              />
+              <input
+                type="text"
+                placeholder="SSN"
+                value={newUser.ssn}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, ssn: e.target.value })
+                }
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                required
               />
               {addUserError && (
                 <div className="text-red-600 text-center">{addUserError}</div>
@@ -453,6 +529,11 @@ const AdminDashboard = () => {
         />
         <main className="flex-1 px-10 py-8">
           <SearchBar onAdd={() => setIsAddUserOpen(true)} />
+          {error && (
+            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
           <div className="bg-white rounded-xl shadow-md border p-6">
             <div className="flex flex-col gap-4 max-h-[420px] overflow-y-auto pr-2">
               {content}
