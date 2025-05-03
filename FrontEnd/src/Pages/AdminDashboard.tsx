@@ -48,6 +48,19 @@ const dummyRequests = [
   { id: "2", status: "Pending", name: "Request from Bob" },
 ];
 
+const defaultNewUser = {
+  id: "",
+  username: "",
+  role: "",
+  email: "",
+  firstName: "",
+  lastName: "",
+  phoneNumber: "",
+  password: "",
+  ssn: "",
+  createdAt: new Date().toISOString(),
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
@@ -59,28 +72,19 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Add User dialog state
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [newUser, setNewUser] = useState<User & { password: string }>({
-    id: "",
-    username: "",
-    role: "",
-    email: "",
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    password: "",
-    ssn: "",
-    createdAt: new Date().toISOString(),
+  const [newUser, setNewUser] = useState<typeof defaultNewUser>({
+    ...defaultNewUser,
   });
   const [addUserError, setAddUserError] = useState<string | null>(null);
 
   // Check authentication and role
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('userRole');
-    
-    if (!token || role !== 'Admin') {
-      navigate('/auth/login');
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("userRole");
+    if (!token || role !== "Admin") {
+      navigate("/auth/login");
       return;
     }
 
@@ -89,25 +93,24 @@ const AdminDashboard = () => {
       try {
         setLoading(true);
         setError(null);
-
         let response;
         switch (activeTab) {
-          case 'users':
-            response = await api.get('/api/Users');
+          case "users":
+            response = await api.get("/api/Users");
             setUsers(response.data);
             break;
-          case 'books':
-            response = await api.get('/api/Books');
+          case "books":
+            response = await api.get("/api/Books");
             setBooks(response.data);
             break;
-          case 'memberships':
-            response = await api.get('/api/Membership');
+          case "memberships":
+            response = await api.get("/api/Membership");
             setMemberships(response.data);
             break;
         }
       } catch (err) {
-        setError('Failed to load data. Please try again.');
-        console.error('Error loading data:', err);
+        setError("Failed to load data. Please try again.");
+        console.error("Error loading data:", err);
       } finally {
         setLoading(false);
       }
@@ -142,7 +145,7 @@ const AdminDashboard = () => {
           setOriginalUser(null);
         })
         .catch((error) => {
-          console.error("Error updating user:", error);
+          setError(error.response?.data?.message || "Error updating user.");
         });
     }
   };
@@ -154,41 +157,29 @@ const AdminDashboard = () => {
         setUsers(users.filter((u) => u.id !== id));
       })
       .catch((error) => {
-        console.error("Error deleting user:", error);
+        setError(error.response?.data?.message || "Error deleting user.");
       });
   };
 
   const handleAddUser = () => {
     setAddUserError(null);
-    // Create a new object without id and createdAt
-    const userPayload = {
-      username: newUser.username,
-      role: newUser.role,
-      email: newUser.email,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      phoneNumber: newUser.phoneNumber,
-      password: newUser.password,
-      ssn: newUser.ssn
+    // Map to PascalCase for backend
+    const payload = {
+      Username: newUser.username,
+      Password: newUser.password,
+      Role: newUser.role,
+      Email: newUser.email,
+      FirstName: newUser.firstName,
+      LastName: newUser.lastName,
+      SSN: newUser.ssn,
+      PhoneNumber: newUser.phoneNumber,
     };
-    
     api
-      .post("/api/Users", userPayload)
+      .post("/api/Users", payload)
       .then((response) => {
         setUsers([...users, response.data]);
         setIsAddUserOpen(false);
-        setNewUser({
-          id: "",
-          username: "",
-          role: "",
-          email: "",
-          firstName: "",
-          lastName: "",
-          phoneNumber: "",
-          password: "",
-          ssn: "",
-          createdAt: new Date().toISOString(),
-        });
+        setNewUser({ ...defaultNewUser });
       })
       .catch((error) => {
         setAddUserError(error.response?.data?.message || "Failed to add user");
@@ -196,25 +187,41 @@ const AdminDashboard = () => {
   };
 
   const handlerCloseAddUser = () => {
-    setNewUser({
-      id: "",
-      username: "",
-      role: "",
-      email: "",
-      firstName: "",
-      lastName: "",
-      phoneNumber: "",
-      password: "",
-      ssn: "",
-      createdAt: new Date().toISOString(),
-    });
+    setNewUser({ ...defaultNewUser });
     setIsAddUserOpen(false);
+    setAddUserError(null);
   };
+
+  // Helper for rendering input fields
+  const renderInput = (
+    label: string,
+    value: string,
+    onChange: (v: string) => void,
+    type = "text",
+    required = false
+  ) => (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-800">{label}</label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+        required={required}
+        aria-label={label}
+      />
+    </div>
+  );
 
   // Render content for each tab
   let content = null;
   if (loading) {
-    content = <div className="text-center py-8 text-gray-800">Loading...</div>;
+    content = (
+      <div className="flex justify-center items-center py-8">
+        <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-2"></span>
+        <span className="text-gray-800">Loading...</span>
+      </div>
+    );
   } else if (activeTab === "users") {
     content = (
       <div className="space-y-4">
@@ -231,44 +238,31 @@ const AdminDashboard = () => {
                   handleSaveUser();
                 }}
               >
+                {renderInput(
+                  "First Name",
+                  editingUser.firstName,
+                  (v) => setEditingUser({ ...editingUser, firstName: v }),
+                  "text",
+                  true
+                )}
+                {renderInput(
+                  "Last Name",
+                  editingUser.lastName,
+                  (v) => setEditingUser({ ...editingUser, lastName: v }),
+                  "text",
+                  true
+                )}
+                {renderInput(
+                  "Email",
+                  editingUser.email,
+                  (v) => setEditingUser({ ...editingUser, email: v }),
+                  "email",
+                  true
+                )}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-800">First Name</label>
-                  <input
-                    type="text"
-                    value={editingUser.firstName}
-                    onChange={(e) =>
-                      setEditingUser({ ...editingUser, firstName: e.target.value })
-                    }
-                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-800">Last Name</label>
-                  <input
-                    type="text"
-                    value={editingUser.lastName}
-                    onChange={(e) =>
-                      setEditingUser({ ...editingUser, lastName: e.target.value })
-                    }
-                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-800">Email</label>
-                  <input
-                    type="email"
-                    value={editingUser.email}
-                    onChange={(e) =>
-                      setEditingUser({ ...editingUser, email: e.target.value })
-                    }
-                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-800">Role</label>
+                  <label className="block text-sm font-medium text-gray-800">
+                    Role
+                  </label>
                   <select
                     value={editingUser.role}
                     onChange={(e) =>
@@ -282,20 +276,9 @@ const AdminDashboard = () => {
                     <option value="Admin">Admin</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-800">Phone</label>
-                  <input
-                    type="tel"
-                    value={editingUser.phoneNumber ?? ""}
-                    onChange={(e) =>
-                      setEditingUser({
-                        ...editingUser,
-                        phoneNumber: e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-                  />
-                </div>
+                {renderInput("Phone", editingUser.phoneNumber ?? "", (v) =>
+                  setEditingUser({ ...editingUser, phoneNumber: v })
+                )}
                 <div className="flex items-end space-x-2">
                   <button
                     type="submit"
@@ -316,36 +299,60 @@ const AdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">Username:</span>
-                    <span className="font-medium text-gray-900">{user.username}</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      Username:
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      {user.username}
+                    </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">Name:</span>
-                    <span className="text-gray-900">{user.firstName} {user.lastName}</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      Name:
+                    </span>
+                    <span className="text-gray-900">
+                      {user.firstName} {user.lastName}
+                    </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">Email:</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      Email:
+                    </span>
                     <span className="text-gray-900">{user.email}</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">Role:</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      user.role === 'Admin' ? 'bg-purple-100 text-purple-900' :
-                      user.role === 'Librarian' ? 'bg-blue-100 text-blue-900' :
-                      'bg-green-100 text-green-900'
-                    }`}>
+                    <span className="text-sm font-medium text-gray-800">
+                      Role:
+                    </span>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        user.role === "Admin"
+                          ? "bg-purple-100 text-purple-900"
+                          : user.role === "Librarian"
+                          ? "bg-blue-100 text-blue-900"
+                          : "bg-green-100 text-green-900"
+                      }`}
+                    >
                       {user.role}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">Phone:</span>
-                    <span className="text-gray-900">{user.phoneNumber || 'N/A'}</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      Phone:
+                    </span>
+                    <span className="text-gray-900">
+                      {user.phoneNumber || "N/A"}
+                    </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">Created:</span>
-                    <span className="text-gray-900">{new Date(user.createdAt).toLocaleDateString()}</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      Created:
+                    </span>
+                    <span className="text-gray-900">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
                 <div className="col-span-2 flex justify-end space-x-2">
@@ -408,111 +415,161 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {isAddUserOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-xl p-8 min-w-[350px] max-w-[420px] shadow-lg w-full">
-            <h2 className="font-bold text-2xl mb-5 text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl"
+              onClick={handlerCloseAddUser}
+              aria-label="Close"
+              type="button"
+            >
+              &times;
+            </button>
+            <h2 className="font-bold text-2xl mb-6 text-center text-blue-900 tracking-wide">
               Add New User
             </h2>
             <form
-              className="flex flex-col gap-3"
+              className="flex flex-col gap-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleAddUser();
               }}
             >
-              <input
-                type="text"
-                placeholder="Username"
-                value={newUser.username}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, username: e.target.value })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                required
-              />
-              <input
-                type="text"
-                placeholder="First Name"
-                value={newUser.firstName}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, firstName: e.target.value })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={newUser.lastName}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, lastName: e.target.value })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={newUser.email}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, email: e.target.value })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                required
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={newUser.password}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, password: e.target.value })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Role"
-                value={newUser.role}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, role: e.target.value })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Phone"
-                value={newUser.phoneNumber ?? ""}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, phoneNumber: e.target.value })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              />
-              <input
-                type="text"
-                placeholder="SSN"
-                value={newUser.ssn}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, ssn: e.target.value })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                required
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-blue-900 mb-1">
+                    Username <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newUser.username}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, username: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    required
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-900 mb-1">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={newUser.email}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, email: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-900 mb-1">
+                    First Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newUser.firstName}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, firstName: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-900 mb-1">
+                    Last Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newUser.lastName}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, lastName: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-900 mb-1">
+                    Phone
+                  </label>
+                  <input
+                    type="text"
+                    value={newUser.phoneNumber}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, phoneNumber: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    placeholder="Optional"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-900 mb-1">
+                    SSN <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newUser.ssn}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, ssn: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-900 mb-1">
+                    Password <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={newUser.password}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, password: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-900 mb-1">
+                    Role <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={newUser.role}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, role: e.target.value })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    required
+                  >
+                    <option value="">Select Role</option>
+                    <option value="User">User</option>
+                    <option value="Librarian">Librarian</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </div>
+              </div>
               {addUserError && (
-                <div className="text-red-600 text-center">{addUserError}</div>
+                <div className="text-red-600 text-center text-sm mt-2">
+                  {addUserError}
+                </div>
               )}
-              <div className="flex gap-2 justify-end mt-2">
+              <div className="flex justify-end gap-2 mt-4">
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded bg-blue-700 text-white font-medium hover:bg-blue-800 transition"
+                  className="px-5 py-2 rounded-lg bg-blue-700 text-white font-semibold hover:bg-blue-800 transition"
                 >
-                  Add
+                  Add User
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlerCloseAddUser()}
-                  className="px-4 py-2 rounded bg-gray-400 text-white font-medium hover:bg-gray-500 transition"
+                  onClick={handlerCloseAddUser}
+                  className="px-5 py-2 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400 transition"
                 >
                   Cancel
                 </button>
@@ -528,7 +585,9 @@ const AdminDashboard = () => {
           onSelect={setActiveTab}
         />
         <main className="flex-1 px-10 py-8">
-          <SearchBar onAdd={() => setIsAddUserOpen(true)} />
+          <div className="flex items-center mb-6 gap-2">
+            <SearchBar onAdd={() => setIsAddUserOpen(true)} />
+          </div>
           {error && (
             <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
               {error}
