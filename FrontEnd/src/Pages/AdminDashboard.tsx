@@ -11,6 +11,8 @@ import SearchBar from "../Components/SearchBar";
 import ViewBoardCard from "../Components/ViewBoardCard";
 import api from "../Services/api";
 import { Book } from "../types/book";
+import AddUserDialog from "../Components/AddUserDialog";
+import UserList from "../Components/UserList";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
@@ -182,7 +184,12 @@ const AdminDashboard = () => {
         setNewUser({ ...defaultNewUser });
       })
       .catch((error) => {
-        setAddUserError(error.response?.data?.message || "Failed to add user");
+        setAddUserError(
+          error.response?.data?.message ||
+            error.response?.data?.title ||
+            JSON.stringify(error.response?.data) ||
+            "Failed to add user"
+        );
       });
   };
 
@@ -191,27 +198,6 @@ const AdminDashboard = () => {
     setIsAddUserOpen(false);
     setAddUserError(null);
   };
-
-  // Helper for rendering input fields
-  const renderInput = (
-    label: string,
-    value: string,
-    onChange: (v: string) => void,
-    type = "text",
-    required = false
-  ) => (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-800">{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-        required={required}
-        aria-label={label}
-      />
-    </div>
-  );
 
   // Render content for each tab
   let content = null;
@@ -224,156 +210,16 @@ const AdminDashboard = () => {
     );
   } else if (activeTab === "users") {
     content = (
-      <div className="space-y-4">
-        {users.map((user) => (
-          <div
-            key={user.id}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200"
-          >
-            {editingUser && editingUser.id === user.id ? (
-              <form
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSaveUser();
-                }}
-              >
-                {renderInput(
-                  "First Name",
-                  editingUser.firstName,
-                  (v) => setEditingUser({ ...editingUser, firstName: v }),
-                  "text",
-                  true
-                )}
-                {renderInput(
-                  "Last Name",
-                  editingUser.lastName,
-                  (v) => setEditingUser({ ...editingUser, lastName: v }),
-                  "text",
-                  true
-                )}
-                {renderInput(
-                  "Email",
-                  editingUser.email,
-                  (v) => setEditingUser({ ...editingUser, email: v }),
-                  "email",
-                  true
-                )}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-800">
-                    Role
-                  </label>
-                  <select
-                    value={editingUser.role}
-                    onChange={(e) =>
-                      setEditingUser({ ...editingUser, role: e.target.value })
-                    }
-                    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-                    required
-                  >
-                    <option value="User">User</option>
-                    <option value="Librarian">Librarian</option>
-                    <option value="Admin">Admin</option>
-                  </select>
-                </div>
-                {renderInput("Phone", editingUser.phoneNumber ?? "", (v) =>
-                  setEditingUser({ ...editingUser, phoneNumber: v })
-                )}
-                <div className="flex items-end space-x-2">
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCancelEdit}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 font-medium"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">
-                      Username:
-                    </span>
-                    <span className="font-medium text-gray-900">
-                      {user.username}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">
-                      Name:
-                    </span>
-                    <span className="text-gray-900">
-                      {user.firstName} {user.lastName}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">
-                      Email:
-                    </span>
-                    <span className="text-gray-900">{user.email}</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">
-                      Role:
-                    </span>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        user.role === "Admin"
-                          ? "bg-purple-100 text-purple-900"
-                          : user.role === "Librarian"
-                          ? "bg-blue-100 text-blue-900"
-                          : "bg-green-100 text-green-900"
-                      }`}
-                    >
-                      {user.role}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">
-                      Phone:
-                    </span>
-                    <span className="text-gray-900">
-                      {user.phoneNumber || "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-800">
-                      Created:
-                    </span>
-                    <span className="text-gray-900">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-                <div className="col-span-2 flex justify-end space-x-2">
-                  <button
-                    onClick={() => handleEditUser(user)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteUser(user.id)}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      <UserList
+        users={users}
+        editingUser={editingUser}
+        setEditingUser={setEditingUser}
+        setOriginalUser={setOriginalUser}
+        handleSaveUser={handleSaveUser}
+        handleCancelEdit={handleCancelEdit}
+        handleEditUser={handleEditUser}
+        handleDeleteUser={handleDeleteUser}
+      />
     );
   } else if (activeTab === "books") {
     content = books.map((book) => (
@@ -414,170 +260,14 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {isAddUserOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative">
-            <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl"
-              onClick={handlerCloseAddUser}
-              aria-label="Close"
-              type="button"
-            >
-              &times;
-            </button>
-            <h2 className="font-bold text-2xl mb-6 text-center text-blue-900 tracking-wide">
-              Add New User
-            </h2>
-            <form
-              className="flex flex-col gap-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleAddUser();
-              }}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-blue-900 mb-1">
-                    Username <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newUser.username}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, username: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    required
-                    autoFocus
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-blue-900 mb-1">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={newUser.email}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, email: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-blue-900 mb-1">
-                    First Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newUser.firstName}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, firstName: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-blue-900 mb-1">
-                    Last Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newUser.lastName}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, lastName: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-blue-900 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="text"
-                    value={newUser.phoneNumber}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, phoneNumber: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    placeholder="Optional"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-blue-900 mb-1">
-                    SSN <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newUser.ssn}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, ssn: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-blue-900 mb-1">
-                    Password <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="password"
-                    value={newUser.password}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, password: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-blue-900 mb-1">
-                    Role <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={newUser.role}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, role: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    required
-                  >
-                    <option value="">Select Role</option>
-                    <option value="User">User</option>
-                    <option value="Librarian">Librarian</option>
-                    <option value="Admin">Admin</option>
-                  </select>
-                </div>
-              </div>
-              {addUserError && (
-                <div className="text-red-600 text-center text-sm mt-2">
-                  {addUserError}
-                </div>
-              )}
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-lg bg-blue-700 text-white font-semibold hover:bg-blue-800 transition"
-                >
-                  Add User
-                </button>
-                <button
-                  type="button"
-                  onClick={handlerCloseAddUser}
-                  className="px-5 py-2 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400 transition"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <AddUserDialog
+        open={isAddUserOpen}
+        newUser={newUser}
+        setNewUser={setNewUser}
+        onClose={handlerCloseAddUser}
+        onSubmit={handleAddUser}
+        addUserError={addUserError}
+      />
       <div className="flex flex-1">
         <Sidebar
           items={sidebarItems}
