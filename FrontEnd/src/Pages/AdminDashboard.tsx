@@ -134,8 +134,18 @@ const AdminDashboard = () => {
 
   const handleSaveUser = () => {
     if (editingUser && originalUser) {
+      // Map to PascalCase for backend and ensure all required fields are present
+      const payload = {
+        Username: editingUser.username,
+        Email: editingUser.email,
+        FirstName: editingUser.firstName,
+        LastName: editingUser.lastName,
+        PhoneNumber: editingUser.phoneNumber ?? "",
+        Role: editingUser.role,
+        SSN: editingUser.ssn,
+      };
       api
-        .put(`/api/Users/${editingUser.id}`, editingUser)
+        .put(`/api/Users/${editingUser.id}`, payload)
         .then((response) => {
           const updated = response.data;
           setUsers(
