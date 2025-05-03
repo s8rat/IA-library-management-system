@@ -46,13 +46,11 @@ internal class Program
         {
             options.AddDefaultPolicy(policy =>
             {
-                //-------------------------------------- frontend url ---------------------------------------------//
                 policy
                       .WithOrigins("http://localhost:5173")
-                      //.AllowAnyOrigin()
                       .AllowAnyHeader()
                       .AllowAnyMethod()
-                      .AllowCredentials(); // Needed for SignalR
+                      .AllowCredentials();
             });
         });
 
@@ -88,6 +86,9 @@ internal class Program
         }
 
         // app.UseHttpsRedirection();
+
+        // Enable CORS before other middleware
+        app.UseCors();
 
         app.UseAuthentication();
         app.UseAuthorization();
@@ -212,9 +213,6 @@ internal class Program
                 logger.LogError(ex, "An error occurred during migration and seeding.");
             }
         }
-
-        // Enable CORS
-        app.UseCors();
 
         // Map SignalR hub
         app.MapHub<ChatHub>("/chathub");

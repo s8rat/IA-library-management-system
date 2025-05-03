@@ -1,10 +1,32 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+
+interface User {
+    id: string;
+    role: string;
+    username: string;
+}
 
 export const Navigation = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+
+    // Check authentication status from localStorage
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('userRole');
+        const id = localStorage.getItem('userId');
+        const username = localStorage.getItem('username');
+
+        if (token && role && id && username) {
+            setUser({ id, role, username });
+        } else {
+            setUser(null);
+        }
+    }, [location.pathname]); // Re-check auth when route changes
 
     // Handle scroll effect
     useEffect(() => {
@@ -20,11 +42,27 @@ export const Navigation = () => {
         setIsMenuOpen(false);
     }, [location]);
 
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        setUser(null);
+        navigate('/');
+    };
+
     const navLinks = [
         { to: "/", label: "Home" },
         { to: "/explore", label: "Explore Books" },
         { to: "/services", label: "Our Services" },
     ];
+
+    // Add role-specific links
+    if (user?.role === 'Admin') {
+        navLinks.push({ to: "/admin", label: "Admin Dashboard" });
+    } else if (user?.role === 'Librarian') {
+        navLinks.push({ to: "/library", label: "Library Dashboard" });
+    }
 
     return (
         <nav className={`fixed top-0 left-0 right-0 z-50 text-white transition-all duration-300 ${
@@ -45,28 +83,45 @@ export const Navigation = () => {
                         <span className="hidden sm:inline font-extralight">Aalam Al-Kutub</span>
                     </Link>
 
-                    {/* Navigation Links - Adaptive for both mobile and desktop */}
-                    <div className={`absolute md:relative top-full md:top-auto left-0 md:left-auto right-0 md:right-auto 
-                        ${isMenuOpen ? 'block' : 'hidden md:block'} 
-                        bg-white md:bg-transparent shadow-lg md:shadow-none mt-0`}>
+                    {/* Navigation Links */}
+                    <div className={`${
+                        isMenuOpen ? 'block' : 'hidden md:block'
+                    } bg-white md:bg-transparent shadow-lg md:shadow-none mt-0`}>
                         <div className="flex flex-col md:flex-row md:items-center md:gap-8 p-4 md:p-0">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.to}
                                     to={link.to}
-                                    className={`text-white hover:text-gray-500  font-poppins transition-colors py-2 md:py-0 ${
+                                    className={`text-white hover:text-gray-500 font-poppins transition-colors py-2 md:py-0 ${
                                         location.pathname === link.to ? 'text-blue-600 font-medium' : ''
                                     }`}
                                 >
                                     {link.label}
                                 </Link>
                             ))}
-                            <Link 
-                                to="/auth/login" 
-                                className="mt-4 md:mt-0 px-6 py-2 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl hover:text-gray-500 transition-all duration-300  text-center"
-                            >
-                                Login
-                            </Link>
+                            {user ? (
+                                <>
+                                    <Link 
+                                        to={`/auth/user/${user.id}`}
+                                        className="mt-4 md:mt-0 px-6 py-2 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl hover:text-gray-500 transition-all duration-300 text-center"
+                                    >
+                                        {user.username}
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="mt-4 md:mt-0 px-6 py-2 bg-red-600 text-white rounded-full shadow-lg hover:shadow-xl hover:bg-red-700 transition-all duration-300 text-center"
+                                    >
+                                        Logout
+                                    </button>
+                                </>
+                            ) : (
+                                <Link 
+                                    to="/auth/login" 
+                                    className="mt-4 md:mt-0 px-6 py-2 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl hover:text-gray-500 transition-all duration-300 text-center"
+                                >
+                                    Login
+                                </Link>
+                            )}
                         </div>
                     </div>
 

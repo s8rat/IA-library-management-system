@@ -1,5 +1,4 @@
-﻿
-namespace BackEnd.DTOs
+﻿namespace BackEnd.DTOs
 {
     public class AuthResponseDTO
     {
@@ -7,5 +6,6 @@ namespace BackEnd.DTOs
         public string Token { get; set; }
         public string Username { get; set; }
         public string Role { get; set; }
+        public long Id { get; set; }
     }
 }

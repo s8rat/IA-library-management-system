@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import BookManage from "../Components/BookMange";
 import {
   faBook,
   faChartBar,
   faCrown,
 } from "@fortawesome/free-solid-svg-icons";
+import BookManage from "../Components/BookMange";
 
 const boards = [
   {
@@ -26,7 +27,33 @@ const boards = [
 ];
 
 export const Library = () => {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // Check authentication and role on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole');
+    
+    if (!token || role !== 'Librarian') {
+      navigate('/auth/login');
+      return;
+    }
+
+    setLoading(false);
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto min-h-screen flex pt-4 bg-gray-50">

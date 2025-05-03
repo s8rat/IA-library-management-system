@@ -33,7 +33,8 @@ namespace BackEnd.Services
             {
                 Token = token,
                 Username = user.Username,
-                Role = user.Role
+                Role = user.Role,
+                Id = user.Id
             };
         }
 
@@ -70,7 +71,8 @@ namespace BackEnd.Services
             {
                 Token = token,
                 Username = user.Username,
-                Role = user.Role
+                Role = user.Role,
+                Id = user.Id
             };
         }
 

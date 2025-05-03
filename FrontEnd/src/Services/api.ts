@@ -6,12 +6,17 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true // Important for CORS with credentials
 });
 
 // Add a request interceptor
 api.interceptors.request.use(
     (config) => {
-        // You can add auth token here if needed
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => {
