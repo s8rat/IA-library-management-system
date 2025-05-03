@@ -1,5 +1,4 @@
-﻿
-using BackEnd.Data;
+﻿using BackEnd.Data;
 using BackEnd.DTOs;
 using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +35,9 @@ namespace BackEnd.Services
 
         public async Task<UserDTO> GetUserById(long id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id);
+        
             if (user == null)
             {
                 throw new Exception("User not found");
@@ -120,9 +121,15 @@ namespace BackEnd.Services
                 throw new Exception("Email already exists");
             }
 
+            // Update all fields
             user.Username = userDTO.Username;
-            user.Role = userDTO.Role;
             user.Email = userDTO.Email;
+            user.FirstName = userDTO.FirstName;
+            user.LastName = userDTO.LastName;
+            user.PhoneNumber = userDTO.PhoneNumber;
+            // Don't update SSN and Role as they should not be changed by the user
+            // user.SSN = userDTO.SSN;
+            // user.Role = userDTO.Role;
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
