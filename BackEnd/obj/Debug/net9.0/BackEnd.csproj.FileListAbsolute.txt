@@ -174,7 +174,6 @@ E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-mana
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\staticwebassets\msbuild.buildMultiTargeting.BackEnd.props
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\staticwebassets\msbuild.buildTransitive.BackEnd.props
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\staticwebassets.pack.json
-E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\BackEnd.csproj.Up2Date
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\BackEnd.dll
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\refint\BackEnd.dll

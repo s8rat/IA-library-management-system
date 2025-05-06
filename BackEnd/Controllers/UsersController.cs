@@ -26,58 +26,58 @@ namespace BackEnd.Controllers
             return Ok(users);
         }
 
-        [HttpGet("profile")]
-        [Authorize]
-        public async Task<IActionResult> GetCurrentUserProfile()
-        {
-            try
-            {
-                // Log all claims for debugging
-                var claims = User.Claims.ToList();
-                Console.WriteLine("User Claims:");
-                foreach (var claim in claims)
-                {
-                    Console.WriteLine($"{claim.Type}: {claim.Value} (ValueType: {claim.ValueType})");
-                }
+        //[HttpGet("profile")]
+        //[Authorize]
+        // public async Task<IActionResult> GetCurrentUserProfile()
+        // {
+        //     try
+        //     {
+        //         // Log all claims for debugging
+        //         var claims = User.Claims.ToList();
+        //         Console.WriteLine("User Claims:");
+        //         foreach (var claim in claims)
+        //         {
+        //             Console.WriteLine($"{claim.Type}: {claim.Value} (ValueType: {claim.ValueType})");
+        //         }
 
-                var userIdClaim = User.FindFirst("userId");
-                if (userIdClaim == null)
-                {
-                    Console.WriteLine("userId claim not found");
-                    return Unauthorized(new { message = "User ID not found in token" });
-                }
+        //         var userIdClaim = User.FindFirst("userId");
+        //         if (userIdClaim == null)
+        //         {
+        //             Console.WriteLine("userId claim not found");
+        //             return Unauthorized(new { message = "User ID not found in token" });
+        //         }
 
-                Console.WriteLine($"Found user ID claim: {userIdClaim.Value} (ValueType: {userIdClaim.ValueType})");
+        //         Console.WriteLine($"Found user ID claim: {userIdClaim.Value} (ValueType: {userIdClaim.ValueType})");
 
-                if (!long.TryParse(userIdClaim.Value, out long userId))
-                {
-                    Console.WriteLine($"Failed to parse user ID: {userIdClaim.Value}");
-                    Console.WriteLine($"ValueType: {userIdClaim.ValueType}");
-                    return BadRequest(new { 
-                        message = "Invalid user ID format in token", 
-                        details = $"Value: {userIdClaim.Value}, Type: {userIdClaim.ValueType}" 
-                    });
-                }
+        //         if (!long.TryParse(userIdClaim.Value, out long userId))
+        //         {
+        //             Console.WriteLine($"Failed to parse user ID: {userIdClaim.Value}");
+        //             Console.WriteLine($"ValueType: {userIdClaim.ValueType}");
+        //             return BadRequest(new { 
+        //                 message = "Invalid user ID format in token", 
+        //                 details = $"Value: {userIdClaim.Value}, Type: {userIdClaim.ValueType}" 
+        //             });
+        //         }
 
-                Console.WriteLine($"Successfully parsed user ID: {userId}");
+        //         Console.WriteLine($"Successfully parsed user ID: {userId}");
 
-                var user = await _userService.GetUserById(userId);
-                if (user == null)
-                {
-                    Console.WriteLine($"User with ID {userId} not found in database");
-                    return NotFound(new { message = "User not found" });
-                }
+        //         var user = await _userService.GetUserById(userId);
+        //         if (user == null)
+        //         {
+        //             Console.WriteLine($"User with ID {userId} not found in database");
+        //             return NotFound(new { message = "User not found" });
+        //         }
 
-                Console.WriteLine($"Successfully retrieved user: {user.Username}");
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in GetCurrentUserProfile: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return StatusCode(500, new { message = "An error occurred while retrieving the user profile", details = ex.Message });
-            }
-        }
+        //         Console.WriteLine($"Successfully retrieved user: {user.Username}");
+        //         return Ok(user);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Console.WriteLine($"Error in GetCurrentUserProfile: {ex.Message}");
+        //         Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        //         return StatusCode(500, new { message = "An error occurred while retrieving the user profile", details = ex.Message });
+        //     }
+        // }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
@@ -116,13 +116,13 @@ namespace BackEnd.Controllers
             try
             {
                 // Check if the user is updating their own profile or is an admin
-                var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                var isAdmin = User.IsInRole("Admin");
+                // var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                // var isAdmin = User.IsInRole("Admin");
                 
-                if (!isAdmin && userId != id)
-                {
-                    return Forbid();
-                }
+                // if (!isAdmin && userId != id)
+                // {
+                //     return Forbid();
+                // }
 
                 var user = await _userService.UpdateUser(id, userDTO);
                 return Ok(user);
