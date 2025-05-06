@@ -180,3 +180,4 @@ E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-mana
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\BackEnd.pdb
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\BackEnd.genruntimeconfig.cache
 E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\ref\BackEnd.dll
+E:\3rd year- 2nd term\IA\ASP .NET\IA-ProjectFR\Faculty-Team-2026\IA-library-management-system\BackEnd\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

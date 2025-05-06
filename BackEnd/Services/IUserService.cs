@@ -8,6 +8,7 @@ namespace BackEnd.Services
         Task<IEnumerable<UserDTO>> GetAllUsers();
         Task<UserDTO> GetUserById(long id);
         Task<UserDTO> CreateUser(UserDTO userDTO);
+        Task<UserDTO> GetCurrentUserProfile(long userId);
         Task<UserDTO> UpdateUser(long id, UserDTO userDTO);
         Task<bool> DeleteUser(long id);
     }

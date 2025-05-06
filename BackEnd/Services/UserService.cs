@@ -108,28 +108,38 @@ namespace BackEnd.Services
             }
 
             // Check if username is being changed to one that already exists
-            if (user.Username != userDTO.Username &&
+            if (!string.IsNullOrWhiteSpace(userDTO.Username) &&
+                user.Username != userDTO.Username &&
                 await _context.Users.AnyAsync(u => u.Username == userDTO.Username))
             {
                 throw new Exception("Username already exists");
             }
 
             // Check if email is being changed to one that already exists
-            if (user.Email != userDTO.Email &&
+            if (!string.IsNullOrWhiteSpace(userDTO.Email) &&
+                user.Email != userDTO.Email &&
                 await _context.Users.AnyAsync(u => u.Email == userDTO.Email))
             {
                 throw new Exception("Email already exists");
             }
 
-            // Update all fields
-            user.Username = userDTO.Username;
-            user.Email = userDTO.Email;
-            user.FirstName = userDTO.FirstName;
-            user.LastName = userDTO.LastName;
-            user.PhoneNumber = userDTO.PhoneNumber;
-            // Don't update SSN and Role as they should not be changed by the user
-            // user.SSN = userDTO.SSN;
-            // user.Role = userDTO.Role;
+            // Update fields if they are provided (not null or whitespace)
+            if (!string.IsNullOrWhiteSpace(userDTO.Username))
+                user.Username = userDTO.Username;
+
+            if (!string.IsNullOrWhiteSpace(userDTO.Email))
+                user.Email = userDTO.Email;
+
+            if (!string.IsNullOrWhiteSpace(userDTO.FirstName))
+                user.FirstName = userDTO.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(userDTO.LastName))
+                user.LastName = userDTO.LastName;
+
+            if (!string.IsNullOrWhiteSpace(userDTO.PhoneNumber))
+                user.PhoneNumber = userDTO.PhoneNumber;
+
+            // Do not update SSN and Role
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
@@ -145,6 +155,29 @@ namespace BackEnd.Services
                 LastName = user.LastName,
                 SSN = user.SSN,
                 PhoneNumber = user.PhoneNumber
+            };
+        }
+
+
+        public async Task<UserDTO> GetCurrentUserProfile(long userId)
+        {
+            // Retrieve the user from the database
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            // Map the user to a UserDTO to ensure data privacy
+            return new UserDTO
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                CreatedAt = user.CreatedAt
             };
         }
 
