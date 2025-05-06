@@ -37,7 +37,7 @@ namespace BackEnd.Models
         public string LastName { get; set; }
 
         [Required]
-        [StringLength(11)] // Format: XXX-XX-XXXX
+        //[StringLength(11)] // Format: XXX-XX-XXXX
         public string SSN { get; set; }
 
         [Phone]

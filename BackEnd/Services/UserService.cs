@@ -72,7 +72,7 @@ namespace BackEnd.Services
             var user = new User
             {
                 Username = userDTO.Username,
-                Password = BCrypt.Net.BCrypt.HashPassword("defaultPassword"), // Admin should set a proper password
+                Password = BCrypt.Net.BCrypt.HashPassword(userDTO.Password),
                 Role = userDTO.Role,
                 Email = userDTO.Email,
                 CreatedAt = DateTime.UtcNow,
