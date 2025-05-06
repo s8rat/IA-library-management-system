@@ -2,11 +2,12 @@ interface IButton {
   name: string;
   style: string;
   onclick?: () => void;
+  type?: "button" | "submit" | "reset";
 }
 
-const Button = ({ name, style, onclick }: IButton) => {
+const Button = ({ name, style, onclick, type = "button" }: IButton) => {
   return (
-    <button className={`${style}`} onClick={onclick}>
+    <button className={`${style}`} onClick={onclick} type={type}>
       {name}
     </button>
   );
