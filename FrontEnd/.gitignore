@@ -23,3 +23,99 @@ dist-ssr
 *.sln
 *.sw?
 .qodo
+
+
+
+################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+# Ignore Visual Studio files
+/.vs
+/BackEnd/.vs/
+
+# Ignore build outputs
+/BackEnd/bin/
+/BackEnd/obj/
+/BackEnd/appsettings.json
+
+node_modules/
+
+# Ignore lock files
+FrontEnd/yarn.lock
+
+# Ignore sensitive configuration files
+BackEnd/appsettings.json
+
+# Optional: Add a template for appsettings.json
+# !BackEnd/appsettings.json.template
+
+.fake
+node_modules/
+BackEnd/appsettings.json
+BackEnd/obj/BackEnd.csproj.nuget.dgspec.json
+BackEnd/obj/BackEnd.csproj.nuget.dgspec.json
+BackEnd/obj/BackEnd.csproj.nuget.dgspec.json
+BackEnd/obj/BackEnd.csproj.nuget.g.props
+BackEnd/obj/project.nuget.cache
+BackEnd/obj/project.assets.json
+BackEnd/obj/Debug/net9.0/apphost.exe
+BackEnd/obj/Debug/net9.0/BackEnd.AssemblyInfo.cs
+BackEnd/obj/Debug/net9.0/BackEnd.AssemblyInfoInputs.cache
+BackEnd/obj/Debug/net9.0/BackEnd.assets.cache
+BackEnd/obj/Debug/net9.0/BackEnd.csproj.CoreCompileInputs.cache
+BackEnd/obj/Debug/net9.0/BackEnd.dll
+BackEnd/obj/Debug/net9.0/BackEnd.genruntimeconfig.cache
+BackEnd/obj/Debug/net9.0/BackEnd.pdb
+BackEnd/obj/Debug/net9.0/BackEnd.sourcelink.json
+BackEnd/obj/Debug/net9.0/ref/BackEnd.dll
+BackEnd/obj/Debug/net9.0/refint/BackEnd.dll
+BackEnd/appsettings.json
+
+
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# NuGet Packages
+*.nupkg
+# NuGet Symbol Packages
+*.snupkg
+
+# Others
+~$*
+*~
+CodeCoverage/
+
+# MSBuild Binary and Structured Log
+*.binlog
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
