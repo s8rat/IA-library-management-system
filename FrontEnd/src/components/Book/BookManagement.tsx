@@ -26,7 +26,12 @@ const BookManagement: React.FC<BookManagementProps> = ({
   customActions,
 }) => {
   const [books, setBooks] = useState<Book[]>([]);
-  const [newBook, setNewBook] = useState({ title: "", author: "", isbn: "" });
+  const [newBook, setNewBook] = useState({
+    title: "",
+    author: "",
+    isbn: "",
+    quantity: 0,
+  });
   const [newBookImage, setNewBookImage] = useState<File | null>(null);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [editBookImage, setEditBookImage] = useState<File | null>(null);
@@ -48,7 +53,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
               coverImage: b.coverImage,
               coverImageContentType: b.coverImageContentType,
               available: b.available,
-              quantity: b.quantity
+              quantity: b.quantity,
             }))
           : [];
         setBooks(data);
@@ -64,6 +69,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
       formData.append("Title", newBook.title);
       formData.append("Author", newBook.author);
       formData.append("ISBN", newBook.isbn);
+      formData.append("Quantity", String(newBook.quantity));
       if (newBookImage) {
         formData.append("CoverImageFile", newBookImage);
       }
@@ -83,10 +89,10 @@ const BookManagement: React.FC<BookManagementProps> = ({
               coverImage: b.coverImage,
               coverImageContentType: b.coverImageContentType,
               available: b.available,
-              quantity: b.quantity
+              quantity: b.quantity,
             },
           ]);
-          setNewBook({ title: "", author: "", isbn: "" });
+          setNewBook({ title: "", author: "", isbn: "", quantity: 0 });
           setNewBookImage(null);
           setIsAddDialogOpen(false);
         })
@@ -114,6 +120,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
     formData.append("Title", editingBook.title);
     formData.append("Author", editingBook.author);
     formData.append("ISBN", editingBook.isbn || "");
+    formData.append("Quantity", String(editingBook.quantity));
     if (editBookImage) {
       formData.append("CoverImageFile", editBookImage);
     }
@@ -135,7 +142,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
                   coverImage: b.coverImage,
                   coverImageContentType: b.coverImageContentType,
                   available: b.available,
-                  quantity: b.quantity
+                  quantity: b.quantity,
                 }
               : book
           )
@@ -211,4 +218,4 @@ const BookManagement: React.FC<BookManagementProps> = ({
   );
 };
 
-export default BookManagement; 
+export default BookManagement;
