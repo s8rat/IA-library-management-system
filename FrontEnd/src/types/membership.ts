@@ -1,4 +1,5 @@
 export interface Membership {
+  membershipId: number;
   membershipType: string;
   borrowLimit: number;
   durationInDays: number;

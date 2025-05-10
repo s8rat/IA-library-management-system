@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import InputField from "../../Components/UI/InputField";
+import InputField from "../../components/UI/InputField";
 import TelInput from "../../Components/UI/TelInput";
 
 const Register = () => {

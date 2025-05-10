@@ -5,6 +5,7 @@ import {
   faBook,
   faCrown,
   faSignIn,
+  faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "../Components/Sidebar";
 import SearchBar from "../Components/SearchBar";
@@ -16,6 +17,9 @@ import UserList from "../Components/UserList";
 import MemberShipDialog from "../Components/MemberShip/MemberShipDialog";
 import { Membership } from "../types/membership";
 import BookManagement from "../Components/Book/BookManagement";
+import EditMemberShipDialog from "../Components/MemberShip/EditMemberShipDialog";
+import DeleteMemberShip from "../Components/MemberShip/DeleteMemberShip";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
@@ -43,6 +47,7 @@ const defaultNewUser = {
 };
 
 const defaultNewMembership: Membership = {
+  membershipId: 0,
   membershipType: "",
   borrowLimit: 1,
   durationInDays: 30,
@@ -78,6 +83,10 @@ const AdminDashboard = () => {
   const [addMembershipError, setAddMembershipError] = useState<string | null>(
     null
   );
+
+  const [isEditMembershipOpen, setIsEditMembershipOpen] = useState(false);
+  const [editingMembership, setEditingMembership] = useState<Membership | null>(null);
+  const [editMembershipError, setEditMembershipError] = useState<string | null>(null);
 
   const token =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjQxMWY2NmU4LTk5NWQtNDYwOS04YmQzLTJiYWJmZWE1YWEzYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwidXNlcklkIjoxLCJleHAiOjE3NDY4NzYyMjMsImlzcyI6ImFhbGFtX2FsX2t1dHViIiwiYXVkIjoiYWFsYW1fYWxfa3V0dWJfdXNlcnMifQ.D91gNeQn5RhOhXhJ0SjnT0_OGmkPRYPJ_d9IFlUbJ_8";
@@ -270,6 +279,41 @@ const AdminDashboard = () => {
     setAddMembershipError(null);
   };
 
+  const handleEditMembership = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingMembership) return;
+
+    try {
+      const response = await api.put(`/api/Membership/${editingMembership.membershipId}`, editingMembership, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMemberships(memberships.map(m => 
+        m.membershipId === editingMembership.membershipId ? response.data : m
+      ));
+      setIsEditMembershipOpen(false);
+      setEditingMembership(null);
+    } catch (err) {
+      setEditMembershipError('Failed to update membership');
+      console.error('Error updating membership:', err);
+    }
+  };
+
+  const handleDeleteMembership = async (membershipId: number) => {
+    try {
+      await api.delete(`/api/Membership/${membershipId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMemberships(memberships.filter(m => m.membershipId !== membershipId));
+    } catch (err) {
+      setError('Failed to delete membership');
+      console.error('Error deleting membership:', err);
+    }
+  };
+
   // Render content for each tab
   let content = null;
   if (loading) {
@@ -309,14 +353,37 @@ const AdminDashboard = () => {
       />
     ));
   } else if (activeTab === "memberships") {
-    content = memberships.map((m, idx) => (
-      <ViewBoardCard
-        key={idx}
-        name={m.membershipType}
-        description={`Price: ${m.price ?? "N/A"} | Duration: ${
-          m.durationInDays
-        } days | Limit: ${m.borrowLimit}`}
-      />
+    content = memberships.map((m) => (
+      <div key={m.membershipId} className="bg-white p-6 rounded-lg shadow-md relative">
+        <div className="absolute top-4 right-4 flex gap-2">
+          <button
+            onClick={() => {
+              setEditingMembership(m);
+              setIsEditMembershipOpen(true);
+            }}
+            className="text-blue-600 hover:text-blue-800"
+          >
+            <FontAwesomeIcon icon={faEdit} />
+          </button>
+          <DeleteMemberShip
+            membership={m}
+            onDelete={() => handleDeleteMembership(m.membershipId)}
+            className="text-red-600 hover:text-red-800"
+          />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-2 pr-16">{m.membershipType}</h3>
+        <div className="space-y-2 text-gray-600">
+          <p>Borrow Limit: {m.borrowLimit}</p>
+          <p>Duration: {m.durationInDays} days</p>
+          {m.price && <p>Price: {m.price} EGP</p>}
+          {m.description && <p>Description: {m.description}</p>}
+          <p>Family Plan: {m.isFamilyPlan ? 'Yes' : 'No'}</p>
+          {m.isFamilyPlan && m.maxFamilyMembers && (
+            <p>Max Family Members: {m.maxFamilyMembers}</p>
+          )}
+          <p>Requires Approval: {m.requiresApproval ? 'Yes' : 'No'}</p>
+        </div>
+      </div>
     ));
   }
 
@@ -333,14 +400,29 @@ const AdminDashboard = () => {
         />
       )}
       {activeTab === "memberships" && (
-        <MemberShipDialog
-          open={isAddMembershipOpen}
-          newMembership={newMembership}
-          setNewMembership={setNewMembership}
-          onClose={handlerCloseAddMembership}
-          onSubmit={handleAddMembership}
-          addMembershipError={addMembershipError}
-        />
+        <>
+          <MemberShipDialog
+            open={isAddMembershipOpen}
+            newMembership={newMembership}
+            setNewMembership={setNewMembership}
+            onClose={handlerCloseAddMembership}
+            onSubmit={handleAddMembership}
+            addMembershipError={addMembershipError}
+          />
+          {editingMembership && (
+            <EditMemberShipDialog
+              open={isEditMembershipOpen}
+              membership={editingMembership}
+              setMembership={setEditingMembership}
+              onClose={() => {
+                setIsEditMembershipOpen(false);
+                setEditingMembership(null);
+              }}
+              onSubmit={handleEditMembership}
+              editError={editMembershipError}
+            />
+          )}
+        </>
       )}
       <div className="flex flex-1">
         <Sidebar
