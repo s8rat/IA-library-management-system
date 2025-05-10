@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../Services/api';
-import UserAvatar from '../../Components/Profile/UserAvatar';
-import ProfileForm from '../../Components/Profile/ProfileForm';
-import BorrowedBooks from '../../Components/Profile/BorrowedBooks';
+import api from '../Services/api';
+import ProfileForm from '../Components/Profile/ProfileForm';
+import BorrowedBooks from '../Components/Profile/BorrowedBooks';
 
 interface User {
     id: number;

@@ -75,15 +75,17 @@ const PlanCard = ({ plan, style }: { plan: Membership; style: PlanStyle }) => {
                     </ul>
                 </div>
                 <div className="mt-4">
-                    <div className="flex items-baseline mb-4">
-                        <span className="text-2xl font-bold">{annualPrice}</span>
-                        {plan.price && (
-                            <>
-                                <span className="ml-2">EGP</span>
-                                <span className="ml-2">Annual</span>
-                            </>
-                        )}
-                    </div>
+                    {plan.price !== 0 && (
+                        <div className="flex items-baseline mb-4">
+                            <span className="text-2xl font-bold">{annualPrice}</span>
+                            {plan.price && (
+                                <>
+                                    <span className="ml-2">EGP</span>
+                                    <span className="ml-2">Annual</span>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="p-8 pt-0">
@@ -108,10 +110,15 @@ export const Services = () => {
         const fetchPlans = async () => {
             try {
                 const response = await api.get('/api/Membership');
-                // Sort plans by price (undefined prices will be at the end)
+                // Sort plans: free trial (price = 0) first, then by price, undefined prices last
                 const sortedPlans = response.data.sort((a: Membership, b: Membership) => {
+                    // Handle free trial (price = 0)
+                    if (a.price === 0) return -1;
+                    if (b.price === 0) return 1;
+                    // Handle undefined prices
                     if (!a.price) return 1;
                     if (!b.price) return -1;
+                    // Sort by price
                     return a.price - b.price;
                 });
                 setPlans(sortedPlans);

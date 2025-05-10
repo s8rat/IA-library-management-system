@@ -19,7 +19,7 @@ public class RegisterDTO
     public string LastName { get; set; }
 
     [Required]
-    [StringLength(11)] // Format: XXX-XX-XXXX
+    [StringLength(14)] // Format: XXX-XX-XXXX
     public string SSN { get; set; }
 
     [Phone]

@@ -68,56 +68,58 @@ export const Navigation = () => {
         <nav className={`fixed top-0 left-0 right-0 z-50 text-white transition-all duration-300 ${
             isScrolled ? 'bg-primary shadow-lg' : 'bg-primary'
         }`}>
-            <div className="max-w-full mx-32 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="relative flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
                     <Link 
                         to="/" 
-                        className="h-full flex items-center gap-2 text-xl md:text-2xl transition-colors z-10 text-white hover:text-white font-poppins"
+                        className="flex items-center gap-3 text-xl md:text-2xl transition-colors z-10 text-white hover:text-white font-poppins"
                     >
-                        <img 
-                            src="/Image/aalm-alkutub-logo.png" 
-                            alt="logo" 
-                            className="h-full relative after:content-[''] after:absolute after:top-0 after:right-[-8px] after:h-full after:w-[2px] after:bg-white"
-                        />
-                        <span className="hidden sm:inline font-extralight">Aalam Al-Kutub</span>
+                        <div className="h-10 w-10 md:h-12 md:w-12 relative flex items-center justify-center">
+                            <img 
+                                src="/Image/aalm-alkutub-logo.png" 
+                                alt="logo" 
+                                className="h-full w-full object-contain"
+                            />
+                        </div>
+                        <span className="hidden sm:inline font-extralight tracking-wide">Aalam Al-Kutub</span>
                     </Link>
 
                     {/* Navigation Links */}
                     <div className={`${
-                        isMenuOpen ? 'block' : 'hidden md:block'
-                    } bg-white md:bg-transparent shadow-lg md:shadow-none mt-0`}>
-                        <div className="flex flex-col md:flex-row md:items-center md:gap-8 p-4 md:p-0">
+                        isMenuOpen ? 'flex' : 'hidden md:flex'
+                    } absolute md:relative top-16 md:top-0 left-0 right-0 bg-white md:bg-transparent shadow-lg md:shadow-none`}>
+                        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 p-4 md:p-0 w-full md:w-auto">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.to}
                                     to={link.to}
-                                    className={`text-white hover:text-gray-500 font-poppins transition-colors py-2 md:py-0 ${
-                                        location.pathname === link.to ? 'text-blue-600 font-medium' : ''
+                                    className={`text-gray-800 md:text-white hover:text-blue-600 md:hover:text-gray-300 font-poppins transition-colors py-2 md:py-0 ${
+                                        location.pathname === link.to ? 'text-blue-600 md:text-white font-medium' : ''
                                     }`}
                                 >
                                     {link.label}
                                 </Link>
                             ))}
                             {user ? (
-                                <>
+                                <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
                                     <Link 
                                         to={`/auth/user/${user.id}`}
-                                        className="mt-4 md:mt-0 px-6 py-2 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl hover:text-gray-500 transition-all duration-300 text-center"
+                                        className="w-full md:w-auto px-6 py-2 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-300 text-center"
                                     >
                                         {user.username}
                                     </Link>
                                     <button
                                         onClick={handleLogout}
-                                        className="mt-4 md:mt-0 px-6 py-2 bg-red-600 text-white rounded-full shadow-lg hover:shadow-xl hover:bg-red-700 transition-all duration-300 text-center"
+                                        className="w-full md:w-auto px-6 py-2 bg-red-600 text-white rounded-full shadow-lg hover:shadow-xl hover:bg-red-700 transition-all duration-300 text-center"
                                     >
                                         Logout
                                     </button>
-                                </>
+                                </div>
                             ) : (
                                 <Link 
                                     to="/auth/login" 
-                                    className="mt-4 md:mt-0 px-6 py-2 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl hover:text-gray-500 transition-all duration-300 text-center"
+                                    className="w-full md:w-auto px-6 py-2 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-300 text-center"
                                 >
                                     Login
                                 </Link>

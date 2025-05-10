@@ -8,7 +8,7 @@ import RootLayout from "../Pages/Layout";
 import AuthLayout from "../Pages/auth/Layout";
 import AdminDashboard from "../Pages/AdminDashboard";
 import { Library } from "../Pages/Library";
-import UserProfile from "../Pages/auth/UserProfile";
+import UserProfile from "../Pages/UserProfile";
 import Register from "../Pages/auth/Register";
 
 export const router = createBrowserRouter([

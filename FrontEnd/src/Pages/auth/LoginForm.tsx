@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import Checkbox from '../Components/UI/Checkbox';
-import InputField from '../Components/UI/InputField';
-import Button from '../Components/UI/Button';
-import api from '../Services/api';
+import Checkbox from '../../Components/UI/Checkbox';
+import InputField from '../../Components/UI/InputField';
+import Button from '../../Components/UI/Button';
+import api from '../../Services/api';
 
 const LoginForm = () => {
   const navigate = useNavigate();

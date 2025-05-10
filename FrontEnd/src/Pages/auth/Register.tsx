@@ -1,12 +1,95 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import InputField from "../../components/UI/InputField";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import InputField from "../../Components/UI/InputField";
 import TelInput from "../../Components/UI/TelInput";
+import api from "../../Services/api";
+import { AxiosError } from "axios";
+
+interface RegisterFormData {
+  username: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  ssn: string;
+  phoneNumber: string;
+  email: string;
+  role: string;
+}
+
+interface ValidationErrors {
+  Username?: string[];
+  Password?: string[];
+  FirstName?: string[];
+  LastName?: string[];
+  SSN?: string[];
+  PhoneNumber?: string[];
+  Email?: string[];
+}
+
+interface ApiError {
+  errors: ValidationErrors;
+  status: number;
+  title: string;
+}
 
 const Register = () => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<RegisterFormData>({
+    username: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    ssn: "",
+    phoneNumber: "",
+    email: "",
+    role: "User"
+  });
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePhoneChange = (phoneNumber: string) => {
+    setFormData(prev => ({
+      ...prev,
+      phoneNumber
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
+    setErrors({});
+    setLoading(true);
+
+    try {
+      const response = await api.post('/api/Auth/register', {
+        username: formData.username,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        ssn: formData.ssn,
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
+        role: formData.role
+      });
+      
+      if (response.data) {
+        navigate('/Login', { state: { message: 'Registration successful! Please sign in.' } });
+      }
+    } catch (err: unknown) {
+      const error = err as AxiosError<ApiError>;
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -18,7 +101,7 @@ const Register = () => {
           </h1>
           <p className="text-gray-600">
             Already have an account?{" "}
-            <Link to="/signin" className="text-emerald-600 hover:underline">
+            <Link to="/Login" className="text-emerald-600 hover:underline">
               Log in
             </Link>
           </p>
@@ -29,37 +112,68 @@ const Register = () => {
               label="First Name"
               name="firstName"
               type="text"
+              value={formData.firstName}
+              onChange={handleChange}
               required
+              error={errors.FirstName?.[0]}
             />
             <InputField
               label="Last Name"
               name="lastName"
               type="text"
+              value={formData.lastName}
+              onChange={handleChange}
               required
+              error={errors.LastName?.[0]}
             />
           </div>
+
+          <InputField
+            label="Username"
+            name="username"
+            type="text"
+            value={formData.username}
+            onChange={handleChange}
+            required
+            error={errors.Username?.[0]}
+          />
 
           <InputField
             label="Email Address"
             name="email"
             type="email"
+            value={formData.email}
+            onChange={handleChange}
             required
+            error={errors.Email?.[0]}
           />
 
-          <TelInput />
+          <TelInput onPhoneChange={handlePhoneChange} error={errors.PhoneNumber?.[0]} />
 
           <InputField
             label="National ID"
-            name="nationalId"
+            name="ssn"
             type="text"
+            value={formData.ssn}
+            onChange={(e) => {
+              const newValue = e.target.value.replace(/\D/g, '').slice(0, 14);
+              setFormData(prev => ({
+                ...prev,
+                ssn: newValue
+              }));
+            }}
             required
+            error={formData.ssn.length > 0 && formData.ssn.length !== 14 ? 'National ID must be exactly 14 digits' : errors.SSN?.[0]}
           />
 
           <InputField
             label="Password"
             name="password"
             type="password"
+            value={formData.password}
+            onChange={handleChange}
             required
+            error={errors.Password?.[0]}
           />
 
           <div className="text-sm text-gray-600">
@@ -75,9 +189,10 @@ const Register = () => {
 
           <button
             type="submit"
-            className="w-fit px-8 bg-emerald-500 text-white rounded-full py-2.5 font-medium hover:bg-emerald-600 transition-colors"
+            disabled={loading}
+            className="w-fit px-8 bg-emerald-500 text-white rounded-full py-2.5 font-medium hover:bg-emerald-600 transition-colors disabled:bg-emerald-300"
           >
-            Sign Up
+            {loading ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
       </div>

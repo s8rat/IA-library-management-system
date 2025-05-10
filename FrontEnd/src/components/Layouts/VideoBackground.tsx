@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { FALLBACK_VIDEOS } from '../utils/constants';
+import { FALLBACK_VIDEOS } from '../../utils/constants';
 
 
 const VideoBackground = () => {

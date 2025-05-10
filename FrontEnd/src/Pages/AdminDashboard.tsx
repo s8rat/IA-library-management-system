@@ -5,21 +5,16 @@ import {
   faBook,
   faCrown,
   faSignIn,
-  faEdit,
 } from "@fortawesome/free-solid-svg-icons";
-import Sidebar from "../Components/Sidebar";
-import SearchBar from "../Components/SearchBar";
-import ViewBoardCard from "../Components/ViewBoardCard";
+import Sidebar from "../Components/admin/Sidebar";
+import SearchBar from "../Components/admin/SearchBar";
+import ViewBoardCard from "../Components/admin/ViewBoardCard";
 import api from "../Services/api";
 import { User } from "../types/user";
-import AddUserDialog from "../Components/AddUserDialog";
-import UserList from "../Components/UserList";
-import MemberShipDialog from "../Components/MemberShip/MemberShipDialog";
-import { Membership } from "../types/membership";
+import AddUserDialog from "../Components/admin/AddUserDialog";
+import UserList from "../Components/admin/UserList";
 import BookManagement from "../Components/Book/BookManagement";
-import EditMemberShipDialog from "../Components/MemberShip/EditMemberShipDialog";
-import DeleteMemberShip from "../Components/MemberShip/DeleteMemberShip";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ManageMemberShip from "../Components/MemberShip/ManageMemberShip";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
@@ -46,47 +41,22 @@ const defaultNewUser = {
   createdAt: new Date().toISOString(),
 };
 
-const defaultNewMembership: Membership = {
-  membershipId: 0,
-  membershipType: "",
-  borrowLimit: 1,
-  durationInDays: 30,
-  price: undefined,
-  description: "",
-  isFamilyPlan: false,
-  maxFamilyMembers: undefined,
-  requiresApproval: false,
-};
-
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [originalUser, setOriginalUser] = useState<User | null>(null);
-  const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Add User dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [isAddMembershipOpen, setIsAddMembershipOpen] = useState(false);
   const [newUser, setNewUser] = useState<typeof defaultNewUser>({
     ...defaultNewUser,
   });
   const [addUserError, setAddUserError] = useState<string | null>(null);
-
-  // Add Membership dialog states
-  const [newMembership, setNewMembership] = useState<Membership>({
-    ...defaultNewMembership,
-  });
-  const [addMembershipError, setAddMembershipError] = useState<string | null>(
-    null
-  );
-
-  const [isEditMembershipOpen, setIsEditMembershipOpen] = useState(false);
-  const [editingMembership, setEditingMembership] = useState<Membership | null>(null);
-  const [editMembershipError, setEditMembershipError] = useState<string | null>(null);
 
   const token =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjQxMWY2NmU4LTk5NWQtNDYwOS04YmQzLTJiYWJmZWE1YWEzYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwidXNlcklkIjoxLCJleHAiOjE3NDY4NzYyMjMsImlzcyI6ImFhbGFtX2FsX2t1dHViIiwiYXVkIjoiYWFsYW1fYWxfa3V0dWJfdXNlcnMifQ.D91gNeQn5RhOhXhJ0SjnT0_OGmkPRYPJ_d9IFlUbJ_8";
@@ -106,14 +76,7 @@ const AdminDashboard = () => {
               },
             });
             setUsers(response.data);
-            break;
-          case "memberships":
-            response = await api.get("/api/Membership", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            setMemberships(response.data);
+            setFilteredUsers(response.data);
             break;
         }
       } catch (err) {
@@ -128,9 +91,21 @@ const AdminDashboard = () => {
     loadData();
   }, [activeTab, navigate]);
 
+  const handleSearch = (searchTerm: string) => {
+    if (activeTab === "users") {
+      const filtered = users.filter(
+        (user) =>
+          user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    }
+  };
+
   const handleAddClick = () => {
     if (activeTab === "users") setIsAddUserOpen(true);
-    else if (activeTab === "memberships") setIsAddMembershipOpen(true);
   };
 
   // User actions
@@ -247,73 +222,6 @@ const AdminDashboard = () => {
     setAddUserError(null);
   };
 
-  // Membership handlers
-  const handleAddMembership = (event?: React.FormEvent) => {
-    if (event) event.preventDefault();
-    setAddMembershipError(null);
-
-    api
-      .post("/api/Membership", newMembership, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setMemberships([...memberships, response.data]);
-        setIsAddMembershipOpen(false);
-        setNewMembership({ ...defaultNewMembership });
-      })
-      .catch((error) => {
-        setAddMembershipError(
-          error.response?.data?.message ||
-            error.response?.data?.title ||
-            JSON.stringify(error.response?.data) ||
-            "Failed to add membership"
-        );
-      });
-  };
-
-  const handlerCloseAddMembership = () => {
-    setNewMembership({ ...defaultNewMembership });
-    setIsAddMembershipOpen(false);
-    setAddMembershipError(null);
-  };
-
-  const handleEditMembership = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingMembership) return;
-
-    try {
-      const response = await api.put(`/api/Membership/${editingMembership.membershipId}`, editingMembership, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setMemberships(memberships.map(m => 
-        m.membershipId === editingMembership.membershipId ? response.data : m
-      ));
-      setIsEditMembershipOpen(false);
-      setEditingMembership(null);
-    } catch (err) {
-      setEditMembershipError('Failed to update membership');
-      console.error('Error updating membership:', err);
-    }
-  };
-
-  const handleDeleteMembership = async (membershipId: number) => {
-    try {
-      await api.delete(`/api/Membership/${membershipId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setMemberships(memberships.filter(m => m.membershipId !== membershipId));
-    } catch (err) {
-      setError('Failed to delete membership');
-      console.error('Error deleting membership:', err);
-    }
-  };
-
   // Render content for each tab
   let content = null;
   if (loading) {
@@ -326,7 +234,7 @@ const AdminDashboard = () => {
   } else if (activeTab === "users") {
     content = (
       <UserList
-        users={users}
+        users={filteredUsers}
         editingUser={editingUser}
         setEditingUser={setEditingUser}
         setOriginalUser={setOriginalUser}
@@ -353,38 +261,7 @@ const AdminDashboard = () => {
       />
     ));
   } else if (activeTab === "memberships") {
-    content = memberships.map((m) => (
-      <div key={m.membershipId} className="bg-white p-6 rounded-lg shadow-md relative">
-        <div className="absolute top-4 right-4 flex gap-2">
-          <button
-            onClick={() => {
-              setEditingMembership(m);
-              setIsEditMembershipOpen(true);
-            }}
-            className="text-blue-600 hover:text-blue-800"
-          >
-            <FontAwesomeIcon icon={faEdit} />
-          </button>
-          <DeleteMemberShip
-            membership={m}
-            onDelete={() => handleDeleteMembership(m.membershipId)}
-            className="text-red-600 hover:text-red-800"
-          />
-        </div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-2 pr-16">{m.membershipType}</h3>
-        <div className="space-y-2 text-gray-600">
-          <p>Borrow Limit: {m.borrowLimit}</p>
-          <p>Duration: {m.durationInDays} days</p>
-          {m.price && <p>Price: {m.price} EGP</p>}
-          {m.description && <p>Description: {m.description}</p>}
-          <p>Family Plan: {m.isFamilyPlan ? 'Yes' : 'No'}</p>
-          {m.isFamilyPlan && m.maxFamilyMembers && (
-            <p>Max Family Members: {m.maxFamilyMembers}</p>
-          )}
-          <p>Requires Approval: {m.requiresApproval ? 'Yes' : 'No'}</p>
-        </div>
-      </div>
-    ));
+    content = <ManageMemberShip containerClassName="w-full" />;
   }
 
   return (
@@ -399,31 +276,6 @@ const AdminDashboard = () => {
           addUserError={addUserError}
         />
       )}
-      {activeTab === "memberships" && (
-        <>
-          <MemberShipDialog
-            open={isAddMembershipOpen}
-            newMembership={newMembership}
-            setNewMembership={setNewMembership}
-            onClose={handlerCloseAddMembership}
-            onSubmit={handleAddMembership}
-            addMembershipError={addMembershipError}
-          />
-          {editingMembership && (
-            <EditMemberShipDialog
-              open={isEditMembershipOpen}
-              membership={editingMembership}
-              setMembership={setEditingMembership}
-              onClose={() => {
-                setIsEditMembershipOpen(false);
-                setEditingMembership(null);
-              }}
-              onSubmit={handleEditMembership}
-              editError={editMembershipError}
-            />
-          )}
-        </>
-      )}
       <div className="flex flex-1">
         <Sidebar
           items={sidebarItems}
@@ -432,7 +284,13 @@ const AdminDashboard = () => {
         />
         <main className="flex-1 px-10 py-8">
           <div className="flex items-center mb-6 gap-2">
-            {activeTab !== "books" && <SearchBar onAdd={handleAddClick} />}
+            {activeTab !== "books" && activeTab !== "memberships" && (
+              <SearchBar 
+                onAdd={handleAddClick} 
+                onSearch={handleSearch}
+                placeholder={activeTab === "users" ? "Search users..." : "Search..."}
+              />
+            )}
           </div>
           {error && (
             <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
