@@ -14,6 +14,7 @@ import { Book } from "../types/book";
 import AddUserDialog from "../components/AddUserDialog";
 import UserList from "../components/UserList";
 import BookAddDialog from "../components/BookAddDialog";
+import BookEditDialog from "../components/BookEditDialog";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
@@ -81,6 +82,12 @@ const AdminDashboard = () => {
   const [newBook, setNewBook] = useState({ ...defaultNewBook });
   const [addBookError, setAddBookError] = useState<string | null>(null);
   const [newBookImage, setNewBookImage] = useState<File | null>(null);
+
+  // Edit Book dialog states
+  const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [originalBook, setOriginalBook] = useState<Book | null>(null);
+  const [editBookError, setEditBookError] = useState<string | null>(null);
+  const [editBookImage, setEditBookImage] = useState<File | null>(null);
 
   // Add User dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -327,6 +334,60 @@ const AdminDashboard = () => {
       });
   };
 
+  const handleEditBook = (book: Book) => {
+    setEditingBook({ ...book });
+    setOriginalBook({ ...book });
+    setEditBookImage(null);
+    setEditBookError(null);
+  };
+
+  const handleCancelEditBook = () => {
+    setEditingBook(null);
+    setOriginalBook(null);
+    setEditBookImage(null);
+    setEditBookError(null);
+  };
+
+  const handleSaveBook = (event?: React.FormEvent) => {
+    if (event) event.preventDefault();
+    if (!editingBook) return;
+    setEditBookError(null);
+
+    const formData = new FormData();
+    formData.append("Title", editingBook.title);
+    formData.append("Author", editingBook.author);
+    formData.append("Isbn", editingBook.isbn ?? "");
+    if (editBookImage) {
+      formData.append("CoverImage", editBookImage);
+    }
+
+    api
+      .put(`/api/Books/${editingBook.id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        setBooks(
+          books.map((b) =>
+            b.id === editingBook.id ? { ...b, ...response.data } : b
+          )
+        );
+        setEditingBook(null);
+        setOriginalBook(null);
+        setEditBookImage(null);
+      })
+      .catch((error) => {
+        setEditBookError(
+          error.response?.data?.message ||
+            error.response?.data?.title ||
+            JSON.stringify(error.response?.data) ||
+            "Failed to update book"
+        );
+      });
+  };
+
   // Render content for each tab
   let content = null;
   if (loading) {
@@ -374,6 +435,7 @@ const AdminDashboard = () => {
           </div>
         }
         onDelete={() => handleDeleteBook(book.id)}
+        onEdit={() => handleEditBook(book)}
       />
     ));
   } else if (activeTab === "req") {
@@ -419,6 +481,18 @@ const AdminDashboard = () => {
           newBookImage={newBookImage}
           setNewBookImage={setNewBookImage}
           addError={addBookError}
+        />
+      )}
+      {editingBook && (
+        <BookEditDialog
+          open={!!editingBook}
+          onClose={handleCancelEditBook}
+          onSubmit={handleSaveBook}
+          editingBook={editingBook}
+          setEditingBook={setEditingBook}
+          editBookImage={editBookImage}
+          setEditBookImage={setEditBookImage}
+          editBookError={editBookError}
         />
       )}
       <div className="flex flex-1">
