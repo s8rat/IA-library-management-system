@@ -5,7 +5,7 @@ import Login from "../Pages/auth/Login";
 import { ExploreBooks } from "../Pages/ExploreBooks";
 import { Services } from "../Pages/Plans";
 import RootLayout from "../Pages/Layout";
-import AuthLayout from "../Pages/auth/Layout";
+import AuthLayout from "../Components/Layouts/Layout";
 import AdminDashboard from "../Pages/AdminDashboard";
 import { Library } from "../Pages/Library";
 import UserProfile from "../Pages/UserProfile";
