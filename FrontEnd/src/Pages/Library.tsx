@@ -2,13 +2,19 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBook, faChartBar, faCrown } from "@fortawesome/free-solid-svg-icons";
-import BookManage from "../Components/BookMange";
+import BookManagement from "../Components/Book/BookManagement";
 
 const boards = [
   {
     name: "Manage Books",
     icon: faBook,
-    content: <BookManage />,
+    content: (
+      <BookManagement
+        containerClassName="w-full"
+        searchBarClassName="justify-center"
+        tableClassName="shadow-lg border border-gray-200"
+      />
+    ),
   },
   {
     name: "Borrow Requests",

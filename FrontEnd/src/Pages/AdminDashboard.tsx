@@ -6,18 +6,16 @@ import {
   faCrown,
   faSignIn,
 } from "@fortawesome/free-solid-svg-icons";
-import Sidebar from "../components/Sidebar";
-import SearchBar from "../components/SearchBar";
-import ViewBoardCard from "../components/ViewBoardCard";
+import Sidebar from "../Components/Sidebar";
+import SearchBar from "../Components/SearchBar";
+import ViewBoardCard from "../Components/ViewBoardCard";
 import api from "../Services/api";
-import { Book } from "../types/book";
-import AddUserDialog from "../components/AddUserDialog";
-import UserList from "../components/UserList";
-import BookAddDialog from "../components/BookAddDialog";
-import BookEditDialog from "../components/BookEditDialog";
-import AddMembershipDialog from "../components/MemberShipDialog";
-import { Membership } from "../types/membership";
 import { User } from "../types/user";
+import AddUserDialog from "../Components/AddUserDialog";
+import UserList from "../Components/UserList";
+import MemberShipDialog from "../Components/MemberShip/MemberShipDialog";
+import { Membership } from "../types/membership";
+import BookManagement from "../Components/Book/BookManagement";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
@@ -44,8 +42,6 @@ const defaultNewUser = {
   createdAt: new Date().toISOString(),
 };
 
-const defaultNewBook = { title: "", author: "", isbn: "" };
-
 const defaultNewMembership: Membership = {
   membershipType: "",
   borrowLimit: 1,
@@ -63,21 +59,17 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [originalUser, setOriginalUser] = useState<User | null>(null);
-  const [books, setBooks] = useState<Book[]>([]);
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ADd Book dialot states
-  const [newBook, setNewBook] = useState({ ...defaultNewBook });
-  const [addBookError, setAddBookError] = useState<string | null>(null);
-  const [newBookImage, setNewBookImage] = useState<File | null>(null);
-
-  // Edit Book dialog states
-  const [editingBook, setEditingBook] = useState<Book | null>(null);
-  const [, setOriginalBook] = useState<Book | null>(null);
-  const [editBookError, setEditBookError] = useState<string | null>(null);
-  const [editBookImage, setEditBookImage] = useState<File | null>(null);
+  // Add User dialog states
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isAddMembershipOpen, setIsAddMembershipOpen] = useState(false);
+  const [newUser, setNewUser] = useState<typeof defaultNewUser>({
+    ...defaultNewUser,
+  });
+  const [addUserError, setAddUserError] = useState<string | null>(null);
 
   // Add Membership dialog states
   const [newMembership, setNewMembership] = useState<Membership>({
@@ -87,28 +79,11 @@ const AdminDashboard = () => {
     null
   );
 
-  // Add User dialog states
-  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [isAddBookOpen, setIsAddBookOpen] = useState(false);
-  const [isAddMembershipOpen, setIsAddMembershipOpen] = useState(false);
-  const [newUser, setNewUser] = useState<typeof defaultNewUser>({
-    ...defaultNewUser,
-  });
-  const [addUserError, setAddUserError] = useState<string | null>(null);
-
   const token =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjQxMWY2NmU4LTk5NWQtNDYwOS04YmQzLTJiYWJmZWE1YWEzYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwidXNlcklkIjoxLCJleHAiOjE3NDY4NzYyMjMsImlzcyI6ImFhbGFtX2FsX2t1dHViIiwiYXVkIjoiYWFsYW1fYWxfa3V0dWJfdXNlcnMifQ.D91gNeQn5RhOhXhJ0SjnT0_OGmkPRYPJ_d9IFlUbJ_8";
 
   // Check authentication and role
   useEffect(() => {
-    // const role = localStorage.getItem("userRole");
-    // const token = localStorage.getItem("token");
-    // if (!token || role !== "Admin") {
-    //   console.warn("No token or not admin, redirecting...");
-    //   navigate("/admin");
-    //   return;
-    // }
-
     const loadData = async () => {
       try {
         setLoading(true);
@@ -122,10 +97,6 @@ const AdminDashboard = () => {
               },
             });
             setUsers(response.data);
-            break;
-          case "books":
-            response = await api.get("/api/Books");
-            setBooks(response.data);
             break;
           case "memberships":
             response = await api.get("/api/Membership", {
@@ -148,10 +119,8 @@ const AdminDashboard = () => {
     loadData();
   }, [activeTab, navigate]);
 
-  // ...inside AdminDashboard component...
   const handleAddClick = () => {
     if (activeTab === "users") setIsAddUserOpen(true);
-    else if (activeTab === "books") setIsAddBookOpen(true);
     else if (activeTab === "memberships") setIsAddMembershipOpen(true);
   };
 
@@ -269,125 +238,7 @@ const AdminDashboard = () => {
     setAddUserError(null);
   };
 
-  // book handlers
-
-  const handleAddBook = (event?: React.FormEvent) => {
-    if (event) event.preventDefault();
-    setAddBookError(null);
-
-    const formData = new FormData();
-    formData.append("Title", newBook.title);
-    formData.append("Author", newBook.author);
-    formData.append("Isbn", newBook.isbn);
-    if (newBookImage) {
-      formData.append("CoverImage", newBookImage);
-    }
-
-    api
-      .post("/api/Books", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        setBooks([...books, response.data]);
-        setIsAddBookOpen(false);
-        setNewBook({ ...defaultNewBook });
-        setNewBookImage(null);
-      })
-      .catch((error) => {
-        setAddBookError(
-          error.response?.data?.message ||
-            error.response?.data?.title ||
-            JSON.stringify(error.response?.data) ||
-            "Failed to add book"
-        );
-      });
-  };
-
-  const handlerCloseAddBook = () => {
-    setNewBook({ ...defaultNewBook });
-    setIsAddBookOpen(false);
-    setAddBookError(null);
-  };
-
-  const handleDeleteBook = (id: number) => {
-    api
-      .delete(`/api/Books/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(() => {
-        setBooks(books.filter((b) => b.id !== id));
-      })
-      .catch((error) => {
-        setError(
-          error.response?.data?.message ||
-            error.response?.data?.title ||
-            JSON.stringify(error.response?.data) ||
-            "Error deleting book."
-        );
-      });
-  };
-
-  const handleEditBook = (book: Book) => {
-    setEditingBook({ ...book });
-    setOriginalBook({ ...book });
-    setEditBookImage(null);
-    setEditBookError(null);
-  };
-
-  const handleCancelEditBook = () => {
-    setEditingBook(null);
-    setOriginalBook(null);
-    setEditBookImage(null);
-    setEditBookError(null);
-  };
-
-  const handleSaveBook = (event?: React.FormEvent) => {
-    if (event) event.preventDefault();
-    if (!editingBook) return;
-    setEditBookError(null);
-
-    const formData = new FormData();
-    formData.append("Title", editingBook.title);
-    formData.append("Author", editingBook.author);
-    formData.append("Isbn", editingBook.isbn ?? "");
-    if (editBookImage) {
-      formData.append("CoverImage", editBookImage);
-    }
-
-    api
-      .put(`/api/Books/${editingBook.id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        setBooks(
-          books.map((b) =>
-            b.id === editingBook.id ? { ...b, ...response.data } : b
-          )
-        );
-        setEditingBook(null);
-        setOriginalBook(null);
-        setEditBookImage(null);
-      })
-      .catch((error) => {
-        setEditBookError(
-          error.response?.data?.message ||
-            error.response?.data?.title ||
-            JSON.stringify(error.response?.data) ||
-            "Failed to update book"
-        );
-      });
-  };
-
-  // MemeberShip handlers
-
+  // Membership handlers
   const handleAddMembership = (event?: React.FormEvent) => {
     if (event) event.preventDefault();
     setAddMembershipError(null);
@@ -442,33 +293,13 @@ const AdminDashboard = () => {
       />
     );
   } else if (activeTab === "books") {
-    content = books.map((book) => (
-      <ViewBoardCard
-        key={book.id}
-        name={book.title}
-        description={
-          <div>
-            {book.coverImage && (
-              <div className="mb-2 flex justify-center">
-                <img
-                  src={`data:${book.coverImageContentType};base64,${book.coverImage}`}
-                  alt={`Cover of ${book.title}`}
-                  className="w-32 h-40 object-cover rounded shadow"
-                />
-              </div>
-            )}
-            <div>
-              <strong>Author:</strong> {book.author}
-            </div>
-            <div>
-              <strong>ISBN:</strong> {book.isbn}
-            </div>
-          </div>
-        }
-        onDelete={() => handleDeleteBook(book.id)}
-        onEdit={() => handleEditBook(book)}
+    content = (
+      <BookManagement
+        containerClassName="w-full"
+        searchBarClassName="justify-start"
+        tableClassName="shadow-md"
       />
-    ));
+    );
   } else if (activeTab === "req") {
     content = dummyRequests.map((req) => (
       <ViewBoardCard
@@ -491,7 +322,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      // ...inside your return statement, before the main layout...
       {activeTab === "users" && (
         <AddUserDialog
           open={isAddUserOpen}
@@ -502,32 +332,8 @@ const AdminDashboard = () => {
           addUserError={addUserError}
         />
       )}
-      {activeTab === "books" && (
-        <BookAddDialog
-          open={isAddBookOpen}
-          onClose={handlerCloseAddBook}
-          onSubmit={handleAddBook}
-          newBook={newBook}
-          setNewBook={setNewBook}
-          newBookImage={newBookImage}
-          setNewBookImage={setNewBookImage}
-          addError={addBookError}
-        />
-      )}
-      {editingBook && (
-        <BookEditDialog
-          open={!!editingBook}
-          onClose={handleCancelEditBook}
-          onSubmit={handleSaveBook}
-          editingBook={editingBook}
-          setEditingBook={setEditingBook}
-          editBookImage={editBookImage}
-          setEditBookImage={setEditBookImage}
-          editBookError={editBookError}
-        />
-      )}
       {activeTab === "memberships" && (
-        <AddMembershipDialog
+        <MemberShipDialog
           open={isAddMembershipOpen}
           newMembership={newMembership}
           setNewMembership={setNewMembership}
@@ -544,7 +350,7 @@ const AdminDashboard = () => {
         />
         <main className="flex-1 px-10 py-8">
           <div className="flex items-center mb-6 gap-2">
-            <SearchBar onAdd={handleAddClick} />
+            {activeTab !== "books" && <SearchBar onAdd={handleAddClick} />}
           </div>
           {error && (
             <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">

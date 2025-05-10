@@ -1,7 +1,7 @@
 import React from "react";
-import { Membership } from "../types/membership";
+import { Membership } from "../../types/membership";
 
-interface AddMembershipDialogProps {
+interface MemberShipDialogProps {
   open: boolean;
   newMembership: Membership;
   setNewMembership: (m: Membership) => void;
@@ -10,7 +10,7 @@ interface AddMembershipDialogProps {
   addMembershipError: string | null;
 }
 
-const AddMembershipDialog: React.FC<AddMembershipDialogProps> = ({
+const MemberShipDialog: React.FC<MemberShipDialogProps> = ({
   open,
   newMembership,
   setNewMembership,
@@ -215,4 +215,4 @@ const AddMembershipDialog: React.FC<AddMembershipDialogProps> = ({
   );
 };
 
-export default AddMembershipDialog;
+export default MemberShipDialog;

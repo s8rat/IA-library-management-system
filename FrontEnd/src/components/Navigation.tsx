@@ -54,7 +54,7 @@ export const Navigation = () => {
     const navLinks = [
         { to: "/", label: "Home" },
         { to: "/explore", label: "Explore Books" },
-        { to: "/services", label: "Our Services" },
+        { to: "/plans", label: "Our Plans" },
     ];
 
     // Add role-specific links

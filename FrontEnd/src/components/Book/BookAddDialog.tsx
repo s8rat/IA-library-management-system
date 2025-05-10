@@ -1,28 +1,45 @@
-import React from "react";
-import { Book } from "../types/book";
+import React, { useState } from "react";
 
-interface BookEditDialogProps {
+interface BookAddDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
-  editingBook: Book;
-  setEditingBook: (book: Book) => void;
-  editBookImage: File | null;
-  setEditBookImage: (file: File | null) => void;
-  editBookError: string | null;
+  newBook: {
+    title: string;
+    author: string;
+    isbn: string;
+  };
+  setNewBook: (book: { title: string; author: string; isbn: string }) => void;
+  newBookImage: File | null;
+  setNewBookImage: (file: File | null) => void;
+  addError: string | null;
 }
 
-const BookEditDialog: React.FC<BookEditDialogProps> = ({
+const BookAddDialog: React.FC<BookAddDialogProps> = ({
   open,
   onClose,
   onSubmit,
-  editingBook,
-  setEditingBook,
-  editBookImage,
-  setEditBookImage,
-  editBookError,
+  newBook,
+  setNewBook,
+  setNewBookImage,
+  addError,
 }) => {
-  if (!open || !editingBook) return null;
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  if (!open) return null;
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewBookImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative">
@@ -35,79 +52,90 @@ const BookEditDialog: React.FC<BookEditDialogProps> = ({
           &times;
         </button>
         <h2 className="font-bold text-2xl mb-6 text-center text-blue-900 tracking-wide">
-          Edit Book
+          Add New Book
         </h2>
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Cover Image */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-blue-900 mb-1">
+                Cover Image
+              </label>
+              <div className="flex items-center gap-4">
+                <div className="w-32 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                  {previewUrl ? (
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-400 text-sm">No image</span>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Recommended size: 300x450px
+                  </p>
+                </div>
+              </div>
+            </div>
+            {/* Title */}
             <div>
               <label className="block text-sm font-semibold text-blue-900 mb-1">
                 Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                value={editingBook.title}
+                value={newBook.title}
                 onChange={(e) =>
-                  setEditingBook({ ...editingBook, title: e.target.value })
+                  setNewBook({ ...newBook, title: e.target.value })
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
                 autoFocus
               />
             </div>
+            {/* Author */}
             <div>
               <label className="block text-sm font-semibold text-blue-900 mb-1">
                 Author <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                value={editingBook.author}
+                value={newBook.author}
                 onChange={(e) =>
-                  setEditingBook({ ...editingBook, author: e.target.value })
+                  setNewBook({ ...newBook, author: e.target.value })
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
               />
             </div>
+            {/* ISBN */}
             <div>
               <label className="block text-sm font-semibold text-blue-900 mb-1">
                 ISBN
               </label>
               <input
                 type="text"
-                value={editingBook.isbn}
+                value={newBook.isbn}
                 onChange={(e) =>
-                  setEditingBook({ ...editingBook, isbn: e.target.value })
+                  setNewBook({ ...newBook, isbn: e.target.value })
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 placeholder="Optional"
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-blue-900 mb-1">
-                Cover Image
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setEditBookImage(e.target.files ? e.target.files[0] : null)
-                }
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-              />
-              {editBookImage && (
-                <div className="mt-2 flex justify-center">
-                  <img
-                    src={URL.createObjectURL(editBookImage)}
-                    alt="Preview"
-                    className="h-28 w-auto rounded shadow border"
-                  />
-                </div>
-              )}
-            </div>
           </div>
-          {editBookError && (
+          {addError && (
             <div className="text-red-600 text-center text-sm mt-2">
-              {editBookError}
+              {addError}
             </div>
           )}
           <div className="flex justify-end gap-2 mt-4">
@@ -115,7 +143,7 @@ const BookEditDialog: React.FC<BookEditDialogProps> = ({
               type="submit"
               className="px-5 py-2 rounded-lg bg-blue-700 text-white font-semibold hover:bg-blue-800 transition"
             >
-              Save
+              Add Book
             </button>
             <button
               type="button"
@@ -131,4 +159,4 @@ const BookEditDialog: React.FC<BookEditDialogProps> = ({
   );
 };
 
-export default BookEditDialog;
+export default BookAddDialog; 
