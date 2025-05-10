@@ -1,24 +1,34 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Membership } from "../../types/membership";
 
 interface EditMemberShipDialogProps {
   open: boolean;
   membership: Membership;
-  setMembership: (m: Membership) => void;
   onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onEdit: (membership: Membership) => Promise<void>;
   editError: string | null;
 }
 
 const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
   open,
   membership,
-  setMembership,
   onClose,
-  onSubmit,
+  onEdit,
   editError,
 }) => {
+  const [editedMembership, setEditedMembership] = useState<Membership>(membership);
+
+  useEffect(() => {
+    setEditedMembership(membership);
+  }, [membership]);
+
   if (!open) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onEdit(editedMembership);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative">
@@ -33,7 +43,7 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
         <h2 className="font-bold text-2xl mb-6 text-center text-blue-900 tracking-wide">
           Edit Membership Plan
         </h2>
-        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Membership Type */}
             <div>
@@ -42,10 +52,10 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
               </label>
               <input
                 type="text"
-                value={membership.membershipType}
+                value={editedMembership.membershipType}
                 onChange={(e) =>
-                  setMembership({
-                    ...membership,
+                  setEditedMembership({
+                    ...editedMembership,
                     membershipType: e.target.value,
                   })
                 }
@@ -60,10 +70,10 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
               </label>
               <input
                 type="number"
-                value={membership.borrowLimit}
+                value={editedMembership.borrowLimit}
                 onChange={(e) =>
-                  setMembership({
-                    ...membership,
+                  setEditedMembership({
+                    ...editedMembership,
                     borrowLimit: Number(e.target.value),
                   })
                 }
@@ -79,10 +89,10 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
               </label>
               <input
                 type="number"
-                value={membership.durationInDays}
+                value={editedMembership.durationInDays}
                 onChange={(e) =>
-                  setMembership({
-                    ...membership,
+                  setEditedMembership({
+                    ...editedMembership,
                     durationInDays: Number(e.target.value),
                   })
                 }
@@ -98,10 +108,10 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
               </label>
               <input
                 type="number"
-                value={membership.price ?? ""}
+                value={editedMembership.price ?? ""}
                 onChange={(e) =>
-                  setMembership({
-                    ...membership,
+                  setEditedMembership({
+                    ...editedMembership,
                     price: e.target.value ? Number(e.target.value) : undefined,
                   })
                 }
@@ -116,10 +126,10 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
               </label>
               <input
                 type="text"
-                value={membership.description ?? ""}
+                value={editedMembership.description ?? ""}
                 onChange={(e) =>
-                  setMembership({
-                    ...membership,
+                  setEditedMembership({
+                    ...editedMembership,
                     description: e.target.value,
                   })
                 }
@@ -134,10 +144,10 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={membership.isFamilyPlan}
+                  checked={editedMembership.isFamilyPlan}
                   onChange={(e) =>
-                    setMembership({
-                      ...membership,
+                    setEditedMembership({
+                      ...editedMembership,
                       isFamilyPlan: e.target.checked,
                     })
                   }
@@ -147,17 +157,17 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
               </div>
             </div>
             {/* Max Family Members */}
-            {membership.isFamilyPlan && (
+            {editedMembership.isFamilyPlan && (
               <div>
                 <label className="block text-sm font-semibold text-blue-900 mb-1">
                   Max Family Members
                 </label>
                 <input
                   type="number"
-                  value={membership.maxFamilyMembers ?? ""}
+                  value={editedMembership.maxFamilyMembers ?? ""}
                   onChange={(e) =>
-                    setMembership({
-                      ...membership,
+                    setEditedMembership({
+                      ...editedMembership,
                       maxFamilyMembers: e.target.value
                         ? Number(e.target.value)
                         : undefined,
@@ -176,10 +186,10 @@ const EditMemberShipDialog: React.FC<EditMemberShipDialogProps> = ({
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={membership.requiresApproval}
+                  checked={editedMembership.requiresApproval}
                   onChange={(e) =>
-                    setMembership({
-                      ...membership,
+                    setEditedMembership({
+                      ...editedMembership,
                       requiresApproval: e.target.checked,
                     })
                   }

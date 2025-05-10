@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Button from "../Layouts/Button";
+import Button from "../UI/Button";
 
 interface IViewBoardCard {
   name: string;

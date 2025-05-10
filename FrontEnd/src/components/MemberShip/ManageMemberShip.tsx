@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { Membership } from "../../types/membership";
 import api from "../../Services/api";
-import MemberShipDialog from "./MemberShipDialog";
+import MemberShipDialog from "./AddMemberShipDialog";
 import EditMemberShipDialog from "./EditMemberShipDialog";
 import DeleteMemberShip from "./DeleteMemberShip";
 
@@ -11,25 +11,12 @@ interface ManageMemberShipProps {
   containerClassName?: string;
 }
 
-const defaultNewMembership: Membership = {
-  membershipId: 0,
-  membershipType: "",
-  borrowLimit: 1,
-  durationInDays: 30,
-  price: undefined,
-  description: "",
-  isFamilyPlan: false,
-  maxFamilyMembers: undefined,
-  requiresApproval: false,
-};
-
 const ManageMemberShip: React.FC<ManageMemberShipProps> = ({ containerClassName = "" }) => {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [editingMembership, setEditingMembership] = useState<Membership | null>(null);
-  const [newMembership, setNewMembership] = useState<Membership>({ ...defaultNewMembership });
   const [membershipError, setMembershipError] = useState<string | null>(null);
 
   // Fetch memberships
@@ -48,47 +35,6 @@ const ManageMemberShip: React.FC<ManageMemberShipProps> = ({ containerClassName 
 
     fetchMemberships();
   }, []);
-
-  // Membership handlers
-  const handleAddMembership = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await api.post('/api/Membership', newMembership);
-      setMemberships([...memberships, response.data]);
-      setIsDialogOpen(false);
-      setNewMembership({ ...defaultNewMembership });
-    } catch (err) {
-      setMembershipError('Failed to add membership');
-      console.error('Error adding membership:', err);
-    }
-  };
-
-  const handleEditMembership = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingMembership) return;
-
-    try {
-      const response = await api.put(`/api/Membership/${editingMembership.membershipId}`, editingMembership);
-      setMemberships(memberships.map(m => 
-        m.membershipId === editingMembership.membershipId ? response.data : m
-      ));
-      setIsEditDialogOpen(false);
-      setEditingMembership(null);
-    } catch (err) {
-      setMembershipError('Failed to update membership');
-      console.error('Error updating membership:', err);
-    }
-  };
-
-  const handleDeleteMembership = async (membershipId: number) => {
-    try {
-      await api.delete(`/api/Membership/${membershipId}`);
-      setMemberships(memberships.filter(m => m.membershipId !== membershipId));
-    } catch (err) {
-      setMembershipError('Failed to delete membership');
-      console.error('Error deleting membership:', err);
-    }
-  };
 
   if (loading) {
     return (
@@ -130,7 +76,15 @@ const ManageMemberShip: React.FC<ManageMemberShipProps> = ({ containerClassName 
               </button>
               <DeleteMemberShip
                 membership={membership}
-                onDelete={() => handleDeleteMembership(membership.membershipId)}
+                onDelete={async () => {
+                  try {
+                    await api.delete(`/api/Membership/${membership.membershipId}`);
+                    setMemberships(memberships.filter(m => m.membershipId !== membership.membershipId));
+                  } catch (err) {
+                    setMembershipError('Failed to delete membership');
+                    console.error('Error deleting membership:', err);
+                  }
+                }}
                 className="text-red-600 hover:text-red-800"
               />
             </div>
@@ -151,22 +105,40 @@ const ManageMemberShip: React.FC<ManageMemberShipProps> = ({ containerClassName 
       </div>
       <MemberShipDialog 
         open={isDialogOpen} 
-        newMembership={newMembership} 
-        setNewMembership={setNewMembership} 
         onClose={() => setIsDialogOpen(false)} 
-        onSubmit={handleAddMembership} 
+        onAdd={async (newMembership: Membership) => {
+          try {
+            const response = await api.post('/api/Membership', newMembership);
+            setMemberships([...memberships, response.data]);
+            setIsDialogOpen(false);
+          } catch (err) {
+            setMembershipError('Failed to add membership');
+            console.error('Error adding membership:', err);
+          }
+        }}
         addMembershipError={membershipError} 
       />
       {editingMembership && (
         <EditMemberShipDialog
           open={isEditDialogOpen}
           membership={editingMembership}
-          setMembership={setEditingMembership}
           onClose={() => {
             setIsEditDialogOpen(false);
             setEditingMembership(null);
           }}
-          onSubmit={handleEditMembership}
+          onEdit={async (updatedMembership: Membership) => {
+            try {
+              const response = await api.put(`/api/Membership/${updatedMembership.membershipId}`, updatedMembership);
+              setMemberships(memberships.map(m => 
+                m.membershipId === updatedMembership.membershipId ? response.data : m
+              ));
+              setIsEditDialogOpen(false);
+              setEditingMembership(null);
+            } catch (err) {
+              setMembershipError('Failed to update membership');
+              console.error('Error updating membership:', err);
+            }
+          }}
           editError={membershipError}
         />
       )}

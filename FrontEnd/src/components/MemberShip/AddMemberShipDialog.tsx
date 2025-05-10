@@ -1,24 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { Membership } from "../../types/membership";
 
 interface MemberShipDialogProps {
   open: boolean;
-  newMembership: Membership;
-  setNewMembership: (m: Membership) => void;
   onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onAdd: (membership: Membership) => Promise<void>;
   addMembershipError: string | null;
 }
 
+const defaultNewMembership: Membership = {
+  membershipId: 0,
+  membershipType: "",
+  borrowLimit: 1,
+  durationInDays: 30,
+  price: undefined,
+  description: "",
+  isFamilyPlan: false,
+  maxFamilyMembers: undefined,
+  requiresApproval: false,
+};
+
 const MemberShipDialog: React.FC<MemberShipDialogProps> = ({
   open,
-  newMembership,
-  setNewMembership,
   onClose,
-  onSubmit,
+  onAdd,
   addMembershipError,
 }) => {
+  const [newMembership, setNewMembership] = useState<Membership>({ ...defaultNewMembership });
+
   if (!open) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onAdd(newMembership);
+    setNewMembership({ ...defaultNewMembership });
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative">
@@ -33,7 +50,7 @@ const MemberShipDialog: React.FC<MemberShipDialogProps> = ({
         <h2 className="font-bold text-2xl mb-6 text-center text-blue-900 tracking-wide">
           Add Membership Plan
         </h2>
-        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Membership Type */}
             <div>
