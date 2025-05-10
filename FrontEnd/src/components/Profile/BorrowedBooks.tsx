@@ -2,11 +2,12 @@ import React from 'react';
 
 interface BorrowedBook {
     id: number;
-    title: string;
+    bookTitle: string;
     author: string;
     borrowDate: string;
     dueDate: string;
     status: string;
+    returnDate: string | null;
 }
 
 interface BorrowedBooksProps {
@@ -57,10 +58,10 @@ const BorrowedBooks: React.FC<BorrowedBooksProps> = ({ books, isLoading }) => {
                     {books.map((book) => (
                         <tr key={book.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {book.title}
+                                {book.bookTitle}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {book.author}
+                                {book.author || 'Unknown'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {new Date(book.borrowDate).toLocaleDateString()}
@@ -70,7 +71,7 @@ const BorrowedBooks: React.FC<BorrowedBooksProps> = ({ books, isLoading }) => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    book.status === 'Active' 
+                                    book.status === 'Borrowed' 
                                         ? 'bg-green-100 text-green-800'
                                         : 'bg-red-100 text-red-800'
                                 }`}>
