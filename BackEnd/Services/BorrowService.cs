@@ -1,4 +1,4 @@
-﻿using BackEnd.Data;
+using BackEnd.Data;
 using BackEnd.DTOs;
 using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
@@ -253,6 +253,7 @@ namespace BackEnd.Services
                     Username = br.User.Username,
                     BookId = br.BookId,
                     BookTitle = br.Book.Title,
+                    Author = br.Book.Author,
                     BorrowDate = br.BorrowDate,
                     DueDate = br.DueDate,
                     ReturnDate = br.ReturnDate,

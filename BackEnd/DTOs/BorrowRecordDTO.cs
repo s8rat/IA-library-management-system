@@ -1,4 +1,4 @@
-﻿namespace BackEnd.DTOs
+namespace BackEnd.DTOs
 {
     public class BorrowRecordDTO
     {
@@ -7,6 +7,7 @@
         public string Username { get; set; }
         public long BookId { get; set; }
         public string BookTitle { get; set; }
+        public string Author { get; set; }
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
