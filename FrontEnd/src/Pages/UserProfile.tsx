@@ -175,36 +175,74 @@ const UserProfile: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-            <div className="container mx-auto px-4 py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <div className="flex-1">
-                        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6">
-                            <UserAvatar 
-                                firstName={user.firstName}
-                                lastName={user.lastName}
-                                role={user.role}
-                            />
-                            <ProfileForm
-                                user={user}
-                                isEditing={isEditing}
-                                editedUser={editedUser}
-                                onInputChange={handleInputChange}
-                                onSave={handleSave}
-                                onCancel={handleCancel}
-                                onEdit={handleEdit}
-                            />
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex flex-col w-full">
+            <div className="flex-1 w-full flex flex-col px-4 md:px-12 xl:px-32 py-8">
+                <div className="flex-1 flex flex-col xl:flex-row gap-8 min-h-0 w-full">
+                    {/* Left Column - Profile Info */}
+                    <div className="w-full xl:w-2/5 animate-fadeIn flex flex-col">
+                        <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex-1 flex flex-col">
+                            {/* Top gradient banner */}
+                            <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+                            <div className="-mt-16 px-8 pb-8 flex-1 flex flex-col">
+                                <UserAvatar 
+                                    firstName={user.firstName}
+                                    lastName={user.lastName}
+                                    role={user.role}
+                                />
+                                <div className="mt-6 flex-1 flex flex-col">
+                                    <ProfileForm
+                                        user={user}
+                                        isEditing={isEditing}
+                                        editedUser={editedUser}
+                                        onInputChange={handleInputChange}
+                                        onSave={handleSave}
+                                        onCancel={handleCancel}
+                                        onEdit={handleEdit}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <BorrowHistorySection 
-                        borrowHistory={borrowHistory}
-                        isLoading={loading}
-                    />
+                    {/* Right Column - Borrow History */}
+                    <div className="w-full xl:w-3/5 animate-fadeIn animation-delay-150 flex flex-col">
+                        <div className="h-full bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 flex-1 flex flex-col">
+                            <BorrowHistorySection 
+                                borrowHistory={borrowHistory}
+                                isLoading={loading}
+                            />
+                        </div>
+                    </div>
                 </div>
 
-                <LibrarianRequestSection userRole={user.role} />
+                {/* Bottom Section - Librarian Request */}
+                <div className="mt-8 animate-fadeIn animation-delay-300 w-full">
+                    <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 w-full">
+                        <LibrarianRequestSection userRole={user.role} />
+                    </div>
+                </div>
             </div>
+
+            {/* Loading State */}
+            {loading && (
+                <div className="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="text-center">
+                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+                        <p className="mt-4 text-gray-600 font-medium">Loading your profile...</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Error State */}                    {error && (
+                <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-xl p-4 animate-slideIn max-w-md">
+                    <div className="flex items-center text-red-600">
+                        <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-sm">{error}</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
