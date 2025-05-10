@@ -58,7 +58,7 @@ namespace BackEnd.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateUser(long id, [FromBody] UserDTO userDTO)
+        public async Task<IActionResult> UpdateUser(long id, [FromBody] UpdateUserDTO updateUserDTO)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace BackEnd.Controllers
                     return Forbid();
                 }
 
-                var user = await _userService.UpdateUser(id, userDTO);
+                var user = await _userService.UpdateUser(id, updateUserDTO);
                 return Ok(user);
             }
             catch (Exception ex)

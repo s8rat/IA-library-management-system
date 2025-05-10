@@ -9,7 +9,7 @@ namespace BackEnd.Services
         Task<UserDTO> GetUserById(long id);
         Task<UserDTO> CreateUser(UserDTO userDTO);
         Task<UserDTO> GetCurrentUserProfile(long userId);
-        Task<UserDTO> UpdateUser(long id, UserDTO userDTO);
+        Task<UserDTO> UpdateUser(long id, UpdateUserDTO updateUserDTO);
         Task<bool> DeleteUser(long id);
     }
 }

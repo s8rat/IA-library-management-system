@@ -99,7 +99,7 @@ namespace BackEnd.Services
             };
         }
 
-        public async Task<UserDTO> UpdateUser(long id, UserDTO userDTO)
+        public async Task<UserDTO> UpdateUser(long id, UpdateUserDTO updateUserDTO)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -108,36 +108,39 @@ namespace BackEnd.Services
             }
 
             // Check if username is being changed to one that already exists
-            if (!string.IsNullOrWhiteSpace(userDTO.Username) &&
-                user.Username != userDTO.Username &&
-                await _context.Users.AnyAsync(u => u.Username == userDTO.Username))
+            if (!string.IsNullOrWhiteSpace(updateUserDTO.Username) &&
+                user.Username != updateUserDTO.Username &&
+                await _context.Users.AnyAsync(u => u.Username == updateUserDTO.Username))
             {
                 throw new Exception("Username already exists");
             }
 
             // Check if email is being changed to one that already exists
-            if (!string.IsNullOrWhiteSpace(userDTO.Email) &&
-                user.Email != userDTO.Email &&
-                await _context.Users.AnyAsync(u => u.Email == userDTO.Email))
+            if (!string.IsNullOrWhiteSpace(updateUserDTO.Email) &&
+                user.Email != updateUserDTO.Email &&
+                await _context.Users.AnyAsync(u => u.Email == updateUserDTO.Email))
             {
                 throw new Exception("Email already exists");
             }
 
             // Update fields if they are provided (not null or whitespace)
-            if (!string.IsNullOrWhiteSpace(userDTO.Username))
-                user.Username = userDTO.Username;
+            if (!string.IsNullOrWhiteSpace(updateUserDTO.Username))
+                user.Username = updateUserDTO.Username;
 
-            if (!string.IsNullOrWhiteSpace(userDTO.Email))
-                user.Email = userDTO.Email;
+            if (!string.IsNullOrWhiteSpace(updateUserDTO.Email))
+                user.Email = updateUserDTO.Email;
 
-            if (!string.IsNullOrWhiteSpace(userDTO.FirstName))
-                user.FirstName = userDTO.FirstName;
+            if (!string.IsNullOrWhiteSpace(updateUserDTO.FirstName))
+                user.FirstName = updateUserDTO.FirstName;
 
-            if (!string.IsNullOrWhiteSpace(userDTO.LastName))
-                user.LastName = userDTO.LastName;
+            if (!string.IsNullOrWhiteSpace(updateUserDTO.LastName))
+                user.LastName = updateUserDTO.LastName;
 
-            if (!string.IsNullOrWhiteSpace(userDTO.PhoneNumber))
-                user.PhoneNumber = userDTO.PhoneNumber;
+            if (!string.IsNullOrWhiteSpace(updateUserDTO.PhoneNumber))
+                user.PhoneNumber = updateUserDTO.PhoneNumber;
+
+            if (!string.IsNullOrWhiteSpace(updateUserDTO.Role))
+                user.Role = updateUserDTO.Role;
 
             // Do not update SSN and Role
 
@@ -153,7 +156,7 @@ namespace BackEnd.Services
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                SSN = user.SSN,
+                SSN = user.SSN, // Still not updating SSN
                 PhoneNumber = user.PhoneNumber
             };
         }
