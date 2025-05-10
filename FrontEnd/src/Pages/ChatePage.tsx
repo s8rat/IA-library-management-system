@@ -1,70 +1,86 @@
 import React, { useState, useRef, useEffect } from "react";
-
-interface Message {
-  id: number;
-  user: string;
-  content: string;
-  timestamp: string;
-}
-
-const dummyMessages: Message[] = [
-  { id: 1, user: "Alice", content: "Hello everyone! 👋", timestamp: "10:00" },
-  { id: 2, user: "Bob", content: "Hi Alice!", timestamp: "10:01" },
-];
+import {
+  startConnection,
+  sendMessage,
+  stopConnection,
+  ChatHistoryMessage,
+} from "../Services/signalR";
 
 export const ChatePage = () => {
-  const [messages, setMessages] = useState<Message[]>(dummyMessages);
+  const [messages, setMessages] = useState<ChatHistoryMessage[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Replace with your actual user name logic
+  const user = localStorage.getItem("username") || "You";
+  const userId = Number(localStorage.getItem("userId"));
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    let isMounted = true;
+
+    // Start SignalR connection
+    startConnection(
+      // On single message
+      (msg) => {
+        console.log("Received message:", msg);
+        if (isMounted) setMessages((prev) => [...prev, msg]);
+      },
+      // On history
+      (msgs) => {
+        console.log("Received chat history:", msgs);
+        if (isMounted) setMessages(msgs.reverse());
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      stopConnection();
+    };
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
   }, [messages]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-    setMessages([
-      ...messages,
-      {
-        id: messages.length + 1,
-        user: "You",
-        content: input,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      },
-    ]);
+    sendMessage(userId, input);
     setInput("");
   };
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-gradient-to-br from-blue-50 to-blue-100">
-      {/* Remove header here if you have a global header */}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* Optional: User List Sidebar */}
-        {/* <aside className="hidden md:block w-64 bg-white border-r p-4"> ... </aside> */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         <main className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6 space-y-4">
-            {messages.map((msg) => (
+          <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-transparent max-h-[60vh] min-h-[300px]">
+            {messages.map((msg, idx) => (
               <div
-                key={msg.id}
+                key={idx}
                 className={`flex flex-col max-w-xl ${
-                  msg.user === "You" ? "ml-auto items-end" : "items-start"
+                  msg.User === user ? "ml-auto items-end" : "items-start"
                 }`}
               >
                 <span className="text-xs text-gray-500 mb-1">
-                  {msg.user} • {msg.timestamp}
+                  {msg.User || "Unknown"} •{" "}
+                  {msg.Timestamp
+                    ? new Date(msg.Timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : ""}
                 </span>
                 <div
                   className={`px-4 py-2 rounded-2xl shadow ${
-                    msg.user === "You"
+                    msg.User === user
                       ? "bg-blue-600 text-white"
                       : "bg-white text-gray-800"
                   }`}
                 >
-                  {msg.content}
+                  {msg.Message}
                 </div>
               </div>
             ))}
@@ -77,7 +93,7 @@ export const ChatePage = () => {
           >
             <input
               type="text"
-              className="flex-1 rounded-full border bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 caret-black"
+              className="flex-1 rounded-full border text-black bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 caret-black"
               placeholder="Type your message…"
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -92,7 +108,6 @@ export const ChatePage = () => {
           </form>
         </main>
       </div>
-      {/* Remove footer here if you have a global footer */}
     </div>
   );
 };
