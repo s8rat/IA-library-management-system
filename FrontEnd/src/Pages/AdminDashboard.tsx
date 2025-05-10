@@ -264,7 +264,7 @@ const AdminDashboard = () => {
     setAddUserError(null);
   };
 
-  // Add book handlers
+  // book handlers
 
   const handleAddBook = (event?: React.FormEvent) => {
     if (event) event.preventDefault();
@@ -305,6 +305,26 @@ const AdminDashboard = () => {
     setNewBook({ ...defaultNewBook });
     setIsAddBookOpen(false);
     setAddBookError(null);
+  };
+
+  const handleDeleteBook = (id: number) => {
+    api
+      .delete(`/api/Books/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => {
+        setBooks(books.filter((b) => b.id !== id));
+      })
+      .catch((error) => {
+        setError(
+          error.response?.data?.message ||
+            error.response?.data?.title ||
+            JSON.stringify(error.response?.data) ||
+            "Error deleting book."
+        );
+      });
   };
 
   // Render content for each tab
@@ -353,6 +373,7 @@ const AdminDashboard = () => {
             </div>
           </div>
         }
+        onDelete={() => handleDeleteBook(book.id)}
       />
     ));
   } else if (activeTab === "req") {
