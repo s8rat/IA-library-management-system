@@ -180,7 +180,8 @@ namespace BackEnd.Services
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 PhoneNumber = user.PhoneNumber,
-                CreatedAt = user.CreatedAt
+                CreatedAt = user.CreatedAt,
+                Role = user.Role
             };
         }
 

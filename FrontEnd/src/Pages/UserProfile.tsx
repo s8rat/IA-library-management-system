@@ -133,7 +133,7 @@ const UserProfile: React.FC = () => {
                 FirstName: editedUser.firstName?.trim(),
                 LastName: editedUser.lastName?.trim(),
                 PhoneNumber: editedUser.phoneNumber?.trim(),
-                Role: user.role || 'User' // Default to 'User' if role is null
+                Role: user.role 
             };
 
             // Validate required fields
@@ -196,7 +196,20 @@ const UserProfile: React.FC = () => {
     const handleRequest = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.post('/api/Auth/request-librarian');
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError('Authentication token not found');
+                return;
+            }
+
+            // Decode the JWT token to get the role
+            const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+            const currentRole = tokenPayload.role;
+
+            await api.post('/api/Auth/request-librarian', {
+                message: requestMsg,
+                currentRole: currentRole
+            });
             setSubmitted(true);
         } catch (err) {
             console.error('Error submitting request:', err);

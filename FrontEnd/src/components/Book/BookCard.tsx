@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Book } from '../types/book';
+import { Book } from '../../types/book';
 import BorrowRequestDialog from './BorrowRequestDialog';
 
 interface BookCardProps {
