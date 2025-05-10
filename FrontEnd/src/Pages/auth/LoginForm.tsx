@@ -60,7 +60,7 @@ const LoginForm = () => {
       if (role === 'Admin') {
         navigate('/admin');
       } else if (role === 'Librarian') {
-        navigate('/library');
+        navigate('/Librarian');
       } else {
         navigate('/');
       }

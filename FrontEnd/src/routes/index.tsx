@@ -7,7 +7,7 @@ import { Services } from "../Pages/Plans";
 import RootLayout from "../Pages/Layout";
 import AuthLayout from "../Components/Layouts/Layout";
 import AdminDashboard from "../Pages/AdminDashboard";
-import { Library } from "../Pages/Library";
+import { Librarian} from "../Pages/Librarian";
 import UserProfile from "../Pages/UserProfile";
 import Register from "../Pages/auth/Register";
 
@@ -37,8 +37,8 @@ export const router = createBrowserRouter([
         element: <AdminDashboard />,
       },
       {
-        path: "/library",
-        element: <Library />,
+        path: "/Librarian",
+        element: <Librarian />,
       },
     ],
   },

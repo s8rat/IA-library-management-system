@@ -4,8 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBook, faChartBar, faCrown } from "@fortawesome/free-solid-svg-icons";
 import BookManagement from "../Components/Book/BookManagement";
 import ManageMemberShip from "../Components/MemberShip/ManageMemberShip";
+import SeeBorrowRequest from "../Components/Librarian/SeeBorrowRequst";
+import SeeReturnRequest from "../Components/Librarian/SeeReturnRequst";
 
-export const Library = () => {
+export const Librarian = () => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -38,13 +40,18 @@ export const Library = () => {
     {
       name: "Borrow Requests",
       icon: faChartBar,
-      content: <div>Borrow requests content goes here.</div>,
-    },
+      content: <SeeBorrowRequest />,
+    },  
     {
-      name: "Manage Memberships",
-      icon: faCrown,
-      content: <ManageMemberShip containerClassName="w-full" />
+      name: "Return Requests",
+      icon: faChartBar,
+      content: <SeeReturnRequest />,
     },
+      {
+        name: "Manage Memberships",
+        icon: faCrown,
+        content: <ManageMemberShip containerClassName="w-full" />
+      },
   ];
 
   if (loading) {

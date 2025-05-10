@@ -61,7 +61,7 @@ export const Navigation = () => {
     if (user?.role === 'Admin') {
         navLinks.push({ to: "/admin", label: "Admin Dashboard" });
     } else if (user?.role === 'Librarian') {
-        navLinks.push({ to: "/library", label: "Library Dashboard" });
+        navLinks.push({ to: "/Librarian", label: "Librarian Dashboard" });
     }
 
     return (

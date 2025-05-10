@@ -128,27 +128,30 @@ const UserProfile: React.FC = () => {
             }
 
             const updateData = {
-                id: user.id,
-                username: editedUser.username?.trim(),
-                email: editedUser.email?.trim(),
-                firstName: editedUser.firstName?.trim(),
-                lastName: editedUser.lastName?.trim(),
-                phoneNumber: editedUser.phoneNumber?.trim(),
-                ssn: user.ssn,
-                role: user.role,
-                createdAt: user.createdAt
+                Username: editedUser.username?.trim(),
+                Email: editedUser.email?.trim(),
+                FirstName: editedUser.firstName?.trim(),
+                LastName: editedUser.lastName?.trim(),
+                PhoneNumber: editedUser.phoneNumber?.trim(),
+                Role: user.role || 'User' // Default to 'User' if role is null
             };
 
             // Validate required fields
-            if (!updateData.username || !updateData.email || !updateData.firstName || !updateData.lastName) {
+            if (!updateData.Username || !updateData.Email || !updateData.FirstName || !updateData.LastName) {
                 setError('Please fill in all required fields');
                 return;
             }
 
             // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(updateData.email)) {
+            if (!emailRegex.test(updateData.Email)) {
                 setError('Please enter a valid email address');
+                return;
+            }
+
+            // Validate role
+            if (!['Admin', 'Librarian', 'User'].includes(updateData.Role)) {
+                setError('Invalid role specified');
                 return;
             }
 
@@ -220,58 +223,79 @@ const UserProfile: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* User Profile Card */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <div className="flex flex-col items-center mb-6">
-                            <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                                <span className="text-3xl font-bold text-blue-600">
-                                    {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left Column - Profile */}
+                    <div className="flex-1">
+                        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6">
+                            <div className="flex flex-col items-center mb-8">
+                                <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                                    <span className="text-4xl font-bold text-white">
+                                        {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                                    </span>
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                                    {user.firstName} {user.lastName}
+                                </h2>
+                                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                    {user.role}
                                 </span>
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-900">
-                                {user.firstName} {user.lastName}
-                            </h2>
-                            <p className="text-gray-500">{user.role}</p>
-                        </div>
 
-                        <ProfileForm
-                            user={user}
-                            isEditing={isEditing}
-                            editedUser={editedUser}
-                            onInputChange={handleInputChange}
-                            onSave={handleSave}
-                            onCancel={handleCancel}
-                            onEdit={handleEdit}
-                        />
-                    </div>
-
-                    {/* Borrow History Card */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">Borrow History</h2>
-                        <div className="overflow-x-auto">
-                            <BorrowedBooks 
-                                books={borrowHistory.map(book => ({
-                                    id: book.id,
-                                    title: book.bookTitle,
-                                    author: book.author,
-                                    borrowDate: book.requestDate,
-                                    dueDate: book.returnDate,
-                                    status: book.status
-                                }))}
-                                isLoading={loading}
+                            <ProfileForm
+                                user={user}
+                                isEditing={isEditing}
+                                editedUser={editedUser}
+                                onInputChange={handleInputChange}
+                                onSave={handleSave}
+                                onCancel={handleCancel}
+                                onEdit={handleEdit}
                             />
                         </div>
                     </div>
 
-                    {/* Request to be Librarian Card */}
-                    {user.role === 'User' && (
-                        <div className="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Request to Become a Librarian</h2>
+                    {/* Right Column - Borrow History */}
+                    <div className="flex-1">
+                        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                                <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                                Borrow History
+                            </h2>
+                            <div className="overflow-x-auto">
+                                <BorrowedBooks 
+                                    books={borrowHistory.map(book => ({
+                                        id: book.id,
+                                        title: book.bookTitle,
+                                        author: book.author,
+                                        borrowDate: book.requestDate,
+                                        dueDate: book.returnDate,
+                                        status: book.status
+                                    }))}
+                                    isLoading={loading}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Request to be Librarian Card - Full Width */}
+                {user.role === 'User' && (
+                    <div className="mt-8">
+                        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                                <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Request to Become a Librarian
+                            </h2>
                             {submitted ? (
-                                <div className="bg-green-50 text-green-800 p-4 rounded-md">
+                                <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-lg flex items-center">
+                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
                                     Your request has been submitted successfully!
                                 </div>
                             ) : (
@@ -281,7 +305,7 @@ const UserProfile: React.FC = () => {
                                             Why do you want to be a librarian?
                                         </label>
                                         <textarea
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
                                             rows={4}
                                             value={requestMsg}
                                             onChange={e => setRequestMsg(e.target.value)}
@@ -291,15 +315,15 @@ const UserProfile: React.FC = () => {
                                     </div>
                                     <button
                                         type="submit"
-                                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]"
                                     >
                                         Submit Request
                                     </button>
                                 </form>
                             )}
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );
