@@ -50,6 +50,7 @@ const AdminDashboard = () => {
   const [originalUser, setOriginalUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const token = localStorage.getItem('token');
 
   // Add User dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -58,12 +59,13 @@ const AdminDashboard = () => {
   });
   const [addUserError, setAddUserError] = useState<string | null>(null);
 
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjQxMWY2NmU4LTk5NWQtNDYwOS04YmQzLTJiYWJmZWE1YWEzYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwidXNlcklkIjoxLCJleHAiOjE3NDY4NzYyMjMsImlzcyI6ImFhbGFtX2FsX2t1dHViIiwiYXVkIjoiYWFsYW1fYWxfa3V0dWJfdXNlcnMifQ.D91gNeQn5RhOhXhJ0SjnT0_OGmkPRYPJ_d9IFlUbJ_8";
 
-  // Check authentication and role
   useEffect(() => {
     const loadData = async () => {
+      if (!token) {
+        navigate('/auth/login');
+        return;
+      }
       try {
         setLoading(true);
         setError(null);
@@ -89,7 +91,7 @@ const AdminDashboard = () => {
     };
 
     loadData();
-  }, [activeTab, navigate]);
+  }, [activeTab, navigate, token]);
 
   const handleSearch = (searchTerm: string) => {
     if (activeTab === "users") {
@@ -122,13 +124,15 @@ const AdminDashboard = () => {
   const handleSaveUser = () => {
     if (editingUser && originalUser) {
       const payload = {
-        Username: editingUser.username,
-        Email: editingUser.email,
-        FirstName: editingUser.firstName,
-        LastName: editingUser.lastName,
-        PhoneNumber: editingUser.phoneNumber ?? "",
-        Role: editingUser.role,
-        SSN: editingUser.ssn,
+        id: editingUser.id,
+        username: editingUser.username,
+        email: editingUser.email,
+        firstName: editingUser.firstName,
+        lastName: editingUser.lastName,
+        phoneNumber: editingUser.phoneNumber ?? "",
+        role: editingUser.role,
+        ssn: editingUser.ssn,
+        createdAt: editingUser.createdAt
       };
       console.log("handleSaveUser: Saving user with payload:", payload);
 
