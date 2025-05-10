@@ -15,6 +15,9 @@ import AddUserDialog from "../components/AddUserDialog";
 import UserList from "../components/UserList";
 import BookAddDialog from "../components/BookAddDialog";
 import BookEditDialog from "../components/BookEditDialog";
+import AddMembershipDialog from "../components/MemberShipDialog";
+import { Membership } from "../types/membership";
+import { User } from "../types/user";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
@@ -22,30 +25,6 @@ const sidebarItems = [
   { key: "req", icon: faSignIn, label: "Registration Requests" },
   { key: "memberships", icon: faCrown, label: "Manage Membership plans" },
 ];
-
-interface User {
-  id: number;
-  username: string;
-  role: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber?: string;
-  ssn: string;
-  createdAt: string;
-}
-
-interface Membership {
-  id: number;
-  membershipType: string;
-  borrowLimit: number;
-  durationInDays: number;
-  price?: number;
-  description?: string;
-  isFamilyPlan: boolean;
-  maxFamilyMembers?: number;
-  requiresApproval: boolean;
-}
 
 const dummyRequests = [
   { id: "1", status: "Pending", name: "Request from Alice" },
@@ -67,6 +46,17 @@ const defaultNewUser = {
 
 const defaultNewBook = { title: "", author: "", isbn: "" };
 
+const defaultNewMembership: Membership = {
+  membershipType: "",
+  borrowLimit: 1,
+  durationInDays: 30,
+  price: undefined,
+  description: "",
+  isFamilyPlan: false,
+  maxFamilyMembers: undefined,
+  requiresApproval: false,
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
@@ -85,9 +75,17 @@ const AdminDashboard = () => {
 
   // Edit Book dialog states
   const [editingBook, setEditingBook] = useState<Book | null>(null);
-  const [originalBook, setOriginalBook] = useState<Book | null>(null);
+  const [, setOriginalBook] = useState<Book | null>(null);
   const [editBookError, setEditBookError] = useState<string | null>(null);
   const [editBookImage, setEditBookImage] = useState<File | null>(null);
+
+  // Add Membership dialog states
+  const [newMembership, setNewMembership] = useState<Membership>({
+    ...defaultNewMembership,
+  });
+  const [addMembershipError, setAddMembershipError] = useState<string | null>(
+    null
+  );
 
   // Add User dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -388,6 +386,39 @@ const AdminDashboard = () => {
       });
   };
 
+  // MemeberShip handlers
+
+  const handleAddMembership = (event?: React.FormEvent) => {
+    if (event) event.preventDefault();
+    setAddMembershipError(null);
+
+    api
+      .post("/api/Membership", newMembership, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setMemberships([...memberships, response.data]);
+        setIsAddMembershipOpen(false);
+        setNewMembership({ ...defaultNewMembership });
+      })
+      .catch((error) => {
+        setAddMembershipError(
+          error.response?.data?.message ||
+            error.response?.data?.title ||
+            JSON.stringify(error.response?.data) ||
+            "Failed to add membership"
+        );
+      });
+  };
+
+  const handlerCloseAddMembership = () => {
+    setNewMembership({ ...defaultNewMembership });
+    setIsAddMembershipOpen(false);
+    setAddMembershipError(null);
+  };
+
   // Render content for each tab
   let content = null;
   if (loading) {
@@ -493,6 +524,16 @@ const AdminDashboard = () => {
           editBookImage={editBookImage}
           setEditBookImage={setEditBookImage}
           editBookError={editBookError}
+        />
+      )}
+      {activeTab === "memberships" && (
+        <AddMembershipDialog
+          open={isAddMembershipOpen}
+          newMembership={newMembership}
+          setNewMembership={setNewMembership}
+          onClose={handlerCloseAddMembership}
+          onSubmit={handleAddMembership}
+          addMembershipError={addMembershipError}
         />
       )}
       <div className="flex flex-1">
