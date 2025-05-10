@@ -50,7 +50,7 @@ const AdminDashboard = () => {
   const [originalUser, setOriginalUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   // Add User dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -59,11 +59,10 @@ const AdminDashboard = () => {
   });
   const [addUserError, setAddUserError] = useState<string | null>(null);
 
-
   useEffect(() => {
     const loadData = async () => {
       if (!token) {
-        navigate('/auth/login');
+        navigate("/auth/login");
         return;
       }
       try {
@@ -132,7 +131,7 @@ const AdminDashboard = () => {
         phoneNumber: editingUser.phoneNumber ?? "",
         role: editingUser.role,
         ssn: editingUser.ssn,
-        createdAt: editingUser.createdAt
+        createdAt: editingUser.createdAt,
       };
       console.log("handleSaveUser: Saving user with payload:", payload);
 
@@ -289,10 +288,12 @@ const AdminDashboard = () => {
         <main className="flex-1 px-10 py-8">
           <div className="flex items-center mb-6 gap-2">
             {activeTab !== "books" && activeTab !== "memberships" && (
-              <SearchBar 
-                onAdd={handleAddClick} 
+              <SearchBar
+                onAdd={handleAddClick}
                 onSearch={handleSearch}
-                placeholder={activeTab === "users" ? "Search users..." : "Search..."}
+                placeholder={
+                  activeTab === "users" ? "Search users..." : "Search..."
+                }
               />
             )}
           </div>
