@@ -20,11 +20,11 @@ const BookSearchBar: React.FC<BookSearchBarProps> = ({
         placeholder="Search books..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        className="flex-1 px-4 py-2 border bg-gray-200 border-gray-300 rounded-lg focus:outline-none"
       />
       <button
         onClick={onAdd}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-blue-700 transition"
       >
         Add Book
       </button>
@@ -32,4 +32,4 @@ const BookSearchBar: React.FC<BookSearchBarProps> = ({
   );
 };
 
-export default BookSearchBar; 
+export default BookSearchBar;

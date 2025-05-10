@@ -16,15 +16,27 @@ const BookTable: React.FC<BookTableProps> = ({
   className = "",
   customActions,
 }) => (
-  <div className={`bg-white rounded-lg shadow p-6 w-full flex flex-col items-center ${className}`}>
-    <h2 className="mb-4 text-center w-full text-xl font-semibold text-gray-800">Book List</h2>
+  <div
+    className={`bg-white rounded-lg shadow p-6 w-full flex flex-col items-center ${className}`}
+  >
+    <h2 className="mb-4 text-center w-full text-xl font-semibold text-gray-800">
+      Book List
+    </h2>
     <table className="w-full border-collapse text-center">
       <thead>
         <tr className="bg-gray-100">
-          <th className="py-3 px-4 border-b text-gray-800 font-semibold">Cover</th>
-          <th className="py-3 px-4 border-b text-gray-800 font-semibold">Title</th>
-          <th className="py-3 px-4 border-b text-gray-800 font-semibold">Author</th>
-          <th className="py-3 px-4 border-b text-gray-800 font-semibold">Actions</th>
+          <th className="py-3 px-4 border-b text-gray-800 font-semibold">
+            Cover
+          </th>
+          <th className="py-3 px-4 border-b text-gray-800 font-semibold">
+            Title
+          </th>
+          <th className="py-3 px-4 border-b text-gray-800 font-semibold">
+            Author
+          </th>
+          <th className="py-3 px-4 border-b text-gray-800 font-semibold">
+            Actions
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -33,7 +45,9 @@ const BookTable: React.FC<BookTableProps> = ({
             <td className="py-3 px-4 border-b">
               {book.coverImage ? (
                 <img
-                  src={`data:${book.coverImageContentType || 'image/jpeg'};base64,${book.coverImage}`}
+                  src={`data:${
+                    book.coverImageContentType || "image/jpeg"
+                  };base64,${book.coverImage}`}
                   alt={`${book.title} cover`}
                   className="w-16 h-20 object-cover rounded shadow-sm mx-auto"
                 />
@@ -46,14 +60,12 @@ const BookTable: React.FC<BookTableProps> = ({
             <td className="py-3 px-4 border-b text-gray-900">
               <strong>{book.title}</strong>
             </td>
-            <td className="py-3 px-4 border-b text-gray-900">
-              {book.author}
-            </td>
+            <td className="py-3 px-4 border-b text-gray-900">{book.author}</td>
             <td className="py-3 px-4 border-b">
               <div className="flex gap-2 justify-center">
                 <button
                   onClick={() => handleEditBook(book)}
-                  className="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition"
+                  className="px-4 py-2 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition"
                 >
                   Edit
                 </button>
@@ -80,4 +92,4 @@ const BookTable: React.FC<BookTableProps> = ({
   </div>
 );
 
-export default BookTable; 
+export default BookTable;

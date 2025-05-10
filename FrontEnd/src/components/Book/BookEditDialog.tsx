@@ -43,7 +43,7 @@ const BookEditDialog: React.FC<BookEditDialogProps> = ({
   };
 
   const handleClose = () => {
-    const event = new Event('submit') as unknown as React.FormEvent;
+    const event = new Event("submit") as unknown as React.FormEvent;
     onSubmit(event);
     onClose();
   };
@@ -79,7 +79,9 @@ const BookEditDialog: React.FC<BookEditDialogProps> = ({
                     />
                   ) : editingBook.coverImage ? (
                     <img
-                      src={`data:${editingBook.coverImageContentType || 'image/jpeg'};base64,${editingBook.coverImage}`}
+                      src={`data:${
+                        editingBook.coverImageContentType || "image/jpeg"
+                      };base64,${editingBook.coverImage}`}
                       alt="Current cover"
                       className="w-full h-full object-cover"
                     />
@@ -156,7 +158,7 @@ const BookEditDialog: React.FC<BookEditDialogProps> = ({
             <button
               type="submit"
               onClick={onSubmit}
-              className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+              className="px-5 py-2 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-700 transition"
             >
               Save
             </button>
@@ -174,4 +176,4 @@ const BookEditDialog: React.FC<BookEditDialogProps> = ({
   );
 };
 
-export default BookEditDialog; 
+export default BookEditDialog;
