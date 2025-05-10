@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBook,
-  faChartBar,
-  faCrown,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBook, faChartBar, faCrown } from "@fortawesome/free-solid-svg-icons";
 import BookManage from "../Components/BookMange";
 
 const boards = [
@@ -33,13 +29,13 @@ export const Library = () => {
 
   // Check authentication and role on component mount
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('userRole');
-    
-    if (!token || role !== 'Librarian') {
-      navigate('/auth/login');
-      return;
-    }
+    // const token = localStorage.getItem('token');
+    // const role = localStorage.getItem('userRole');
+
+    // if (!token || role !== 'Librarian') {
+    //   navigate('/auth/login');
+    //   return;
+    // }
 
     setLoading(false);
   }, [navigate]);

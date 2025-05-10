@@ -1,7 +1,7 @@
 import React from "react";
 
 interface User {
-  id: string;
+  id: number;
   username: string;
   role: string;
   email: string;
@@ -20,7 +20,7 @@ interface UserListProps {
   handleSaveUser: () => void;
   handleCancelEdit: () => void;
   handleEditUser: (user: User) => void;
-  handleDeleteUser: (id: string) => void;
+  handleDeleteUser: (id: number) => void;
 }
 
 const UserList: React.FC<UserListProps> = ({

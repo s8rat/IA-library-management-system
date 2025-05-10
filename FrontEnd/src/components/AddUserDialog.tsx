@@ -3,7 +3,7 @@ import React from "react";
 interface AddUserDialogProps {
   open: boolean;
   newUser: {
-    id: string;
+    id: number;
     username: string;
     role: string;
     email: string;
@@ -15,7 +15,7 @@ interface AddUserDialogProps {
     createdAt: string;
   };
   setNewUser: (user: {
-    id: string;
+    id: number;
     username: string;
     role: string;
     email: string;
@@ -44,7 +44,7 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative">
         <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl"
+          className="absolute top-3 right-3 bg-transparent text-black hover:text-red-600 text-xl"
           onClick={onClose}
           aria-label="Close"
           type="button"
