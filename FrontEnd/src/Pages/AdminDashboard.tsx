@@ -6,15 +6,15 @@ import {
   faCrown,
   faSignIn,
 } from "@fortawesome/free-solid-svg-icons";
-import Sidebar from "../Components/admin/Sidebar";
-import SearchBar from "../Components/admin/SearchBar";
-import ViewBoardCard from "../Components/admin/ViewBoardCard";
+import Sidebar from "../components/admin/Sidebar";
+import SearchBar from "../components/admin/SearchBar";
+import ViewBoardCard from "../components/admin/ViewBoardCard";
 import api from "../Services/api";
 import { User } from "../types/user";
-import AddUserDialog from "../Components/admin/AddUserDialog";
-import UserList from "../Components/admin/UserList";
-import BookManagement from "../Components/Book/BookManagement";
-import ManageMemberShip from "../Components/MemberShip/ManageMemberShip";
+import AddUserDialog from "../components/admin/AddUserDialog";
+import UserList from "../components/admin/UserList";
+import BookManagement from "../components/Book/BookManagement";
+import ManageMemberShip from "../components/MemberShip/ManageMemberShip";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
