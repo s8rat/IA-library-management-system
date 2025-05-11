@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../Services/api';
-import ProfileForm from '../Components/Profile/ProfileForm';
-import BorrowHistorySection from '../Components/Profile/BorrowHistorySection';
-import LibrarianRequestSection from '../Components/Profile/LibrarianRequestSection';
-import UserAvatar from '../Components/Profile/UserAvatar';
+import ProfileForm from '../components/Profile/ProfileForm';
+import BorrowHistorySection from '../components/Profile/BorrowHistorySection';
+import LibrarianRequestSection from '../components/Profile/LibrarianRequestSection';
+import UserAvatar from '../components/Profile/UserAvatar';
+import UserSelectPlanDialouge from '../components/Profile/UserSelectPlanDialouge';
 
 interface User {
     id: number;
@@ -204,14 +205,22 @@ const UserProfile: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Right Column - Borrow History */}
-                    <div className="w-full xl:w-3/5 animate-fadeIn animation-delay-150 flex flex-col">
-                        <div className="h-full bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 flex-1 flex flex-col">
+                    {/* Right Column - Borrow History and Plan Selection */}
+                    <div className="w-full xl:w-3/5 animate-fadeIn animation-delay-150 flex flex-col gap-8">
+                        <div className="h-full bg-white rounded-2xl shadow-lg hover:shadow-blue-300 transition-all duration-300 p-6 flex-1 flex flex-col border border-blue-200">
+                            <h2 className="text-xl font-bold text-blue-800 mb-4">Borrow History</h2>
                             <BorrowHistorySection 
                                 borrowHistory={borrowHistory}
                                 isLoading={loading}
                             />
                         </div>
+                        {/* Membership Plan Selection under Borrow History - Only for users */}
+                        {user.role === 'User' && (
+                        <div className="bg-gradient-to-r from-blue-100 via-white to-blue-50 rounded-2xl shadow-lg hover:shadow-blue-300 transition-all duration-300 p-6 flex flex-col border border-blue-200">
+                            <h2 className="text-xl font-bold text-blue-800 mb-4">Select Membership Plan</h2>
+                            <UserSelectPlanDialouge />
+                        </div>
+                        )}
                     </div>
                 </div>
 

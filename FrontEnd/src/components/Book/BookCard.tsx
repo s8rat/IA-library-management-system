@@ -48,16 +48,17 @@ export const BookCard = ({ book }: BookCardProps) => {
             {book.isbn && (
               <p className="text-gray-500 text-xs mb-2">ISBN: {book.isbn}</p>
             )}
-
             <div className="flex items-center gap-2 mb-2">
               <span
                 className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  book.available
+                  book.available && book.quantity > 0
                     ? "bg-emerald-100 text-emerald-800"
                     : "bg-red-100 text-red-800"
                 }`}
               >
-                {book.available ? "Available" : "Unavailable"}
+                {book.available && book.quantity > 0
+                  ? "Available"
+                  : "Unavailable"}
               </span>
               <span className="text-gray-600 text-xs">
                 ({book.quantity} copies)
@@ -73,7 +74,8 @@ export const BookCard = ({ book }: BookCardProps) => {
             >
               Learn More
             </button>
-            {book.available && (
+            {/* Only show Borrow if available and quantity > 0 */}
+            {book.available && book.quantity > 0 && (
               <button
                 className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
                 onClick={handleBorrowClick}

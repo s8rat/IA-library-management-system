@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Book } from '../types/book';
 import axios from 'axios';
+import BorrowRequestDialog from '../components/Book/BorrowRequestDialog';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5205';
 
@@ -9,6 +10,7 @@ export const BookDetail = () => {
     const { id } = useParams();
     const [book, setBook] = useState<Book | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [showBorrowDialog, setShowBorrowDialog] = useState(false);
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -61,6 +63,21 @@ export const BookDetail = () => {
                 <div className="space-y-4">
                     <h1 className="text-3xl font-bold text-gray-800">{book.title}</h1>
                     <h2 className="text-xl text-gray-600">by {book.author}</h2>
+                    {book.isbn && (
+                        <p className="text-gray-500 text-base">ISBN: {book.isbn}</p>
+                    )}
+                    {book.publishedDate && (
+                        <p className="text-gray-500 text-base">Published: {new Date(book.publishedDate).toLocaleDateString()}</p>
+                    )}
+                    {book.description && (
+                        <p className="text-gray-700 text-base">{book.description}</p>
+                    )}
+                    <p className="text-gray-500 text-base">
+                        Status: {book.available ? 'Available' : 'Unavailable'}
+                    </p>
+                    <p className="text-gray-500 text-base">
+                        Quantity: {book.quantity}
+                    </p>
                     <button 
                         className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                             book.available 
@@ -68,9 +85,19 @@ export const BookDetail = () => {
                                 : 'bg-gray-400 cursor-not-allowed text-white'
                         }`}
                         disabled={!book.available}
+                        onClick={() => setShowBorrowDialog(true)}
                     >
                         {book.available ? 'Borrow Now' : 'Currently Unavailable'}
                     </button>
+                    {showBorrowDialog && (
+                        <BorrowRequestDialog
+                            bookId={book.id}
+                            bookTitle={book.title}
+                            isOpen={showBorrowDialog}
+                            onClose={() => setShowBorrowDialog(false)}
+                            onSuccess={() => setShowBorrowDialog(false)}
+                        />
+                    )}
                 </div>
             </div>
         </div>
