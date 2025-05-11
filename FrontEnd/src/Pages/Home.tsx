@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { BookCard } from "../Components/Book/BookCard";
+import { BookCard } from "../components/Book/BookCard";
 import { Book } from "../types/book";
 import api from "../Services/api";
 
