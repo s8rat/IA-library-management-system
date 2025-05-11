@@ -1,12 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { BookCard } from "../Components/Book/BookCard";
+import { BookCard } from "../components/Book/BookCard";
 import { Book } from "../types/book";
 import api from "../Services/api";
 
 export const Home = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   // Define services array with proper syntax
   const services = [
@@ -51,7 +53,7 @@ export const Home = () => {
   return (
     <div className="w-full min-h-screen bg-gray-50 justify-items-center">
       {/* Hero Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-50 to-blue-100">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 max-w-6xl mx-auto text-center lg:text-left">
           <div className="w-full lg:w-1/2 space-y-6">
             <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 leading-tight">
@@ -88,7 +90,7 @@ export const Home = () => {
             {services.map((service) => (
               <div
                 key={service.id}
-                className="bg-gray-50 p-8 rounded-lg text-center shadow-md hover:shadow-lg transition-all w-full max-w-sm"
+                className="bg-gray-50 p-8 rounded-lg text-center shadow-md hover:shadow-xl hover:scale-105 transition-all w-full max-w-sm"
               >
                 <div className="text-5xl text-blue-600 mb-4">
                   {service.icon}
@@ -104,19 +106,17 @@ export const Home = () => {
       </section>
 
       {/* Popular Books Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12 text-center">
+      <section className="px-4 sm:px-6 lg:px-8 py-20 bg-gradient-to-br from-white to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-extrabold mb-14 text-center text-blue-900 tracking-tight drop-shadow">
             Popular Books
           </h2>
           {error ? (
             <p className="text-center text-red-500">{error}</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 justify-items-center">
               {sortedBooks.slice(0, 6).map((book) => (
-                <div className="w-full max-w-sm" key={book.id}>
-                  <BookCard book={book} />
-                </div>
+                <BookCard book={book} key={book.id} />
               ))}
             </div>
           )}
@@ -125,7 +125,7 @@ export const Home = () => {
 
       {/* Join Club Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-16">
-        <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-8 sm:p-12 text-center">
+        <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-8 sm:p-12 text-center shadow-lg">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Join Our Reading Community Today
           </h2>
@@ -141,6 +141,18 @@ export const Home = () => {
           </Link>
         </div>
       </section>
+      {token && (
+        <button
+          onClick={() => navigate("/chat")}
+          className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg p-5 flex items-center justify-center transition-all duration-300 group"
+          title="Open Community Chat"
+        >
+          <span className="text-2xl">💬</span>
+          <span className="ml-2 opacity-100 group-hover:opacity-200 transition-opacity text-base font-semibold">
+            Chat
+          </span>
+        </button>
+      )}
     </div>
   );
 };

@@ -8,8 +8,14 @@ interface BookAddDialogProps {
     title: string;
     author: string;
     isbn: string;
+    quantity: number;
   };
-  setNewBook: (book: { title: string; author: string; isbn: string }) => void;
+  setNewBook: (book: {
+    title: string;
+    author: string;
+    isbn: string;
+    quantity: number;
+  }) => void;
   newBookImage: File | null;
   setNewBookImage: (file: File | null) => void;
   addError: string | null;
@@ -132,6 +138,22 @@ const BookAddDialog: React.FC<BookAddDialogProps> = ({
                 placeholder="Optional"
               />
             </div>
+            {/* Quantity */}
+            <div>
+              <label className="block text-sm font-semibold text-blue-900 mb-1">
+                Quantity <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                min={1}
+                value={newBook.quantity ?? ""}
+                onChange={(e) =>
+                  setNewBook({ ...newBook, quantity: Number(e.target.value) })
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                required
+              />
+            </div>
           </div>
           {addError && (
             <div className="text-red-600 text-center text-sm mt-2">
@@ -159,4 +181,4 @@ const BookAddDialog: React.FC<BookAddDialogProps> = ({
   );
 };
 
-export default BookAddDialog; 
+export default BookAddDialog;

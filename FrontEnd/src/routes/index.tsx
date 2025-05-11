@@ -5,11 +5,12 @@ import Login from "../Pages/auth/Login";
 import { ExploreBooks } from "../Pages/ExploreBooks";
 import { Services } from "../Pages/Plans";
 import RootLayout from "../Pages/Layout";
-import AuthLayout from "../Components/Layouts/Layout";
+import AuthLayout from "../components/Layouts/Layout";
 import AdminDashboard from "../Pages/AdminDashboard";
-import { Librarian} from "../Pages/Librarian";
+import { Librarian } from "../Pages/Librarian";
 import UserProfile from "../Pages/UserProfile";
 import Register from "../Pages/auth/Register";
+import ChatePage from "../Pages/ChatePage";
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
       {
         path: "/Librarian",
         element: <Librarian />,
+      },
+      {
+        path: "/chat",
+        element: <ChatePage />,
       },
     ],
   },

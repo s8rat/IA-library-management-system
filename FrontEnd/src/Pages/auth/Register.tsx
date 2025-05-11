@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../Components/UI/InputField";
-import TelInput from "../../Components/UI/TelInput";
+import TelInput from "../../components/UI/TelInput";
 import api from "../../Services/api";
 import { AxiosError } from "axios";
 
@@ -80,7 +80,7 @@ const Register = () => {
       });
       
       if (response.data) {
-        navigate('/Login', { state: { message: 'Registration successful! Please sign in.' } });
+        navigate('auth/Login', { state: { message: 'Registration successful! Please sign in.' } });
       }
     } catch (err: unknown) {
       const error = err as AxiosError<ApiError>;

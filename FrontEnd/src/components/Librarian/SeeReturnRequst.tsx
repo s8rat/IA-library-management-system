@@ -23,22 +23,30 @@ interface ApiError {
 }
 
 const SeeReturnRequest: React.FC = () => {
-    const [requests, setRequests] = useState<ReturnRequest[]>([]);
+    const [allRequests, setAllRequests] = useState<ReturnRequest[]>([]); // Store all requests
+    const [filteredRequests, setFilteredRequests] = useState<ReturnRequest[]>([]); // Store filtered requests
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<string>('');
     const [processingReturn, setProcessingReturn] = useState<number | null>(null);
 
-    useEffect(() => {
-        fetchRequests();
-    }, [statusFilter]);
+    // Status options for dropdown
+    const statusOptions = [
+        { value: '', label: 'All Records' },
+        { value: 'Active', label: 'Borrowed' },
+        { value: 'Pending', label: 'Pending' },
+        { value: 'Returned', label: 'Returned' },
+        { value: 'Overdue', label: 'Overdue' },
+    ];
 
-    const fetchRequests = async () => {
+    // Fetch all requests once
+    const fetchRequests = React.useCallback(async () => {
         try {
             setLoading(true);
-            const response = await api.get(`/api/Borrow/records${statusFilter ? `?status=${statusFilter}` : ''}`);
-            setRequests(response.data);
+            const response = await api.get('/api/Borrow/records');
+            setAllRequests(response.data);
+            setFilteredRequests(response.data); // Initially show all records
             setError(null);
         } catch (err: unknown) {
             const apiError = err as ApiError;
@@ -46,13 +54,38 @@ const SeeReturnRequest: React.FC = () => {
         } finally {
             setLoading(false);
         }
+    }, []);
+    // Filter requests based on status
+    const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        setStatusFilter(value);
+        
+        if (!value) {
+            // If no filter, show all requests
+            setFilteredRequests(allRequests);
+        } else {
+            // Filter requests based on status
+            const filtered = allRequests.filter(request => {
+                if (value === 'Active') {
+                    return request.status === 'Borrowed';
+                }
+                return request.status === value;
+            });
+            setFilteredRequests(filtered);
+        }
     };
 
-    const handleReturn = async (recordId: number) => {
-        if (!window.confirm('Are you sure you want to process this book return?')) {
-            return;
-        }
+    // Refresh handler - fetch all data again
+    const handleRefresh = () => {
+        fetchRequests();
+        setStatusFilter(''); // Reset filter on refresh
+    };
 
+    useEffect(() => {
+        fetchRequests();
+    }, [fetchRequests]);
+
+    const handleReturn = async (recordId: number) => {
         try {
             setProcessingReturn(recordId);
             setError(null);
@@ -86,16 +119,15 @@ const SeeReturnRequest: React.FC = () => {
                 <div className="flex gap-4">
                     <select
                         value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
+                        onChange={handleStatusChange}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        <option value="">All Records</option>
-                        <option value="Active">Active</option>
-                        <option value="Returned">Returned</option>
-                        <option value="Overdue">Overdue</option>
+                        {statusOptions.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
                     </select>
                     <button
-                        onClick={fetchRequests}
+                        onClick={handleRefresh}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         Refresh
@@ -146,14 +178,14 @@ const SeeReturnRequest: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {requests.length === 0 ? (
+                        {filteredRequests.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
                                     No return requests found
                                 </td>
                             </tr>
                         ) : (
-                            requests.map((request) => (
+                            filteredRequests.map((request) => (
                                 <tr key={request.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{request.bookTitle}</div>
@@ -181,7 +213,7 @@ const SeeReturnRequest: React.FC = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        {request.status === 'Active' && (
+                                        {request.status !== 'Returned' && (
                                             <button
                                                 onClick={() => handleReturn(request.id)}
                                                 disabled={processingReturn === request.id}

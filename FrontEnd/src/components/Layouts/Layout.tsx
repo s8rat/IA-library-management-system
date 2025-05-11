@@ -2,16 +2,17 @@ import { Outlet } from "react-router";
 import { Navigation } from "./Navigation";
 import Footer from "./Footer";
 
-const AuthLayout = () => {
+
+const Layout = () => {
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
             <Navigation />
-            <main className="flex-1 flex pt-16 md:pt-20 min-h-screen">
+            <main className="flex-1 min-h-0 flex flex-col pt-16 md:pt-20">
                 <Outlet />
             </main>
             <Footer />
         </div>
     );
-}
- 
-export default AuthLayout;
+};
+
+export default Layout;
