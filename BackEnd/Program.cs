@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
+using System.Text.Json.Serialization;
 
 internal class Program
 {
@@ -28,16 +29,18 @@ internal class Program
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IMembershipService, MembershipService>();
 
-
-
         builder.Services.Configure<FormOptions>(options =>
         {
             options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
         });
 
-
-        // Add Controllers
-        builder.Services.AddControllers();
+        // Add Controllers with JSON configuration
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.WriteIndented = true;
+            });
         builder.Services.AddOpenApi();
         builder.Services.AddSignalR();
 
