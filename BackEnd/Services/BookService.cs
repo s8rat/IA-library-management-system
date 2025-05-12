@@ -27,6 +27,7 @@ namespace BackEnd.Services
                     PublishedDate = b.PublishedDate,
                     Available = b.Available,
                     Quantity = b.Quantity,
+                    Description = b.Description,
                     CoverImage = b.CoverImage != null ? Convert.ToBase64String(b.CoverImage) : null,
                     CoverImageContentType = b.CoverImageContentType
                 })
@@ -50,6 +51,7 @@ namespace BackEnd.Services
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
                 Quantity = book.Quantity,
+                Description = book.Description,
                 CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
                 CoverImageContentType = book.CoverImageContentType
             };
@@ -73,13 +75,13 @@ namespace BackEnd.Services
             }
 
             var book = new Book
-            {
-                Title = bookDTO.Title,
+            {                Title = bookDTO.Title,
                 Author = bookDTO.Author,
                 ISBN = bookDTO.ISBN,
                 PublishedDate = bookDTO.PublishedDate,
                 Available = bookDTO.Quantity > 0,
-                Quantity = bookDTO.Quantity
+                Quantity = bookDTO.Quantity,
+                Description = bookDTO.Description
             };
 
             // Handle image upload
@@ -107,6 +109,7 @@ namespace BackEnd.Services
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
                 Quantity = book.Quantity,
+                Description = book.Description,
                 CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
                 CoverImageContentType = book.CoverImageContentType
             };
@@ -123,14 +126,13 @@ namespace BackEnd.Services
             if (book.ISBN != bookDTO.ISBN && await _context.Books.AnyAsync(b => b.ISBN == bookDTO.ISBN))
             {
                 throw new Exception("A book with this ISBN already exists");
-            }
-
-            book.Title = bookDTO.Title;
+            }            book.Title = bookDTO.Title;
             book.Author = bookDTO.Author;
             book.ISBN = bookDTO.ISBN;
             book.PublishedDate = bookDTO.PublishedDate;
             book.Quantity = bookDTO.Quantity;
             book.Available = bookDTO.Quantity > 0;
+            book.Description = bookDTO.Description;
 
             // Update image if new one is provided
             if (bookDTO.CoverImageFile != null && bookDTO.CoverImageFile.Length > 0)
@@ -155,6 +157,7 @@ namespace BackEnd.Services
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
                 Quantity = book.Quantity,
+                Description = book.Description,
                 CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
                 CoverImageContentType = book.CoverImageContentType
             };
@@ -168,14 +171,6 @@ namespace BackEnd.Services
                 throw new Exception("Book not found");
             }
 
-            var isBorrowed = await _context.BorrowRecords
-                .AnyAsync(br => br.BookId == id && br.Status == "Borrowed");
-
-            if (isBorrowed)
-            {
-                throw new Exception("Cannot delete a book that is currently borrowed");
-            }
-
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return true;
@@ -183,10 +178,9 @@ namespace BackEnd.Services
 
         public async Task<IEnumerable<BookDTO>> SearchBooks(string searchTerm)
         {
-            return await _context.Books
-                .Where(b => b.Title.Contains(searchTerm) ||
-                           b.Author.Contains(searchTerm) ||
-                           b.ISBN.Contains(searchTerm))
+            return await _context.Books                .Where(b => (b.Title ?? "").Contains(searchTerm) ||
+                           (b.Author ?? "").Contains(searchTerm) ||
+                           (b.ISBN ?? "").Contains(searchTerm))
                 .Select(b => new BookDTO
                 {
                     Id = b.Id,
@@ -196,6 +190,7 @@ namespace BackEnd.Services
                     PublishedDate = b.PublishedDate,
                     Available = b.Available,
                     Quantity = b.Quantity,
+                    Description = b.Description,
                     CoverImage = b.CoverImage != null ? Convert.ToBase64String(b.CoverImage) : null,
                     CoverImageContentType = b.CoverImageContentType
                 })

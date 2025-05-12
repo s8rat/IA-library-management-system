@@ -327,5 +327,40 @@ namespace BackEnd.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving pending requests");
             }
         }
+
+        /// <summary>
+        /// Get membership details for a specific user
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>User's membership details</returns>
+        [HttpGet("user/{userId}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserMembership))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<UserMembership>> GetUserMembership(long userId)
+        {
+            try
+            {
+                // Verify the requesting user matches the authenticated user or is an admin
+                var authenticatedUserId = long.Parse(User.FindFirst("userId").Value);
+                if (authenticatedUserId != userId && !User.IsInRole("Admin"))
+                {
+                    return Forbid();
+                }
+
+                var userMembership = await _membershipService.GetUserMembershipAsync(userId);
+                if (userMembership == null)
+                {
+                    return NotFound($"No membership found for user {userId}");
+                }
+                return Ok(userMembership);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting membership for user {userId}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the user's membership");
+            }
+        }
     }
 }

@@ -1,20 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface BookAddDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
-  newBook: {
+  onSubmit: (e: React.FormEvent) => void;  newBook: {
     title: string;
     author: string;
     isbn: string;
     quantity: number;
+    description: string;
   };
   setNewBook: (book: {
     title: string;
     author: string;
     isbn: string;
     quantity: number;
+    description: string;
   }) => void;
   newBookImage: File | null;
   setNewBookImage: (file: File | null) => void;
@@ -31,6 +32,12 @@ const BookAddDialog: React.FC<BookAddDialogProps> = ({
   addError,
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setPreviewUrl(null);
+    }
+  }, [open]);
 
   if (!open) return null;
 
@@ -135,7 +142,7 @@ const BookAddDialog: React.FC<BookAddDialogProps> = ({
                   setNewBook({ ...newBook, isbn: e.target.value })
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                placeholder="Optional"
+                placeholder="ISBN"
               />
             </div>
             {/* Quantity */}
@@ -152,6 +159,21 @@ const BookAddDialog: React.FC<BookAddDialogProps> = ({
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 required
+              />
+            </div>
+            {/* Description */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-blue-900 mb-1">
+                Description
+              </label>
+              <textarea
+                value={newBook.description}
+                onChange={(e) =>
+                  setNewBook({ ...newBook, description: e.target.value })
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                rows={4}
+                placeholder="Enter book description..."
               />
             </div>
           </div>

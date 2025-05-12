@@ -20,6 +20,9 @@ namespace BackEnd.Models
         public bool Available { get; set; } = true;
         public int Quantity { get; set; } = 1;
 
+        [Column(TypeName = "nvarchar(max)")]
+        public string? Description { get; set; }
+
         // Photo properties
         public byte[]? CoverImage { get; set; }
         public string? CoverImageContentType { get; set; }

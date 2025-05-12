@@ -48,6 +48,7 @@ const UserProfile: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [borrowHistory, setBorrowHistory] = useState<BorrowHistory[]>([]);
+    
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -57,6 +58,7 @@ const UserProfile: React.FC = () => {
                     navigate('/auth/login');
                     return;
                 }
+                
 
                 const response = await api.get('/api/Users/profile');
                 if (!response.data) {
@@ -65,6 +67,7 @@ const UserProfile: React.FC = () => {
 
                 setUser(response.data);
                 setEditedUser(response.data);
+                
                 
                 try {
                     const historyResponse = await api.get('/api/Borrow/my-records');
@@ -107,6 +110,7 @@ const UserProfile: React.FC = () => {
                 setError('User data not found');
                 return;
             }
+            
 
             const updateData = {
                 Username: editedUser.username?.trim(),

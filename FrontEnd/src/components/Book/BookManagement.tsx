@@ -31,6 +31,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
     author: "",
     isbn: "",
     quantity: 0,
+    description: "",
   });
   const [newBookImage, setNewBookImage] = useState<File | null>(null);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
@@ -54,6 +55,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
               coverImageContentType: b.coverImageContentType,
               available: b.available,
               quantity: b.quantity,
+              description: b.description,
             }))
           : [];
         setBooks(data);
@@ -64,12 +66,11 @@ const BookManagement: React.FC<BookManagementProps> = ({
   const handleAddBook = (event?: React.FormEvent) => {
     if (event) event.preventDefault();
     setAddError(null);
-    if (newBook.title && newBook.author && newBook.isbn) {
-      const formData = new FormData();
+    if (newBook.title && newBook.author && newBook.isbn) {      const formData = new FormData();
       formData.append("Title", newBook.title);
       formData.append("Author", newBook.author);
       formData.append("ISBN", newBook.isbn);
-      formData.append("Quantity", String(newBook.quantity));
+      formData.append("Quantity", String(newBook.quantity));      formData.append("Description", newBook.description || "");
       if (newBookImage) {
         formData.append("CoverImageFile", newBookImage);
       }
@@ -78,8 +79,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((response) => {
-          const b = response.data;
-          setBooks([
+          const b = response.data;          setBooks([
             ...books,
             {
               id: b.id,
@@ -90,9 +90,10 @@ const BookManagement: React.FC<BookManagementProps> = ({
               coverImageContentType: b.coverImageContentType,
               available: b.available,
               quantity: b.quantity,
+              description: b.description,
             },
           ]);
-          setNewBook({ title: "", author: "", isbn: "", quantity: 0 });
+          setNewBook({ title: "", author: "", isbn: "", quantity: 0, description: "" });
           setNewBookImage(null);
           setIsAddDialogOpen(false);
         })
@@ -118,9 +119,9 @@ const BookManagement: React.FC<BookManagementProps> = ({
 
     const formData = new FormData();
     formData.append("Title", editingBook.title);
-    formData.append("Author", editingBook.author);
-    formData.append("ISBN", editingBook.isbn || "");
+    formData.append("Author", editingBook.author);    formData.append("ISBN", editingBook.isbn || "");
     formData.append("Quantity", String(editingBook.quantity));
+    formData.append("Description", editingBook.description || "");
     if (editBookImage) {
       formData.append("CoverImageFile", editBookImage);
     }
@@ -139,10 +140,10 @@ const BookManagement: React.FC<BookManagementProps> = ({
                   title: b.title,
                   author: b.author,
                   isbn: b.isbn,
-                  coverImage: b.coverImage,
-                  coverImageContentType: b.coverImageContentType,
+                  coverImage: b.coverImage,                  coverImageContentType: b.coverImageContentType,
                   available: b.available,
                   quantity: b.quantity,
+                  description: b.description,
                 }
               : book
           )
@@ -176,20 +177,27 @@ const BookManagement: React.FC<BookManagementProps> = ({
   );
 
   return (
-    <div className={containerClassName}>
-      <BookAddDialog
+    <div className={containerClassName}>      <BookAddDialog
         open={isAddDialogOpen}
-        onClose={() => setIsAddDialogOpen(false)}
+        onClose={() => {
+          setIsAddDialogOpen(false);
+          setNewBook({ title: "", author: "", isbn: "", quantity: 0, description: "" });
+          setNewBookImage(null);
+          setAddError(null);
+        }}
         onSubmit={handleAddBook}
         newBook={newBook}
         setNewBook={setNewBook}
         newBookImage={newBookImage}
         setNewBookImage={setNewBookImage}
         addError={addError}
-      />
-      <BookEditDialog
+      />      <BookEditDialog
         open={!!editingBook}
-        onClose={() => setEditingBook(null)}
+        onClose={() => {
+          setEditingBook(null);
+          setEditBookImage(null);
+          setEditError(null);
+        }}
         onSubmit={handleSaveBook}
         editingBook={editingBook}
         setEditingBook={setEditingBook}
