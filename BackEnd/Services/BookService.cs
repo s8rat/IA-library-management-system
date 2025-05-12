@@ -27,6 +27,7 @@ namespace BackEnd.Services
                     PublishedDate = b.PublishedDate,
                     Available = b.Available,
                     Quantity = b.Quantity,
+                    Description = b.Description,
                     CoverImage = b.CoverImage != null ? Convert.ToBase64String(b.CoverImage) : null,
                     CoverImageContentType = b.CoverImageContentType
                 })
@@ -50,6 +51,7 @@ namespace BackEnd.Services
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
                 Quantity = book.Quantity,
+                Description = book.Description,
                 CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
                 CoverImageContentType = book.CoverImageContentType
             };
@@ -107,6 +109,7 @@ namespace BackEnd.Services
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
                 Quantity = book.Quantity,
+                Description = book.Description,
                 CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
                 CoverImageContentType = book.CoverImageContentType
             };
@@ -155,6 +158,7 @@ namespace BackEnd.Services
                 PublishedDate = book.PublishedDate,
                 Available = book.Available,
                 Quantity = book.Quantity,
+                Description = book.Description,
                 CoverImage = book.CoverImage != null ? Convert.ToBase64String(book.CoverImage) : null,
                 CoverImageContentType = book.CoverImageContentType
             };
@@ -166,14 +170,6 @@ namespace BackEnd.Services
             if (book == null)
             {
                 throw new Exception("Book not found");
-            }
-
-            var isBorrowed = await _context.BorrowRecords
-                .AnyAsync(br => br.BookId == id && br.Status == "Borrowed");
-
-            if (isBorrowed)
-            {
-                throw new Exception("Cannot delete a book that is currently borrowed");
             }
 
             _context.Books.Remove(book);
@@ -196,6 +192,7 @@ namespace BackEnd.Services
                     PublishedDate = b.PublishedDate,
                     Available = b.Available,
                     Quantity = b.Quantity,
+                    Description = b.Description,
                     CoverImage = b.CoverImage != null ? Convert.ToBase64String(b.CoverImage) : null,
                     CoverImageContentType = b.CoverImageContentType
                 })

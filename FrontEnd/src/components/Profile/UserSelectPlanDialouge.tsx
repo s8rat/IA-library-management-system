@@ -36,6 +36,7 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
         const res = await api.get('/api/Membership');
         setPlans(res.data);
         setError(null);
+        
       } catch (err: unknown) {
         const apiError = err as ApiError;
         setError(apiError.response?.data?.message || 'Failed to load plans');
@@ -57,6 +58,7 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
     try {
       // Get userId from localStorage
       const userId = localStorage.getItem('userId');
+
       console.log(userId);
       if (!userId) {
         setError('User not logged in');

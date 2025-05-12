@@ -9,6 +9,7 @@
         public DateTime? PublishedDate { get; set; }
         public bool Available { get; set; }
         public int Quantity { get; set; }
+        public string? Description { get; set; }
 
         // Add photo data as Base64 string
         public string? CoverImage { get; set; }

@@ -285,5 +285,24 @@ namespace BackEnd.Services
                 throw;
             }
         }
+
+        public async Task<UserMembership?> GetUserMembershipAsync(long userId)
+        {
+            try
+            {
+                return await _dbContext.UserMemberships
+                    .Include(um => um.Membership)
+                    .Include(um => um.User)
+                    .Include(um => um.ParentUser)
+                    .Where(um => um.UserId == userId && !um.IsCanceled)
+                    .OrderByDescending(um => um.StartDate)
+                    .FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting membership for user {userId}");
+                throw;
+            }
+        }
     }
 }

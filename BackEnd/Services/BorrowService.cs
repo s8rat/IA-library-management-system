@@ -172,6 +172,9 @@ namespace BackEnd.Services
                 {
                     UserId = request.UserId,
                     BookId = request.BookId,
+                    BookTitle = book.Title,
+                    BookAuthor = book.Author,
+                    BookISBN = book.ISBN,
                     BorrowDate = DateTime.UtcNow,
                     DueDate = DateTime.UtcNow.AddDays(activeMembership.Membership.DurationInDays),
                     Status = "Borrowed"
@@ -270,10 +273,13 @@ namespace BackEnd.Services
             record.ReturnDate = DateTime.UtcNow;
             _context.BorrowRecords.Update(record);
 
-            var book = record.Book;
-            book.Quantity++;
-            book.Available = true;
-            _context.Books.Update(book);
+            if (record.Book != null)
+            {
+                var book = record.Book;
+                book.Quantity++;
+                book.Available = true;
+                _context.Books.Update(book);
+            }
 
             await _context.SaveChangesAsync();
 
@@ -283,7 +289,9 @@ namespace BackEnd.Services
                 UserId = record.UserId,
                 Username = record.User.Username,
                 BookId = record.BookId,
-                BookTitle = record.Book.Title,
+                BookTitle = record.BookTitle ?? record.Book?.Title,
+                BookAuthor = record.BookAuthor ?? record.Book?.Author,
+                BookISBN = record.BookISBN ?? record.Book?.ISBN,
                 BorrowDate = record.BorrowDate,
                 DueDate = record.DueDate,
                 ReturnDate = record.ReturnDate,
@@ -302,7 +310,9 @@ namespace BackEnd.Services
                     UserId = br.UserId,
                     Username = br.User.Username,
                     BookId = br.BookId,
-                    BookTitle = br.Book.Title,
+                    BookTitle = br.BookTitle != null ? br.BookTitle : br.Book != null ? br.Book.Title : null,
+                    BookAuthor = br.BookAuthor != null ? br.BookAuthor : br.Book != null ? br.Book.Author : null,
+                    BookISBN = br.BookISBN != null ? br.BookISBN : br.Book != null ? br.Book.ISBN : null,
                     BorrowDate = br.BorrowDate,
                     DueDate = br.DueDate,
                     ReturnDate = br.ReturnDate,
@@ -323,7 +333,9 @@ namespace BackEnd.Services
                     UserId = br.UserId,
                     Username = br.User.Username,
                     BookId = br.BookId,
-                    BookTitle = br.Book.Title,
+                    BookTitle = br.BookTitle != null ? br.BookTitle : (br.Book != null ? br.Book.Title : null),
+                    BookAuthor = br.BookAuthor != null ? br.BookAuthor : (br.Book != null ? br.Book.Author : null),
+                    BookISBN = br.BookISBN != null ? br.BookISBN : (br.Book != null ? br.Book.ISBN : null),
                     BorrowDate = br.BorrowDate,
                     DueDate = br.DueDate,
                     ReturnDate = br.ReturnDate,
