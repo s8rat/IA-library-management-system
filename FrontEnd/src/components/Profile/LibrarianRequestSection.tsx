@@ -23,7 +23,7 @@ const LibrarianRequestSection: React.FC<LibrarianRequestSectionProps> = ({ userR
 
             const tokenPayload = JSON.parse(atob(token.split('.')[1]));
             await api.post('/api/Auth/request-librarian', {
-                message: requestMsg,
+                requestMsg: requestMsg,
                 currentRole: tokenPayload.role
             });
             setSubmitted(true);
@@ -88,7 +88,7 @@ const LibrarianRequestSection: React.FC<LibrarianRequestSectionProps> = ({ userR
                                 value={requestMsg}
                                 onChange={e => setRequestMsg(e.target.value)}
                                 required
-                                placeholder="Share your passion for books and why you'd be a great addition to our team..."
+                                placeholder="Tell us why you want to become a librarian and how you can contribute to our library."
                             />
                             {error && (
                                 <div className="mt-2 text-sm text-red-600 flex items-center">
