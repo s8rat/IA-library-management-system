@@ -35,9 +35,7 @@ const SeeReturnRequest: React.FC = () => {
     const statusOptions = [
         { value: '', label: 'All Records' },
         { value: 'Active', label: 'Borrowed' },
-        { value: 'Pending', label: 'Pending' },
         { value: 'Returned', label: 'Returned' },
-        { value: 'Overdue', label: 'Overdue' },
     ];
 
     // Fetch all requests once
@@ -205,8 +203,6 @@ const SeeReturnRequest: React.FC = () => {
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                             request.status === 'Returned' 
                                                 ? 'bg-green-100 text-green-800'
-                                                : request.status === 'Overdue'
-                                                ? 'bg-red-100 text-red-800'
                                                 : 'bg-blue-100 text-blue-800'
                                         }`}>
                                             {request.status}

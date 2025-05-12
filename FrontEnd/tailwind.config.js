@@ -9,6 +9,7 @@ export default {
       fontFamily: {
         'playfair': ['Playfair Display', 'serif'],
         'poppins': ['Poppins', 'sans-serif'],
+        'halimum': ["Halimun", "cursive"]
       },      animation: {
         'fadeIn': 'fadeIn 0.5s ease-in-out',
         'slideIn': 'slideIn 0.5s ease-in-out',

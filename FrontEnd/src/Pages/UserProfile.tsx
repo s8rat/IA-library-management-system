@@ -207,23 +207,25 @@ const UserProfile: React.FC = () => {
 
                     {/* Right Column - Borrow History and Plan Selection */}
                     <div className="w-full xl:w-3/5 animate-fadeIn animation-delay-150 flex flex-col gap-8">
-                        <div className="h-full bg-white rounded-2xl shadow-lg hover:shadow-blue-300 transition-all duration-300 p-6 flex-1 flex flex-col border border-blue-200">
-                            <h2 className="text-xl font-bold text-blue-800 mb-4">Borrow History</h2>
-                            <BorrowHistorySection 
-                                borrowHistory={borrowHistory}
-                                isLoading={loading}
-                            />
-                        </div>
+                        {/* Borrow History only for users */}
+                        {user.role === 'User' && (
+                            <div className="h-full bg-white rounded-2xl shadow-lg hover:shadow-blue-300 transition-all duration-300 p-6 flex-1 flex flex-col border border-blue-200">
+                                <h2 className="text-xl font-bold text-blue-800 mb-4">Borrow History</h2>
+                                <BorrowHistorySection 
+                                    borrowHistory={borrowHistory}
+                                    isLoading={loading}
+                                />
+                            </div>
+                        )}
                         {/* Membership Plan Selection under Borrow History - Only for users */}
                         {user.role === 'User' && (
-                        <div className="bg-gradient-to-r from-blue-100 via-white to-blue-50 rounded-2xl shadow-lg hover:shadow-blue-300 transition-all duration-300 p-6 flex flex-col border border-blue-200">
-                            <h2 className="text-xl font-bold text-blue-800 mb-4">Select Membership Plan</h2>
-                            <UserSelectPlanDialouge />
-                        </div>
+                            <div className="bg-gradient-to-r from-blue-100 via-white to-blue-50 rounded-2xl shadow-lg hover:shadow-blue-300 transition-all duration-300 p-6 flex flex-col border border-blue-200">
+                                <h2 className="text-xl font-bold text-blue-800 mb-4">Select Membership Plan</h2>
+                                <UserSelectPlanDialouge />
+                            </div>
                         )}
                     </div>
                 </div>
-
                 {/* Bottom Section - Librarian Request */}
                 <div className="mt-8 animate-fadeIn animation-delay-300 w-full">
                     <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 w-full">
