@@ -65,11 +65,11 @@ export const Navigation = () => {
     }
 
     return (
-        <nav className={`z-50 text-white h-28 flex flex-col item justify-center transition-all duration-300 ${
+        <nav className={`z-50 text-white sm:h-28 h-20  flex flex-col item justify-center transition-all duration-300 ${
             isScrolled ? 'bg-primary shadow-lg' : 'bg-primary'
         }`}>
             <div className="h-full flex flex-col items-center justify-center w-full px-4 sm:px-6 lg:px-8">
-                <div className="relative w-full h-full flex items-center justify-around text-xl"> 
+                <div className="relative w-full h-full flex items-center justify-between md:justify-around text-xl"> 
                     {/* Logo */}
                     <Link 
                         to="/" 
@@ -82,13 +82,13 @@ export const Navigation = () => {
                                 className="h-full w-full object-contain"
                             />
                         </div>
-                        <span className="hidden sm:inline font-extralight tracking-wide text-4xl">Aalam Al-Kutub</span>
+                        <span className="hidden font-extralight tracking-wide text-4xl sm:hidden">Aalam Al-Kutub</span>
                     </Link>
 
                     {/* Navigation Links */}
-                    <div className={`${
-                        isMenuOpen ? 'flex' : 'hidden md:flex'
-                    } absolute md:relative top-16 md:top-0 left-0 right-0 bg-white md:bg-transparent shadow-lg md:shadow-none`}>
+                    <div className={`
+                        ${ isMenuOpen ? 'flex' : 'hidden md:flex' } 
+                        absolute md:static top-28 md:top-20 left-0 right-0 bg-white md:bg-transparent shadow-lg md:shadow-none`}>
                         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 p-4 md:p-0 w-full md:w-auto">
                             {navLinks.map((link) => (
                                 <Link
@@ -129,7 +129,7 @@ export const Navigation = () => {
 
                     {/* Mobile menu button */}
                     <button
-                        className="md:hidden p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors z-10"
+                        className="md:hidden p-2 rounded-lg bg-primary text-2xl text-white transition-colors z-10"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="Toggle menu"
                     >

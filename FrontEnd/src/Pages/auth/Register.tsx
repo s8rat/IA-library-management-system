@@ -196,7 +196,7 @@ const Register = () => {
           </button>
         </form>
       </div>
-      <div className="w-3/12 h-full">
+      <div className="w-3/12 h-screen">
         <img
           src="/Image/books_background.jpg"
           alt="books"

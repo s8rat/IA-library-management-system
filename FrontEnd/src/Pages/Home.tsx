@@ -51,71 +51,96 @@ export const Home = () => {
     );
 
     return (
-        <div className="w-full min-h-screen bg-gray-50 justify-items-center">
+        <div className="w-full min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="px-60 bg-gradient-to-br w-full h-screen">
-                <div className="h-screen flex flex-col lg:flex-row items-center justify-between gap-8 mx-auto text-center lg:text-left">
+            <section className="px-4 sm:px-10 mt-10 lg:px-60 bg-gradient-to-br w-full h-screen">
+                <div className="h-screen flex lg:flex-row md:flex-col-reverse sm:flex-col-reverse flex-col-reverse items-center 2xl:justify-between sm:justify-center justify-end gap-8 mx-auto text-center lg:text-left">
                     <div className="w-full lg:w-2/3 space-y-6">
-                        <h1 className="text-8xl font-halimum font-bold text-gray-800 leading-tight mb-16">
+                        <h1 className="sm:text-6xl text-2xl lg:leading-snug lg:text-4xl 2xl:text-8xl font-halimum font-bold text-gray-800 leading-tight mb-8 lg:mb-16">
                             Where Your Book Journey Begins
                         </h1>
-                        <p className="text-2xl text-gray-600 text-poppins">
-                            Step into a world of endless stories, wisdom, and imagination. <br /> Let every page be a new adventure.
+                        <p className="lg:text-xs text-gray-600 text-poppins text-xs">
+                            Step into a world of endless stories, wisdom, and
+                            imagination. <br className="hidden lg:block" /> Let every page be a new
+                            adventure.
                         </p>
                         <div className="flex justify-center lg:justify-start">
                             <Link
                                 to="/explore"
-                                className="inline-block font-bold bg-secondary hover:bg-blue-700 text-white px-8 py-3 rounded-md transition-all text-lg"
+                                className="inline-block font-bold bg-secondary hover:bg-blue-700 text-white px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 rounded-md transition-all text-sm sm:text-base lg:text-lg"
                             >
                                 Explore Books
                             </Link>
                         </div>
                     </div>
-                    <div className="w-full h-full lg:w-1/3 flex justify-center items-center">
+                    <div className="md:w-full md:h-full sm:w-1/2 w-1/2 sm:h-fit md:py-14 sm:py-0 h-fit py-0 lg:w-1/3 flex justify-center items-center">
                         <div className="overflow-hidden rounded-full aspect-square flex items-center justify-center shadow-lg">
-                            <img src="/Image/header-image.jpg" alt="logo" />
+                            <img src="/Image/header-image.jpg" alt="logo" className="w-full h-full object-cover" />
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* Services Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-16 bg-white">
-                <div className="max-w-6xl mx-auto">
-                    <h2 className="text-3xl font-bold text-gray-800 text-center mb-12">
-                        Our Services
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-                        {services.map((service) => (
-                            <div
-                                key={service.id}
-                                className="bg-gray-50 p-8 rounded-lg text-center shadow-md hover:shadow-xl hover:scale-105 transition-all w-full max-w-sm"
-                            >
-                                <div className="text-5xl text-blue-600 mb-4">
-                                    {service.icon}
-                                </div>
-                                <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                                    {service.title}
-                                </h3>
-                                <p className="text-gray-600">
-                                    {service.description}
-                                </p>
-                            </div>
-                        ))}
+            <section>
+                <div className="px-4 sm:px-10 lg:px-60 w-full bg-white flex flex-col md:flex-row text-black items-center justify-between 2xl:gap-8">
+                    <div className="w-full lg:w-1/2 overflow-hidden">
+                        <img
+                            src="/public/Image/students-working-study-group.jpg"
+                            alt="Community"
+                            className="hover:scale-110 transition duration-700 w-full h-auto"
+                        />
+                    </div>
+                    <div className="w-full lg:w-1/2 flex flex-col items-center justify-center gap-8">
+                        <div className="flex flex-col items-center gap-3">
+                            <h2 className="text-xl sm:text-2xl font-bold text-primary">
+                                Reader's Community
+                            </h2>
+                            <hr className="w-14 h-[3px] bg-primary rounded-full" />
+                        </div>
+                        <p className="text-center w-full sm:w-3/4 sm:text-xs">
+                            Join our reading community and share your thoughts
+                            with fellow book enthusiasts. Discover new
+                            perspectives, engage in meaningful discussions, and
+                            connect with like-minded readers who share your
+                            passion for books.
+                        </p>
+                    </div>
+                </div>
+                <div className="px-4 sm:px-10 lg:px-60 w-full bg-white flex flex-col md:flex-row-reverse text-black items-center justify-between 2xl:gap-8 2xl:mt-8">
+                    <div className="w-full lg:w-1/2 overflow-hidden">
+                        <img
+                            src="/Image/crop-hand-picking-book-from-shelf.jpg"
+                            alt="Community"
+                            className="hover:scale-110 transition duration-700 w-full h-auto"
+                        />
+                    </div>
+                    <div className="w-full lg:w-1/2 flex flex-col items-center justify-center gap-8">
+                        <div className="flex flex-col items-center gap-3">
+                            <h2 className="text-xl sm:text-2xl font-bold text-primary">
+                                Book Lending
+                            </h2>
+                            <hr className="w-14 h-[3px] bg-primary rounded-full" />
+                        </div>
+                        <p className="text-center w-full sm:w-3/4 sm:text-xs">
+                            Borrow physical books from our extensive collection,
+                            carefully curated to include a wide range of genres,
+                            authors, and topics to suit every reader's taste.
+                        </p>
                     </div>
                 </div>
             </section>
 
             {/* Popular Books Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-20 bg-gradient-to-br from-white to-blue-50">
-                <div className="max-w-7xl mx-auto">
-                    <h2 className="text-4xl font-extrabold mb-14 text-center text-blue-900 tracking-tight drop-shadow">
+            <section className="mt-10 px-4 sm:px-10 lg:px-60 w-full bg-white text-black">
+                <div className="w-full mx-auto">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl text-left font-poppins font-bold italic mb-8 lg:mb-14 text-primary tracking-tight drop-shadow">
                         Popular Books
                     </h2>
                     {error ? (
                         <p className="text-center text-red-500">{error}</p>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 justify-items-center">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 justify-items-center">
                             {sortedBooks.slice(0, 6).map((book) => (
                                 <BookCard book={book} key={book.id} />
                             ))}
@@ -125,18 +150,18 @@ export const Home = () => {
             </section>
 
             {/* Join Club Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-16">
-                <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-8 sm:p-12 text-center shadow-lg">
-                    <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            <section className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+                <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-6 sm:p-8 lg:p-12 text-center shadow-lg">
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
                         Join Our Reading Community Today
                     </h2>
-                    <p className="text-lg mb-8 max-w-2xl mx-auto">
+                    <p className="text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
                         Become a member and enjoy exclusive benefits and access
                         to our entire collection.
                     </p>
                     <Link
                         to="/register"
-                        className="inline-block bg-white text-blue-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-all text-lg"
+                        className="inline-block bg-white text-blue-600 px-6 sm:px-8 py-2 sm:py-3 rounded-md font-semibold hover:bg-gray-100 transition-all text-base sm:text-lg"
                     >
                         Join Now
                     </Link>
@@ -145,11 +170,11 @@ export const Home = () => {
             {token && (
                 <button
                     onClick={() => navigate("/chat")}
-                    className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg p-5 flex items-center justify-center transition-all duration-300 group"
+                    className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg p-4 sm:p-5 flex items-center justify-center transition-all duration-300 group"
                     title="Open Community Chat"
                 >
-                    <span className="text-2xl">💬</span>
-                    <span className="ml-2 opacity-100 group-hover:opacity-200 transition-opacity text-base font-semibold">
+                    <span className="text-xl sm:text-2xl">💬</span>
+                    <span className="ml-2 opacity-0 sm:opacity-100 group-hover:opacity-200 transition-opacity text-sm sm:text-base font-semibold">
                         Chat
                     </span>
                 </button>

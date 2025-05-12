@@ -83,7 +83,7 @@ const LibrarianRequestSection: React.FC<LibrarianRequestSectionProps> = ({ userR
                                 Why do you want to be a librarian?
                             </label>
                             <textarea
-                                className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 transition-colors duration-200"
+                                className="w-full rounded-lg bg-white border-black-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 transition-colors duration-200 text-black"
                                 rows={4}
                                 value={requestMsg}
                                 onChange={e => setRequestMsg(e.target.value)}
