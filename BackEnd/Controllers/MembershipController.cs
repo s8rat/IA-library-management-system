@@ -1,6 +1,7 @@
 ﻿using BackEnd.DTOs;
 using BackEnd.Models;
 using BackEnd.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackEnd.Controllers
@@ -10,6 +11,7 @@ namespace BackEnd.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MembershipController : ControllerBase
     {
         private readonly IMembershipService _membershipService;
@@ -28,6 +30,7 @@ namespace BackEnd.Controllers
         /// </summary>
         /// <returns>List of memberships</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Membership>))]
         public async Task<ActionResult<IEnumerable<Membership>>> GetAllMemberships()
         {
@@ -49,6 +52,7 @@ namespace BackEnd.Controllers
         /// <param name="id">Membership ID</param>
         /// <returns>Membership details</returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Membership))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Membership>> GetMembershipById(int id)
@@ -75,8 +79,10 @@ namespace BackEnd.Controllers
         /// <param name="dto">Membership details</param>
         /// <returns>Created membership</returns>
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Membership))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<Membership>> AddMembership([FromBody] MembershipDTO dto)
         {
             try
@@ -103,9 +109,11 @@ namespace BackEnd.Controllers
         /// <param name="dto">Updated membership details</param>
         /// <returns>Updated membership</returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Membership))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<Membership>> EditMembership(int id, [FromBody] MembershipDTO dto)
         {
             try
@@ -135,8 +143,10 @@ namespace BackEnd.Controllers
         /// <param name="id">Membership ID</param>
         /// <returns>No content if successful</returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> DeleteMembership(int id)
         {
             try
@@ -161,8 +171,10 @@ namespace BackEnd.Controllers
         /// <param name="request">Request details</param>
         /// <returns>Membership request record</returns>
         [HttpPost("request")]
+        [Authorize(Roles = "User,Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserMembership))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<UserMembership>> RequestMembership([FromBody] MembershipRequestDTO request)
         {
             try
@@ -170,6 +182,13 @@ namespace BackEnd.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }
+
+                // Verify the requesting user matches the authenticated user
+                var userId = long.Parse(User.FindFirst("sub")?.Value ?? "0");
+                if (userId != request.UserId && !User.IsInRole("Admin"))
+                {
+                    return Forbid();
                 }
 
                 var userMembership = await _membershipService.RequestMembershipAsync(
@@ -193,8 +212,10 @@ namespace BackEnd.Controllers
         /// <param name="approverId">Approver user ID</param>
         /// <returns>Approved membership record</returns>
         [HttpPut("approve/{userMembershipId}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserMembership))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<UserMembership>> ApproveMembership(
             int userMembershipId,
             [FromQuery] long approverId)
@@ -222,8 +243,10 @@ namespace BackEnd.Controllers
         /// <param name="approverId">Approver user ID</param>
         /// <returns>Rejected membership record</returns>
         [HttpPut("reject/{userMembershipId}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserMembership))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<UserMembership>> RejectMembership(
             int userMembershipId,
             [FromQuery] long approverId)
@@ -248,27 +271,36 @@ namespace BackEnd.Controllers
         /// Cancel a membership (either pending or active)
         /// </summary>
         /// <param name="userMembershipId">User membership ID</param>
-        /// <param name="userId">User ID who is canceling</param>
-        /// <returns>Success message</returns>
+        /// <param name="userId">User ID</param>
+        /// <returns>Success status</returns>
         [HttpPut("cancel/{userMembershipId}")]
+        [Authorize(Roles = "User,Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> CancelMembership(
             int userMembershipId,
             [FromQuery] long userId)
         {
             try
             {
-                var cancelled = await _membershipService.CancelMembershipAsync(userMembershipId, userId);
-                if (!cancelled)
+                // Verify the requesting user matches the authenticated user
+                var authenticatedUserId = long.Parse(User.FindFirst("sub")?.Value ?? "0");
+                if (authenticatedUserId != userId && !User.IsInRole("Admin"))
                 {
-                    return NotFound($"Membership with ID {userMembershipId} not found or cannot be canceled");
+                    return Forbid();
                 }
-                return Ok(new { message = "Membership cancelled successfully" });
+
+                var canceled = await _membershipService.CancelMembershipAsync(userMembershipId, userId);
+                if (!canceled)
+                {
+                    return NotFound($"Membership request with ID {userMembershipId} not found or not authorized to cancel");
+                }
+                return Ok();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error canceling membership {userMembershipId}");
+                _logger.LogError(ex, $"Error canceling membership request {userMembershipId}");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while canceling the membership");
             }
         }
