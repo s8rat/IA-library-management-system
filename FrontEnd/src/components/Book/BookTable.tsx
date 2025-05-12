@@ -35,6 +35,9 @@ const BookTable: React.FC<BookTableProps> = ({
             Author
           </th>
           <th className="py-3 px-4 border-b text-gray-800 font-semibold">
+            Description
+          </th>
+          <th className="py-3 px-4 border-b text-gray-800 font-semibold">
             Actions
           </th>
         </tr>
@@ -61,6 +64,20 @@ const BookTable: React.FC<BookTableProps> = ({
               <strong>{book.title}</strong>
             </td>
             <td className="py-3 px-4 border-b text-gray-900">{book.author}</td>
+            <td className="py-3 px-4 border-b text-gray-900">
+              <div className="max-w-xs overflow-hidden">
+                {book.description ? (
+                  <p
+                    className="text-sm text-gray-600 truncate"
+                    title={book.description}
+                  >
+                    {book.description}
+                  </p>
+                ) : (
+                  <span className="text-gray-400 text-sm">No description</span>
+                )}
+              </div>
+            </td>
             <td className="py-3 px-4 border-b">
               <div className="flex gap-2 justify-center">
                 <button
@@ -82,7 +99,7 @@ const BookTable: React.FC<BookTableProps> = ({
         ))}
         {books.length === 0 && (
           <tr>
-            <td colSpan={4} className="text-center py-8 text-gray-400">
+            <td colSpan={5} className="text-center py-8 text-gray-400">
               No books found.
             </td>
           </tr>

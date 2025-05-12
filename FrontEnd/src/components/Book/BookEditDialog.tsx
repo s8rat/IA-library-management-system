@@ -145,7 +145,25 @@ const BookEditDialog: React.FC<BookEditDialogProps> = ({
                   setEditingBook({ ...editingBook, isbn: e.target.value })
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                placeholder="Optional"
+                placeholder="ISBN"
+              />
+            </div>
+            {/* Description */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-blue-900 mb-1">
+                Description
+              </label>
+              <textarea
+                value={editingBook.description || ""}
+                onChange={(e) =>
+                  setEditingBook({
+                    ...editingBook,
+                    description: e.target.value,
+                  })
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                rows={4}
+                placeholder="Enter book description..."
               />
             </div>
           </div>
