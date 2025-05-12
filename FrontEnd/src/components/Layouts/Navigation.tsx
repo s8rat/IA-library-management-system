@@ -65,24 +65,24 @@ export const Navigation = () => {
     }
 
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-50 text-white transition-all duration-300 ${
+        <nav className={`z-50 text-white h-28 flex flex-col item justify-center transition-all duration-300 ${
             isScrolled ? 'bg-primary shadow-lg' : 'bg-primary'
         }`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="relative flex items-center justify-between h-16 md:h-20">
+            <div className="h-full flex flex-col items-center justify-center w-full px-4 sm:px-6 lg:px-8">
+                <div className="relative w-full h-full flex items-center justify-around text-xl"> 
                     {/* Logo */}
                     <Link 
                         to="/" 
-                        className="flex items-center gap-3 text-xl md:text-2xl transition-colors z-10 text-white hover:text-white font-poppins"
+                        className="flex h-full items-center gap-3 text-xl md:text-2xl transition-colors z-10 text-white hover:text-white font-poppins"
                     >
-                        <div className="h-10 w-10 md:h-12 md:w-12 relative flex items-center justify-center">
+                        <div className="aspect-square h-24 relative flex items-center justify-center">
                             <img 
                                 src="/Image/aalm-alkutub-logo.png" 
                                 alt="logo" 
                                 className="h-full w-full object-contain"
                             />
                         </div>
-                        <span className="hidden sm:inline font-extralight tracking-wide">Aalam Al-Kutub</span>
+                        <span className="hidden sm:inline font-extralight tracking-wide text-4xl">Aalam Al-Kutub</span>
                     </Link>
 
                     {/* Navigation Links */}
@@ -95,7 +95,7 @@ export const Navigation = () => {
                                     key={link.to}
                                     to={link.to}
                                     className={`text-gray-800 md:text-white hover:text-blue-600 md:hover:text-gray-300 font-poppins transition-colors py-2 md:py-0 ${
-                                        location.pathname === link.to ? 'text-blue-600 md:text-white font-medium' : ''
+                                        location.pathname === link.to ? 'text-blue-600 md:text-white' : ''
                                     }`}
                                 >
                                     {link.label}
