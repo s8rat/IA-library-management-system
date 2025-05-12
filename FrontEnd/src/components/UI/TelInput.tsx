@@ -48,6 +48,7 @@ const TelInput = ({ onPhoneChange, error }: TelInputProps) => {
                 onChange={handleChange}
                 error={!!error || !!localError}
                 helperText={error || localError}
+                className="w-full"
             />
         </div>
     )
