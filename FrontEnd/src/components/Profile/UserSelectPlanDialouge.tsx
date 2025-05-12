@@ -15,6 +15,7 @@ interface Membership {
 
 interface ApiError {
   response?: {
+    status?: number;
     data: {
       message?: string;
     };
@@ -28,22 +29,47 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [currentMembership, setCurrentMembership] = useState<Membership | null>(null);
+  const [showPlanSelection, setShowPlanSelection] = useState(false);
 
   useEffect(() => {
-    const fetchPlans = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get('/api/Membership');
-        setPlans(res.data);
+        // Fetch plans first
+        const plansRes = await api.get('/api/Membership');
+        setPlans(plansRes.data);
+
+        // Then try to fetch current membership
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          try {
+            const membershipRes = await api.get(`/api/Membership/user/${userId}`);
+            if (membershipRes.data) {
+              setCurrentMembership(membershipRes.data);
+              setShowPlanSelection(false);
+            } else {
+              setShowPlanSelection(true);
+            }
+          } catch (membershipErr: unknown) {
+            if (membershipErr instanceof Error && (membershipErr as ApiError).response?.status === 404) {
+              // User doesn't have a membership yet - this is normal
+              setShowPlanSelection(true);
+            } else {
+              console.error('Error fetching membership:', membershipErr);
+            }
+          }
+        }
         setError(null);
       } catch (err: unknown) {
         const apiError = err as ApiError;
-        setError(apiError.response?.data?.message || 'Failed to load plans');
+        setError(apiError.response?.data?.message || 'Failed to load data');
       } finally {
         setLoading(false);
       }
     };
-    fetchPlans();
+
+    fetchData();
   }, []);
 
   const handleSubmit = async () => {
@@ -88,9 +114,41 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
     }
   };
 
+  if (!showPlanSelection && currentMembership) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto">
+        <h2 className="text-xl font-semibold mb-4">Current Membership Plan</h2>
+        <div className="border rounded-lg p-4 mb-4">
+          <div className="font-bold text-lg text-black">{currentMembership.membershipType}</div>
+          <div className="text-gray-600 text-sm">{currentMembership.description}</div>
+          <div className="text-gray-500 text-xs mt-1">
+            Borrow Limit: {currentMembership.borrowLimit} | Duration: {currentMembership.durationInDays} days
+            | Price: {currentMembership.price ? `$${currentMembership.price}` : 'Free'}
+          </div>
+        </div>
+        <button
+          onClick={() => setShowPlanSelection(true)}
+          className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Change Plan
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Select a Membership Plan</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Select a Membership Plan</h2>
+        {currentMembership && (
+          <button
+            onClick={() => setShowPlanSelection(false)}
+            className="text-blue-600 hover:text-blue-800"
+          >
+            Back to Current Plan
+          </button>
+        )}
+      </div>
       {loading ? (
         <div className="flex justify-center items-center h-24">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>

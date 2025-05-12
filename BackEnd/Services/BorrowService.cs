@@ -284,6 +284,7 @@ namespace BackEnd.Services
                 Username = record.User.Username,
                 BookId = record.BookId,
                 BookTitle = record.Book.Title,
+                Author = record.Book.Author,
                 BorrowDate = record.BorrowDate,
                 DueDate = record.DueDate,
                 ReturnDate = record.ReturnDate,
@@ -303,6 +304,7 @@ namespace BackEnd.Services
                     Username = br.User.Username,
                     BookId = br.BookId,
                     BookTitle = br.Book.Title,
+                    Author = br.Book.Author,
                     BorrowDate = br.BorrowDate,
                     DueDate = br.DueDate,
                     ReturnDate = br.ReturnDate,
@@ -321,6 +323,7 @@ namespace BackEnd.Services
                 {
                     Id = br.Id,
                     UserId = br.UserId,
+                    Author = br.Book.Author,
                     Username = br.User.Username,
                     BookId = br.BookId,
                     BookTitle = br.Book.Title,
