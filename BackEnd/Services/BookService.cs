@@ -75,13 +75,13 @@ namespace BackEnd.Services
             }
 
             var book = new Book
-            {
-                Title = bookDTO.Title,
+            {                Title = bookDTO.Title,
                 Author = bookDTO.Author,
                 ISBN = bookDTO.ISBN,
                 PublishedDate = bookDTO.PublishedDate,
                 Available = bookDTO.Quantity > 0,
-                Quantity = bookDTO.Quantity
+                Quantity = bookDTO.Quantity,
+                Description = bookDTO.Description
             };
 
             // Handle image upload
@@ -126,14 +126,13 @@ namespace BackEnd.Services
             if (book.ISBN != bookDTO.ISBN && await _context.Books.AnyAsync(b => b.ISBN == bookDTO.ISBN))
             {
                 throw new Exception("A book with this ISBN already exists");
-            }
-
-            book.Title = bookDTO.Title;
+            }            book.Title = bookDTO.Title;
             book.Author = bookDTO.Author;
             book.ISBN = bookDTO.ISBN;
             book.PublishedDate = bookDTO.PublishedDate;
             book.Quantity = bookDTO.Quantity;
             book.Available = bookDTO.Quantity > 0;
+            book.Description = bookDTO.Description;
 
             // Update image if new one is provided
             if (bookDTO.CoverImageFile != null && bookDTO.CoverImageFile.Length > 0)
@@ -179,10 +178,9 @@ namespace BackEnd.Services
 
         public async Task<IEnumerable<BookDTO>> SearchBooks(string searchTerm)
         {
-            return await _context.Books
-                .Where(b => b.Title.Contains(searchTerm) ||
-                           b.Author.Contains(searchTerm) ||
-                           b.ISBN.Contains(searchTerm))
+            return await _context.Books                .Where(b => (b.Title ?? "").Contains(searchTerm) ||
+                           (b.Author ?? "").Contains(searchTerm) ||
+                           (b.ISBN ?? "").Contains(searchTerm))
                 .Select(b => new BookDTO
                 {
                     Id = b.Id,
