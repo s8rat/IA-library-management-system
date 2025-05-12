@@ -68,11 +68,12 @@ namespace BackEnd.Data
                 .HasForeignKey(br => br.BookId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<BorrowRecord>()
-                .HasOne(br => br.BorrowRequest)
-                .WithOne(br => br.BorrowRecord)
-                .HasForeignKey<BorrowRecord>(br => br.BorrowRequestId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<BorrowRecord>()
+            //    .HasOne(br => br.BorrowRequest)
+            //    .WithOne(br => br.BorrowRecord)
+            //    .HasForeignKey<BorrowRecord>(br => br.BorrowRequestId)
+            //    .IsRequired(false)
+            //    .OnDelete(DeleteBehavior.SetNull);
 
             // Configure UserMembership
             modelBuilder.Entity<UserMembership>()

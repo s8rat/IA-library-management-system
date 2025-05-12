@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEnd.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250512000305_UpdateBookBorrowRequestRelationship")]
-    partial class UpdateBookBorrowRequestRelationship
+    [Migration("20250512011325_initialMigration")]
+    partial class initialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,9 +104,6 @@ namespace BackEnd.Migrations
                     b.Property<DateTime>("BorrowDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("BorrowRequestId")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
@@ -123,9 +120,6 @@ namespace BackEnd.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
-
-                    b.HasIndex("BorrowRequestId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -402,12 +396,6 @@ namespace BackEnd.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("BackEnd.Models.BorrowRequest", "BorrowRequest")
-                        .WithOne("BorrowRecord")
-                        .HasForeignKey("BackEnd.Models.BorrowRecord", "BorrowRequestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("BackEnd.Models.User", "User")
                         .WithMany("BorrowRecords")
                         .HasForeignKey("UserId")
@@ -415,8 +403,6 @@ namespace BackEnd.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
-
-                    b.Navigation("BorrowRequest");
 
                     b.Navigation("User");
                 });
@@ -493,11 +479,6 @@ namespace BackEnd.Migrations
                     b.Navigation("BorrowRecords");
 
                     b.Navigation("BorrowRequests");
-                });
-
-            modelBuilder.Entity("BackEnd.Models.BorrowRequest", b =>
-                {
-                    b.Navigation("BorrowRecord");
                 });
 
             modelBuilder.Entity("BackEnd.Models.User", b =>

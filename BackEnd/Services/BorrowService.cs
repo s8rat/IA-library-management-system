@@ -3,7 +3,6 @@ using BackEnd.DTOs;
 using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace BackEnd.Services
 {
     public class BorrowService : IBorrowService
@@ -30,7 +29,6 @@ namespace BackEnd.Services
                     throw new Exception("User not found");
                 }
 
-                // Check if user has an active membership
                 var activeMembership = user.UserMemberships
                     .FirstOrDefault(um => um.IsActive &&
                                          um.Status == "Approved" &&
@@ -52,7 +50,6 @@ namespace BackEnd.Services
                     throw new Exception("Book is not available for borrowing");
                 }
 
-                // Check borrow limit
                 var currentBorrowCount = await _context.BorrowRecords
                     .CountAsync(br => br.UserId == userId &&
                                     br.Status == "Borrowed" &&
@@ -63,7 +60,6 @@ namespace BackEnd.Services
                     throw new Exception($"Borrow limit reached. Your membership allows {activeMembership.Membership.BorrowLimit} books at a time.");
                 }
 
-                // Check if user already has a pending request for this book
                 var existingRequest = await _context.BorrowRequests
                     .FirstOrDefaultAsync(br => br.UserId == userId &&
                                              br.BookId == bookId &&
@@ -74,7 +70,6 @@ namespace BackEnd.Services
                     throw new Exception("You already have a pending or approved request for this book");
                 }
 
-                // Subtract book quantity when request is made
                 book.Quantity--;
                 book.Available = book.Quantity > 0;
                 _context.Books.Update(book);
@@ -84,7 +79,7 @@ namespace BackEnd.Services
                     UserId = userId,
                     BookId = bookId,
                     RequestDate = DateTime.UtcNow,
-                    Status = "Pending" // Always set to Pending, requiring librarian approval
+                    Status = "Pending"
                 };
 
                 _context.BorrowRequests.Add(request);
@@ -102,7 +97,7 @@ namespace BackEnd.Services
                     Status = request.Status
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 await transaction.RollbackAsync();
                 throw;
@@ -161,7 +156,6 @@ namespace BackEnd.Services
                     throw new Exception("User no longer has an active membership");
                 }
 
-                // Check borrow limit
                 var currentBorrowCount = await _context.BorrowRecords
                     .CountAsync(br => br.UserId == user.Id &&
                                     br.Status == "Borrowed" &&
@@ -173,30 +167,18 @@ namespace BackEnd.Services
                 }
 
                 var book = request.Book;
-                if (!book.Available || book.Quantity <= 0)
-                {
-                    throw new Exception("Book is no longer available for borrowing");
-                }
 
-                // Create borrow record
                 var record = new BorrowRecord
                 {
                     UserId = request.UserId,
                     BookId = request.BookId,
                     BorrowDate = DateTime.UtcNow,
                     DueDate = DateTime.UtcNow.AddDays(activeMembership.Membership.DurationInDays),
-                    Status = "Borrowed",
-                    BorrowRequestId = request.Id
+                    Status = "Borrowed"
                 };
 
                 _context.BorrowRecords.Add(record);
 
-                // Reduce book quantity
-                book.Quantity--;
-                book.Available = book.Quantity > 0;
-                _context.Books.Update(book);
-
-                // Remove the request from BorrowRequests
                 _context.BorrowRequests.Remove(request);
 
                 await _context.SaveChangesAsync();
@@ -213,13 +195,12 @@ namespace BackEnd.Services
                     Status = "Approved"
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 await transaction.RollbackAsync();
                 throw;
             }
         }
-
 
         public async Task<BorrowRequestDTO> RejectBorrowRequest(long requestId, long librarianId)
         {
@@ -241,13 +222,11 @@ namespace BackEnd.Services
                     throw new Exception("Only pending requests can be rejected");
                 }
 
-                // Restore book quantity when request is rejected
                 var book = request.Book;
                 book.Quantity++;
                 book.Available = true;
                 _context.Books.Update(book);
 
-                // Remove the request
                 _context.BorrowRequests.Remove(request);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -263,7 +242,7 @@ namespace BackEnd.Services
                     Status = "Rejected"
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 await transaction.RollbackAsync();
                 throw;
@@ -291,7 +270,6 @@ namespace BackEnd.Services
             record.ReturnDate = DateTime.UtcNow;
             _context.BorrowRecords.Update(record);
 
-            // Increase book quantity
             var book = record.Book;
             book.Quantity++;
             book.Available = true;

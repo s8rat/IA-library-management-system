@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Models
 {
@@ -27,10 +26,6 @@ namespace BackEnd.Models
         [Required]
         public string Status { get; set; } // "Borrowed", "Returned"
 
-        [ForeignKey("BorrowRequest")]
-        public long BorrowRequestId { get; set; }
-
-        [DeleteBehavior(DeleteBehavior.NoAction)] // Add this attribute
-        public BorrowRequest BorrowRequest { get; set; }
+        // Removed BorrowRequestId and navigation property
     }
 }

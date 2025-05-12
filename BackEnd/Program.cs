@@ -124,89 +124,91 @@ internal class Program
                 }
 
                 // Seed additional users
-                var users = new List<User>
-                {
-                    new User
-                    {
-                        Username = "salma",
-                        Password = BCrypt.Net.BCrypt.HashPassword("password1"),
-                        Role = "Librarian",
-                        CreatedAt = DateTime.UtcNow,
-                        Email = "salma@example.com",
-                        FirstName = "Salma",
-                        LastName = "Mostafa",
-                        PhoneNumber = "1234567890",
-                        SSN = "323-45-6789"
-                    },
-                    new User
-                    {
-                        Username = "sagheer",
-                        Password = BCrypt.Net.BCrypt.HashPassword("password2"),
-                        Role = "User",
-                        CreatedAt = DateTime.UtcNow,
-                        Email = "sagheer@example.com",
-                        FirstName = "Mohammad",
-                        LastName = "El-Sagheer",
-                        PhoneNumber = "0987654321",
-                        SSN = "213-65-4321"
-                    },
-                    new User
-                    {
-                        Username = "reda",
-                        Password = BCrypt.Net.BCrypt.HashPassword("password3"),
-                        Role = "User",
-                        CreatedAt = DateTime.UtcNow,
-                        Email = "reda@example.com",
-                        FirstName = "Mhmd",
-                        LastName = "Reda",
-                        PhoneNumber = "0987654321",
-                        SSN = "432-65-4321"
-                    },
-                    new User
-                    {
-                        Username = "ahmed",
-                        Password = BCrypt.Net.BCrypt.HashPassword("password4"),
-                        Role = "User",
-                        CreatedAt = DateTime.UtcNow,
-                        Email = "ahmed@example.com",
-                        FirstName = "Ahmed",
-                        LastName = "Hazem",
-                        PhoneNumber = "0987654321",
-                        SSN = "987-65-4321"
-                    },
-                    new User
-                    {
-                        Username = "nehal",
-                        Password = BCrypt.Net.BCrypt.HashPassword("password5"),
-                        Role = "User",
-                        CreatedAt = DateTime.UtcNow,
-                        Email = "nehal@example.com",
-                        FirstName = "Nehal",
-                        LastName = "Nady",
-                        PhoneNumber = "0987654321",
-                        SSN = "737-65-4321"
-                    },
-                    new User
-                    {
-                        Username = "tarek",
-                        Password = BCrypt.Net.BCrypt.HashPassword("password6"),
-                        Role = "User",
-                        CreatedAt = DateTime.UtcNow,
-                        Email = "tarek@example.com",
-                        FirstName = "Mohammed",
-                        LastName = "Tarek",
-                        PhoneNumber = "0987654321",
-                        SSN = "987-65-4321"
-                    }
-                };
+                //var users = new List<User>
+                //{
+                //    new User
+                //    {
+                //        Username = "salma",
+                //        Password = BCrypt.Net.BCrypt.HashPassword("password1"),
+                //        Role = "Librarian",
+                //        CreatedAt = DateTime.UtcNow,
+                //        Email = "salma@example.com",
+                //        FirstName = "Salma",
+                //        LastName = "Mostafa",
+                //        PhoneNumber = "1234567890",
+                //        SSN = "323-45-6789"
+                //    },
+                //    new User
+                //    {
+                //        Username = "sagheer",
+                //        Password = BCrypt.Net.BCrypt.HashPassword("password2"),
+                //        Role = "User",
+                //        CreatedAt = DateTime.UtcNow,
+                //        Email = "sagheer@example.com",
+                //        FirstName = "Mohammad",
+                //        LastName = "El-Sagheer",
+                //        PhoneNumber = "0987654821",
+                //        SSN = "213-65-4321"
+                //    },
+                //    new User
+                //    {
+                //        Username = "reda",
+                //        Password = BCrypt.Net.BCrypt.HashPassword("password3"),
+                //        Role = "User",
+                //        CreatedAt = DateTime.UtcNow,
+                //        Email = "reda@example.com",
+                //        FirstName = "Mhmd",
+                //        LastName = "Reda",
+                //        PhoneNumber = "0987654321",
+                //        SSN = "432-65-4321"
+                //    },
+                //    new User
+                //    {
+                //        Username = "ahmed",
+                //        Password = BCrypt.Net.BCrypt.HashPassword("password4"),
+                //        Role = "User",
+                //        CreatedAt = DateTime.UtcNow,
+                //        Email = "ahmed@example.com",
+                //        FirstName = "Ahmed",
+                //        LastName = "Hazem",
+                //        PhoneNumber = "0987659321",
+                //        SSN = "987-65-4321"
+                //    },
+                //    new User
+                //    {
+                //        Username = "nehal",
+                //        Password = BCrypt.Net.BCrypt.HashPassword("password5"),
+                //        Role = "User",
+                //        CreatedAt = DateTime.UtcNow,
+                //        Email = "nehal@example.com",
+                //        FirstName = "Nehal",
+                //        LastName = "Nady",
+                //        PhoneNumber = "0989654321",
+                //        SSN = "737-65-4321"
+                //    },
+                //    new User
+                //    {
+                //        Username = "tarek",
+                //        Password = BCrypt.Net.BCrypt.HashPassword("password6"),
+                //        Role = "User",
+                //        CreatedAt = DateTime.UtcNow,
+                //        Email = "tarek@example.com",
+                //        FirstName = "Mohammed",
+                //        LastName = "Tarek",
+                //        PhoneNumber = "0887654321",
+                //        SSN = "987-65-4321"
+                //    }
+                //};
 
-                foreach (var user in users)
-                {
-                    if (!await context.Users.AnyAsync(u => u.Username == user.Username))
-                    {
-                        context.Users.Add(user);
-                    }
-                }
+                //foreach (var user in users)
+                //{
+                //    if (!await context.Users.AnyAsync(u => u.Username == user.Username))
+                //    {
+                //        context.Users.Add(user);
+                //    }
+                //}
+
+                
 
                 await context.SaveChangesAsync();
             }

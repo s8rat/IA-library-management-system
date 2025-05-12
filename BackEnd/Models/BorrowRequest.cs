@@ -23,7 +23,7 @@ namespace BackEnd.Models
         [Required]
         public string Status { get; set; } // "Pending", "Approved", "Rejected"
 
-        public BorrowRecord? BorrowRecord { get; set; }
+        //public BorrowRecord? BorrowRecord { get; set; }
     }
 
 }
