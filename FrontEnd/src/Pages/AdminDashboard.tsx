@@ -144,6 +144,11 @@ const AdminDashboard = () => {
               u.id === editingUser.id ? { ...u, ...updated } : u
             )
           );
+          setFilteredUsers(
+            users.map((u) =>
+              u.id === editingUser.id ? { ...u, ...updated } : u
+            )
+          );
           setEditingUser(null);
           setOriginalUser(null);
         })
@@ -174,6 +179,7 @@ const AdminDashboard = () => {
       })
       .then(() => {
         setUsers(users.filter((u) => u.id !== id));
+        setFilteredUsers(users.filter((u) => u.id !== id));
       })
       .catch((error) => {
         setError(error.response?.data?.message || "Error deleting user.");
@@ -201,6 +207,7 @@ const AdminDashboard = () => {
       })
       .then((response) => {
         setUsers([...users, response.data]);
+        setFilteredUsers([...users, response.data]);
         setIsAddUserOpen(false);
         setNewUser({ ...defaultNewUser });
       })
@@ -251,7 +258,7 @@ const AdminDashboard = () => {
       />
     );
   } else if (activeTab === "req") {
-    content = <JoinUS />; 
+    content = <JoinUS />;
   } else if (activeTab === "memberships") {
     content = <ManageMemberShip containerClassName="w-full" />;
   }
