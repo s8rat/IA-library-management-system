@@ -55,15 +55,29 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
     setError(null);
     setSuccess(null);
     try {
-      // Get userId from localStorage or auth context
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const userId = user.id;
+      // Get userId from localStorage
+      const userId = localStorage.getItem('userId');
+      console.log(userId);
       if (!userId) {
         setError('User not logged in');
         setSubmitting(false);
         return;
       }
-      await api.post('/api/Membership/request', { userId, membershipId: selectedPlan });
+
+      const selectedPlanData = plans.find(p => p.membershipId === selectedPlan);
+      if (!selectedPlanData) {
+        setError('Selected plan not found');
+        setSubmitting(false);
+        return;
+      }
+
+      const requestData = {
+        userId: parseInt(userId),
+        membershipId: selectedPlan,
+        parentUserId: selectedPlanData.isFamilyPlan ? parseInt(userId) : null
+      };
+
+      await api.post('/api/Membership/request', requestData);
       setSuccess('Request sent to librarian for approval.');
       if (onRequestSent) onRequestSent();
     } catch (err: unknown) {

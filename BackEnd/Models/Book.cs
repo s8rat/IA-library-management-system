@@ -27,7 +27,7 @@ namespace BackEnd.Models
         [NotMapped]
         public IFormFile? CoverImageFile { get; set; }
 
-        public BorrowRequest BorrowRequest { get; set; }
-        public ICollection<BorrowRecord> BorrowRecords { get; set; }
+        public ICollection<BorrowRequest> BorrowRequests { get; set; } = new List<BorrowRequest>();
+        public ICollection<BorrowRecord> BorrowRecords { get; set; } = new List<BorrowRecord>();
     }
 }

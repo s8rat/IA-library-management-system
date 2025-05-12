@@ -185,7 +185,8 @@ namespace BackEnd.Controllers
                 }
 
                 // Verify the requesting user matches the authenticated user
-                var userId = long.Parse(User.FindFirst("sub")?.Value ?? "0");
+                var userId = long.Parse(User.FindFirst("userId").Value);
+                Console.WriteLine("userId: " + userId);
                 if (userId != request.UserId && !User.IsInRole("Admin"))
                 {
                     return Forbid();
@@ -212,7 +213,7 @@ namespace BackEnd.Controllers
         /// <param name="approverId">Approver user ID</param>
         /// <returns>Approved membership record</returns>
         [HttpPut("approve/{userMembershipId}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Librarian")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserMembership))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -302,6 +303,28 @@ namespace BackEnd.Controllers
             {
                 _logger.LogError(ex, $"Error canceling membership request {userMembershipId}");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while canceling the membership");
+            }
+        }
+
+        /// <summary>
+        /// Get all pending membership requests
+        /// </summary>
+        /// <returns>List of pending membership requests</returns>
+        [HttpGet("requests")]
+        [Authorize(Roles = "Admin,Librarian")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserMembership>))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<IEnumerable<UserMembership>>> GetPendingRequests()
+        {
+            try
+            {
+                var requests = await _membershipService.GetPendingRequestsAsync();
+                return Ok(requests);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting pending membership requests");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving pending requests");
             }
         }
     }

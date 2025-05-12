@@ -159,7 +159,7 @@ namespace BackEnd.Services
                     UserId = userId,
                     MembershipId = membershipId,
                     ParentUserId = parentUserId,
-                    Status = membership.RequiresApproval ? "Pending" : "Approved",
+                    Status =  "Pending" ,
                     IsActive = !membership.RequiresApproval,
                    
                 };
@@ -264,6 +264,24 @@ namespace BackEnd.Services
             {
                 await transaction.RollbackAsync();
                 _logger.LogError(ex, $"Error canceling membership request {userMembershipId}");
+                throw;
+            }
+        }
+
+        public async Task<List<UserMembership>> GetPendingRequestsAsync()
+        {
+            try
+            {
+                return await _dbContext.UserMemberships
+                    .Include(um => um.Membership)
+                    .Include(um => um.User)
+                    .Where(um => um.Status == "Pending" && !um.IsCanceled)
+                    .OrderByDescending(um => um.StartDate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting pending membership requests");
                 throw;
             }
         }

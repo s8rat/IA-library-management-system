@@ -17,101 +17,96 @@ namespace BackEnd.Services
 
         public async Task<BorrowRequestDTO> RequestBorrow(long userId, long bookId)
         {
-            var user = await _context.Users
-                .Include(u => u.UserMemberships)
-                .ThenInclude(um => um.Membership)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-            if (user == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                throw new Exception("User not found");
-            }
+                var user = await _context.Users
+                    .Include(u => u.UserMemberships)
+                    .ThenInclude(um => um.Membership)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
 
-            // Check if user has an active membership
-            var activeMembership = user.UserMemberships
-                .FirstOrDefault(um => um.IsActive &&
-                                     um.Status == "Approved" &&
-                                     (um.EndDate == null || um.EndDate > DateTime.UtcNow));
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
 
-            if (activeMembership == null)
-            {
-                throw new Exception("User does not have an active membership");
-            }
+                // Check if user has an active membership
+                var activeMembership = user.UserMemberships
+                    .FirstOrDefault(um => um.IsActive &&
+                                         um.Status == "Approved" &&
+                                         (um.EndDate == null || um.EndDate > DateTime.UtcNow));
 
-            var book = await _context.Books.FindAsync(bookId);
-            if (book == null)
-            {
-                throw new Exception("Book not found");
-            }
+                if (activeMembership == null)
+                {
+                    throw new Exception("User does not have an active membership");
+                }
 
-            if (!book.Available || book.Quantity <= 0)
-            {
-                throw new Exception("Book is not available for borrowing");
-            }
+                var book = await _context.Books.FindAsync(bookId);
+                if (book == null)
+                {
+                    throw new Exception("Book not found");
+                }
 
-            // Check borrow limit
-            var currentBorrowCount = await _context.BorrowRecords
-                .CountAsync(br => br.UserId == userId &&
-                                br.Status == "Borrowed" &&
-                                br.ReturnDate == null);
+                if (!book.Available || book.Quantity <= 0)
+                {
+                    throw new Exception("Book is not available for borrowing");
+                }
 
-            if (currentBorrowCount >= activeMembership.Membership.BorrowLimit)
-            {
-                throw new Exception($"Borrow limit reached. Your membership allows {activeMembership.Membership.BorrowLimit} books at a time.");
-            }
+                // Check borrow limit
+                var currentBorrowCount = await _context.BorrowRecords
+                    .CountAsync(br => br.UserId == userId &&
+                                    br.Status == "Borrowed" &&
+                                    br.ReturnDate == null);
 
-            // Check if user already has a pending request for this book
-            var existingRequest = await _context.BorrowRequests
-                .FirstOrDefaultAsync(br => br.UserId == userId &&
-                                         br.BookId == bookId &&
-                                         (br.Status == "Pending" || br.Status == "Approved"));
+                if (currentBorrowCount >= activeMembership.Membership.BorrowLimit)
+                {
+                    throw new Exception($"Borrow limit reached. Your membership allows {activeMembership.Membership.BorrowLimit} books at a time.");
+                }
 
-            if (existingRequest != null)
-            {
-                throw new Exception("You already have a pending or approved request for this book");
-            }
+                // Check if user already has a pending request for this book
+                var existingRequest = await _context.BorrowRequests
+                    .FirstOrDefaultAsync(br => br.UserId == userId &&
+                                             br.BookId == bookId &&
+                                             (br.Status == "Pending" || br.Status == "Approved"));
 
-            var request = new BorrowRequest
-            {
-                UserId = userId,
-                BookId = bookId,
-                RequestDate = DateTime.UtcNow,
-                Status = activeMembership.Membership.RequiresApproval ? "Pending" : "Approved"
-            };
+                if (existingRequest != null)
+                {
+                    throw new Exception("You already have a pending or approved request for this book");
+                }
 
-            _context.BorrowRequests.Add(request);
-
-            // If no approval needed, create borrow record immediately
-            if (!activeMembership.Membership.RequiresApproval)
-            {
+                // Subtract book quantity when request is made
                 book.Quantity--;
                 book.Available = book.Quantity > 0;
                 _context.Books.Update(book);
 
-                var record = new BorrowRecord
+                var request = new BorrowRequest
                 {
                     UserId = userId,
                     BookId = bookId,
-                    BorrowDate = DateTime.UtcNow,
-                    DueDate = DateTime.UtcNow.AddDays(activeMembership.Membership.DurationInDays),
-                    Status = "Borrowed",
-                    BorrowRequestId = request.Id
+                    RequestDate = DateTime.UtcNow,
+                    Status = "Pending" // Always set to Pending, requiring librarian approval
                 };
-                _context.BorrowRecords.Add(record);
+
+                _context.BorrowRequests.Add(request);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new BorrowRequestDTO
+                {
+                    Id = request.Id,
+                    UserId = request.UserId,
+                    Username = user.Username,
+                    BookId = request.BookId,
+                    BookTitle = book.Title,
+                    RequestDate = request.RequestDate,
+                    Status = request.Status
+                };
             }
-
-            await _context.SaveChangesAsync();
-
-            return new BorrowRequestDTO
+            catch (Exception ex)
             {
-                Id = request.Id,
-                UserId = request.UserId,
-                Username = user.Username,
-                BookId = request.BookId,
-                BookTitle = book.Title,
-                RequestDate = request.RequestDate,
-                Status = request.Status
-            };
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<IEnumerable<BorrowRequestDTO>> GetBorrowRequests(string status)
@@ -135,117 +130,144 @@ namespace BackEnd.Services
 
         public async Task<BorrowRequestDTO> ApproveBorrowRequest(long requestId, long librarianId)
         {
-            var request = await _context.BorrowRequests
-                .Include(br => br.User)
-                .ThenInclude(u => u.UserMemberships)
-                .ThenInclude(um => um.Membership)
-                .Include(br => br.Book)
-                .FirstOrDefaultAsync(br => br.Id == requestId);
-
-            if (request == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                throw new Exception("Borrow request not found");
+                var request = await _context.BorrowRequests
+                    .Include(br => br.User)
+                    .ThenInclude(u => u.UserMemberships)
+                    .ThenInclude(um => um.Membership)
+                    .Include(br => br.Book)
+                    .FirstOrDefaultAsync(br => br.Id == requestId);
+
+                if (request == null)
+                {
+                    throw new Exception("Borrow request not found");
+                }
+
+                if (request.Status != "Pending")
+                {
+                    throw new Exception("Only pending requests can be approved");
+                }
+
+                var user = request.User;
+                var activeMembership = user.UserMemberships
+                    .FirstOrDefault(um => um.IsActive &&
+                                        um.Status == "Approved" &&
+                                        (um.EndDate == null || um.EndDate > DateTime.UtcNow));
+
+                if (activeMembership == null)
+                {
+                    throw new Exception("User no longer has an active membership");
+                }
+
+                // Check borrow limit
+                var currentBorrowCount = await _context.BorrowRecords
+                    .CountAsync(br => br.UserId == user.Id &&
+                                    br.Status == "Borrowed" &&
+                                    br.ReturnDate == null);
+
+                if (currentBorrowCount >= activeMembership.Membership.BorrowLimit)
+                {
+                    throw new Exception($"User has reached their borrow limit of {activeMembership.Membership.BorrowLimit} books");
+                }
+
+                var book = request.Book;
+                if (!book.Available || book.Quantity <= 0)
+                {
+                    throw new Exception("Book is no longer available for borrowing");
+                }
+
+                // Create borrow record
+                var record = new BorrowRecord
+                {
+                    UserId = request.UserId,
+                    BookId = request.BookId,
+                    BorrowDate = DateTime.UtcNow,
+                    DueDate = DateTime.UtcNow.AddDays(activeMembership.Membership.DurationInDays),
+                    Status = "Borrowed",
+                    BorrowRequestId = request.Id
+                };
+
+                _context.BorrowRecords.Add(record);
+
+                // Reduce book quantity
+                book.Quantity--;
+                book.Available = book.Quantity > 0;
+                _context.Books.Update(book);
+
+                // Remove the request from BorrowRequests
+                _context.BorrowRequests.Remove(request);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new BorrowRequestDTO
+                {
+                    Id = request.Id,
+                    UserId = request.UserId,
+                    Username = user.Username,
+                    BookId = request.BookId,
+                    BookTitle = book.Title,
+                    RequestDate = request.RequestDate,
+                    Status = "Approved"
+                };
             }
-
-            if (request.Status != "Pending")
+            catch (Exception ex)
             {
-                throw new Exception("Only pending requests can be approved");
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            var user = request.User;
-            var activeMembership = user.UserMemberships
-                .FirstOrDefault(um => um.IsActive &&
-                                    um.Status == "Approved" &&
-                                    (um.EndDate == null || um.EndDate > DateTime.UtcNow));
-
-            if (activeMembership == null)
-            {
-                throw new Exception("User no longer has an active membership");
-            }
-
-            // Check borrow limit
-            var currentBorrowCount = await _context.BorrowRecords
-                .CountAsync(br => br.UserId == user.Id &&
-                                br.Status == "Borrowed" &&
-                                br.ReturnDate == null);
-
-            if (currentBorrowCount >= activeMembership.Membership.BorrowLimit)
-            {
-                throw new Exception($"User has reached their borrow limit of {activeMembership.Membership.BorrowLimit} books");
-            }
-
-            var book = request.Book;
-            if (!book.Available || book.Quantity <= 0)
-            {
-                throw new Exception("Book is no longer available for borrowing");
-            }
-
-            request.Status = "Approved";
-            _context.BorrowRequests.Update(request);
-
-            // Reduce book quantity
-            book.Quantity--;
-            book.Available = book.Quantity > 0;
-            _context.Books.Update(book);
-
-            // Create borrow record
-            var record = new BorrowRecord
-            {
-                UserId = request.UserId,
-                BookId = request.BookId,
-                BorrowDate = DateTime.UtcNow,
-                DueDate = DateTime.UtcNow.AddDays(activeMembership.Membership.DurationInDays),
-                Status = "Borrowed",
-                BorrowRequestId = request.Id
-            };
-
-            _context.BorrowRecords.Add(record);
-            await _context.SaveChangesAsync();
-
-            return new BorrowRequestDTO
-            {
-                Id = request.Id,
-                UserId = request.UserId,
-                Username = user.Username,
-                BookId = request.BookId,
-                BookTitle = book.Title,
-                RequestDate = request.RequestDate,
-                Status = request.Status
-            };
         }
 
 
         public async Task<BorrowRequestDTO> RejectBorrowRequest(long requestId, long librarianId)
         {
-            var request = await _context.BorrowRequests
-                .Include(br => br.User)
-                .Include(br => br.Book)
-                .FirstOrDefaultAsync(br => br.Id == requestId);
-
-            if (request == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                throw new Exception("Borrow request not found");
+                var request = await _context.BorrowRequests
+                    .Include(br => br.User)
+                    .Include(br => br.Book)
+                    .FirstOrDefaultAsync(br => br.Id == requestId);
+
+                if (request == null)
+                {
+                    throw new Exception("Borrow request not found");
+                }
+
+                if (request.Status != "Pending")
+                {
+                    throw new Exception("Only pending requests can be rejected");
+                }
+
+                // Restore book quantity when request is rejected
+                var book = request.Book;
+                book.Quantity++;
+                book.Available = true;
+                _context.Books.Update(book);
+
+                // Remove the request
+                _context.BorrowRequests.Remove(request);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new BorrowRequestDTO
+                {
+                    Id = request.Id,
+                    UserId = request.UserId,
+                    Username = request.User.Username,
+                    BookId = request.BookId,
+                    BookTitle = request.Book.Title,
+                    RequestDate = request.RequestDate,
+                    Status = "Rejected"
+                };
             }
-
-            if (request.Status != "Pending")
+            catch (Exception ex)
             {
-                throw new Exception("Only pending requests can be rejected");
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            request.Status = "Rejected";
-            _context.BorrowRequests.Update(request);
-            await _context.SaveChangesAsync();
-
-            return new BorrowRequestDTO
-            {
-                Id = request.Id,
-                UserId = request.UserId,
-                Username = request.User.Username,
-                BookId = request.BookId,
-                BookTitle = request.Book.Title,
-                RequestDate = request.RequestDate,
-                Status = request.Status
-            };
         }
 
         public async Task<BorrowRecordDTO> ReturnBook(long recordId, long librarianId)

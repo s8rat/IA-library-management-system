@@ -15,5 +15,6 @@ namespace BackEnd.Services
         Task<UserMembership?> ApproveMembershipAsync(int userMembershipId, long approverId);
         Task<UserMembership?> RejectMembershipAsync(int userMembershipId, long approverId);
         Task<bool> CancelMembershipAsync(int userMembershipId, long userId);
+        Task<List<UserMembership>> GetPendingRequestsAsync();
     }
 }

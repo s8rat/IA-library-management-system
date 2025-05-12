@@ -24,91 +24,88 @@ namespace BackEnd.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Configure User
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
 
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
 
-            // User configurations
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasIndex(u => u.Username).IsUnique();
-                entity.HasIndex(u => u.Email).IsUnique();
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.SSN)
+                .IsUnique();
 
-                // Relationships
-                entity.HasMany(u => u.BorrowRequests)
-                    .WithOne(br => br.User)
-                    .HasForeignKey(br => br.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            // Configure Book
+            modelBuilder.Entity<Book>()
+                .HasIndex(b => b.ISBN)
+                .IsUnique();
 
-                entity.HasMany(u => u.BorrowRecords)
-                    .WithOne(br => br.User)
-                    .HasForeignKey(br => br.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            // Configure BorrowRequest
+            modelBuilder.Entity<BorrowRequest>()
+                .HasOne(br => br.User)
+                .WithMany(u => u.BorrowRequests)
+                .HasForeignKey(br => br.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasMany(u => u.LibrarianRequests)
-                    .WithOne(lr => lr.User)
-                    .HasForeignKey(lr => lr.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<BorrowRequest>()
+                .HasOne(br => br.Book)
+                .WithMany(b => b.BorrowRequests)
+                .HasForeignKey(br => br.BookId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasMany(u => u.UserMemberships)
-                    .WithOne(um => um.User)
-                    .HasForeignKey(um => um.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            // Configure BorrowRecord
+            modelBuilder.Entity<BorrowRecord>()
+                .HasOne(br => br.User)
+                .WithMany(u => u.BorrowRecords)
+                .HasForeignKey(br => br.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasMany(u => u.FamilyMembers)
-                    .WithOne(um => um.ParentUser)
-                    .HasForeignKey(um => um.ParentUserId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
+            modelBuilder.Entity<BorrowRecord>()
+                .HasOne(br => br.Book)
+                .WithMany(b => b.BorrowRecords)
+                .HasForeignKey(br => br.BookId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Book configurations
-            modelBuilder.Entity<Book>(entity =>
-            {
-                entity.HasIndex(b => b.ISBN).IsUnique();
+            modelBuilder.Entity<BorrowRecord>()
+                .HasOne(br => br.BorrowRequest)
+                .WithOne(br => br.BorrowRecord)
+                .HasForeignKey<BorrowRecord>(br => br.BorrowRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(b => b.BorrowRecords)
-                    .WithOne(br => br.Book)
-                    .HasForeignKey(br => br.BookId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
+            // Configure UserMembership
+            modelBuilder.Entity<UserMembership>()
+                .HasOne(um => um.User)
+                .WithMany(u => u.UserMemberships)
+                .HasForeignKey(um => um.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // BorrowRequest configurations
-            modelBuilder.Entity<BorrowRequest>(entity =>
-            {
-                entity.HasOne(br => br.Book)
-                    .WithOne(b => b.BorrowRequest)
-                    .HasForeignKey<BorrowRequest>(br => br.BookId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserMembership>()
+                .HasOne(um => um.Membership)
+                .WithMany(m => m.UserMemberships)
+                .HasForeignKey(um => um.MembershipId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(br => br.BorrowRecord)
-                    .WithOne(br => br.BorrowRequest)
-                    .HasForeignKey<BorrowRecord>(br => br.BorrowRequestId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
+            modelBuilder.Entity<UserMembership>()
+                .HasOne(um => um.ParentUser)
+                .WithMany(u => u.FamilyMembers)
+                .HasForeignKey(um => um.ParentUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // BorrowRecord configurations
-            modelBuilder.Entity<BorrowRecord>(entity =>
-            {
-                entity.HasIndex(br => br.BorrowRequestId).IsUnique();
-            });
+            // Configure LibrarianRequest
+            modelBuilder.Entity<LibrarianRequest>()
+                .HasOne(lr => lr.User)
+                .WithMany(u => u.LibrarianRequests)
+                .HasForeignKey(lr => lr.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Membership configurations
-            modelBuilder.Entity<Membership>(entity =>
-            {
-                entity.Property(m => m.Price).HasPrecision(18, 2);
-
-                entity.HasMany(m => m.UserMemberships)
-                    .WithOne(um => um.Membership)
-                    .HasForeignKey(um => um.MembershipId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            // UserMembership configurations
-            modelBuilder.Entity<UserMembership>(entity =>
-            {
-                entity.HasKey(um => um.UserMembershipId);
-
-                entity.Property(um => um.Status)
-                    .HasDefaultValue("Pending");
-            });
+            // Configure ChatMessage
+            modelBuilder.Entity<ChatMessage>()
+                .HasOne(cm => cm.User)
+                .WithMany()
+                .HasForeignKey(cm => cm.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             SeedData(modelBuilder);
         }
@@ -151,7 +148,7 @@ namespace BackEnd.Data
                     Description = "Standard membership with a borrow limit of 5 books.",
                     IsFamilyPlan = false,
                     MaxFamilyMembers = null,
-                    RequiresApproval = false,
+                    RequiresApproval = true,
                     CreatedAt = new DateTime(2025, 4, 1) // Static value
                 },
                 new Membership
