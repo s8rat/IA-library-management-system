@@ -80,7 +80,7 @@ const Register = () => {
       });
       
       if (response.data) {
-        navigate('auth/Login', { state: { message: 'Registration successful! Please sign in.' } });
+        navigate('/auth/login', { state: { message: 'Registration successful! Please sign in.' } });
       }
     } catch (err: unknown) {
       const error = err as AxiosError<ApiError>;
@@ -101,7 +101,7 @@ const Register = () => {
           </h1>
           <p className="text-gray-600">
             Already have an account?{" "}
-            <Link to="/Login" className="text-emerald-600 hover:underline">
+            <Link to="/auth/login" className="text-emerald-600 hover:underline">
               Log in
             </Link>
           </p>

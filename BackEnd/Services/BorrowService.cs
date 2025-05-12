@@ -331,6 +331,7 @@ namespace BackEnd.Services
                 {
                     Id = br.Id,
                     UserId = br.UserId,
+                    Author = br.Book.Author,
                     Username = br.User.Username,
                     BookId = br.BookId,
                     BookTitle = br.BookTitle != null ? br.BookTitle : (br.Book != null ? br.Book.Title : null),

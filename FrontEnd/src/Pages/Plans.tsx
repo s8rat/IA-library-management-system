@@ -90,7 +90,7 @@ const PlanCard = ({ plan, style }: { plan: Membership; style: PlanStyle }) => {
             </div>
             <div className="p-8 pt-0">
                 <Link
-                    to="/register"
+                    to="/auth/user/:id"
                     className={`block w-full text-center px-6 py-3 bg-white ${style.text} rounded-lg hover:bg-gray-100 transition-colors font-medium`}
                 >
                     Select Plan
@@ -100,7 +100,6 @@ const PlanCard = ({ plan, style }: { plan: Membership; style: PlanStyle }) => {
     );
 };
 
-// Main Component
 export const Services = () => {
     const [plans, setPlans] = useState<Membership[]>([]);
     const [loading, setLoading] = useState(true);
