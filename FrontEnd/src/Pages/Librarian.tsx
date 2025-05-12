@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBook, faChartBar, faCrown } from "@fortawesome/free-solid-svg-icons";
+import { 
+  faBook, 
+  faExchangeAlt, 
+  faRotateLeft, 
+  faCrown, 
+  faUserPlus 
+} from "@fortawesome/free-solid-svg-icons";
 import BookManagement from "../components/Book/BookManagement";
 import ManageMemberShip from "../components/MemberShip/ManageMemberShip";
 import SeeBorrowRequest from "../components/Librarian/SeeBorrowRequst";
@@ -59,33 +65,31 @@ export const Librarian = () => {
     {
       name: "Manage Books",
       icon: faBook,
-      content: (
-        <BookManagement
-          containerClassName="w-full"
-          searchBarClassName="justify-center"
-          tableClassName="shadow-lg border border-gray-200"
-        />
-      ),
+      content: <BookManagement
+        containerClassName="w-full"
+        searchBarClassName="justify-center"
+        tableClassName="shadow-lg border border-gray-200"
+      />,
     },
     {
       name: "Borrow Requests",
-      icon: faChartBar,
+      icon: faExchangeAlt,
       content: <SeeBorrowRequest />,
-    },  
+    },
     {
       name: "Return Requests",
-      icon: faChartBar,
+      icon: faRotateLeft,
       content: <SeeReturnRequest />,
     },
     {
       name: "Manage Memberships",
       icon: faCrown,
-      content: <ManageMemberShip containerClassName="w-full" />
+      content: <ManageMemberShip containerClassName="w-full" />,
     },
     {
       name: "Approve Subscriptions",
-      icon: faCrown,
-      content: <AcceptSubPlan />,
+      icon: faUserPlus,
+      content: <AcceptSubPlan/>,
     },
   ];
 
@@ -163,8 +167,8 @@ export const Librarian = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:p-8 mt-16 md:mt-0">
-        <div className="w-full h-full bg-white rounded-xl shadow-lg overflow-y-auto min-h-[80vh] p-4 md:p-6 lg:p-8">
-          <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="w-full h-full">
             {boards[selected].content}
           </div>
         </div>

@@ -8,24 +8,19 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "../components/admin/Sidebar";
 import SearchBar from "../components/admin/SearchBar";
-import ViewBoardCard from "../components/admin/ViewBoardCard";
 import api from "../Services/api";
 import { User } from "../types/user";
 import AddUserDialog from "../components/admin/AddUserDialog";
 import UserList from "../components/admin/UserList";
 import BookManagement from "../components/Book/BookManagement";
 import ManageMemberShip from "../components/MemberShip/ManageMemberShip";
+import JoinUS from "../components/admin/JoinUS";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
   { key: "books", icon: faBook, label: "Manage Books" },
   { key: "req", icon: faSignIn, label: "Registration Requests" },
   { key: "memberships", icon: faCrown, label: "Manage Membership plans" },
-];
-
-const dummyRequests = [
-  { id: "1", status: "Pending", name: "Request from Alice" },
-  { id: "2", status: "Pending", name: "Request from Bob" },
 ];
 
 const defaultNewUser = {
@@ -256,13 +251,7 @@ const AdminDashboard = () => {
       />
     );
   } else if (activeTab === "req") {
-    content = dummyRequests.map((req) => (
-      <ViewBoardCard
-        key={req.id}
-        name={req.name}
-        description={`Status: ${req.status}`}
-      />
-    ));
+    content = <JoinUS />; 
   } else if (activeTab === "memberships") {
     content = <ManageMemberShip containerClassName="w-full" />;
   }
