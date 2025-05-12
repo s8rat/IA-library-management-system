@@ -251,7 +251,7 @@ const AdminDashboard = () => {
       />
     );
   } else if (activeTab === "req") {
-    content = <JoinUS />; 
+    content = <JoinUS containerClassName="w-full"/>; 
   } else if (activeTab === "memberships") {
     content = <ManageMemberShip containerClassName="w-full" />;
   }
@@ -276,7 +276,7 @@ const AdminDashboard = () => {
         />
         <main className="flex-1 px-10 py-8">
           <div className="flex items-center mb-6 gap-2">
-            {activeTab !== "books" && activeTab !== "memberships" && (
+            {activeTab !== "books" && activeTab !== "memberships" && activeTab !== "req" && (
               <SearchBar
                 onAdd={handleAddClick}
                 onSearch={handleSearch}
