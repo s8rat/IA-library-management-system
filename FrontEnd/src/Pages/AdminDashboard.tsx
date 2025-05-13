@@ -384,6 +384,13 @@ const AdminDashboard = () => {
     }
   };
 
+  // State for mobile sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {activeTab === "users" && (
@@ -396,33 +403,46 @@ const AdminDashboard = () => {
           addUserError={addUserError}
         />
       )}
-      <div className="flex flex-1">
+      <div className="flex flex-1 relative">
         <Sidebar
           items={sidebarItems}
           activeKey={activeTab}
           onSelect={setActiveTab}
+          isMobileOpen={isSidebarOpen}
+          onMobileClose={() => setIsSidebarOpen(false)}
         />
-        <main className="flex-1 px-10 py-8">
-          {(activeTab === "users" || activeTab === "map") && (
-            <div className="flex items-center mb-6 gap-2">
-              {activeTab === "users" && (
-                <SearchBar
-                  onAdd={handleAddClick}
-                  onSearch={handleSearch}
-                  placeholder="Search users..."
-                />
-              )}
-            </div>
-          )}
+        <main className="flex-1 px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:py-8 w-full">
+          {/* Search bar and mobile menu button */}
+          <div className="w-full">
+            {activeTab === "users" ? (
+              <SearchBar
+                onAdd={handleAddClick}
+                onSearch={handleSearch}
+                placeholder="Search users..."
+                onToggleSidebar={toggleSidebar}
+              />
+            ) : (
+              <div className="flex items-center mb-6 gap-2">
+                <button
+                  className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border bg-white shadow"
+                  onClick={toggleSidebar}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">
               {error}
             </div>
           )}
 
-          <div className="bg-white rounded-xl shadow-md border p-6">
-            <div className="flex flex-col gap-4 max-h-full overflow-y-auto pr-2">
+          <div className="bg-white rounded-xl shadow-md border p-3 sm:p-4 md:p-6 overflow-hidden">
+            <div className="flex flex-col gap-4 max-h-full overflow-y-auto">
               {renderTabContent()}
             </div>
           </div>
