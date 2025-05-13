@@ -3,7 +3,7 @@ import React from 'react';
 interface BorrowedBook {
     id: number;
     bookTitle: string;
-    author: string;
+    bookAuthor: string;
     borrowDate: string;
     dueDate: string;
     status: string;
@@ -61,7 +61,7 @@ const BorrowedBooks: React.FC<BorrowedBooksProps> = ({ books, isLoading }) => {
                                 {book.bookTitle}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {book.author || 'Unknown'}
+                                {book.bookAuthor || 'Unknown'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {new Date(book.borrowDate).toLocaleDateString()}

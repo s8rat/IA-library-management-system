@@ -22,7 +22,7 @@ interface User {
 interface BorrowHistory {
     id: number;
     bookTitle: string;
-    author: string;
+    bookAuthor: string;
     borrowDate: string;
     dueDate: string;
     status: string;
