@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { BookCard } from "../components/Book/BookCard";
 import { Book } from "../types/book";
 import api from "../Services/api";
+import HomeMapView from "../components/maps/HomeMapView";
 
 export const Home = () => {
     const [books, setBooks] = useState<Book[]>([]);
@@ -148,6 +149,19 @@ export const Home = () => {
                     </div>
                 </section>
             )}
+
+            {/* Library Locations Section */}
+            <section className="px-4 sm:px-10 lg:px-60 py-16 bg-white">
+                <div className="w-full mx-auto">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl text-left font-poppins font-bold italic mb-8 lg:mb-14 text-primary tracking-tight drop-shadow">
+                        Find Our Libraries
+                    </h2>
+                    <div className="w-full">
+                        <HomeMapView />
+                    </div>
+                </div>
+            </section>
+
             {token && (
                 <button
                     onClick={() => navigate("/chat")}
