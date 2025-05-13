@@ -113,7 +113,7 @@ export const Librarian = () => {
     >
       {/* Mobile Menu Button */}
       <button
-        className="md:hidden fixed top-4 left-4 z-20 p-2 rounded-lg bg-blue-600 text-white"
+        className="md:hidden fixed top-25 left-4 z-20 p-2 rounded-lg bg-blue-600 text-white"
         onClick={toggleSidebar}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
