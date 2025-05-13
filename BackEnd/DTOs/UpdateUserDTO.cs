@@ -22,7 +22,7 @@ namespace BackEnd.DTOs
 
         [Phone(ErrorMessage = "Invalid phone number format")]
         [StringLength(15, ErrorMessage = "Phone number cannot exceed 15 characters")]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Role is required")]
         [RegularExpression("^(Admin|Librarian|User)$", ErrorMessage = "Invalid role specified")]
