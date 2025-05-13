@@ -10,28 +10,6 @@ export const Home = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
 
-    // Define services array with proper syntax
-    const services = [
-        {
-            id: "service-1",
-            icon: "📚",
-            title: "Book Lending",
-            description: "Borrow physical books from our extensive collection",
-        },
-        {
-            id: "service-2",
-            icon: "📱",
-            title: "E-Books",
-            description: "Access digital books anytime, anywhere",
-        },
-        {
-            id: "service-3",
-            icon: "👥",
-            title: "Community",
-            description: "Join our reading community and share your thoughts",
-        },
-    ];
-
     useEffect(() => {
         const fetchBooks = async () => {
             try {
