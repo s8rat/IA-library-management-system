@@ -92,3 +92,4 @@ TestResult.xml
 nunit-*.xml
 
 
+FrontEnd/yarn.lock
