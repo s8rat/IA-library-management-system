@@ -24,16 +24,15 @@ const SeeBorrowRequest: React.FC = () => {
     const [requests, setRequests] = useState<BorrowRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [statusFilter, setStatusFilter] = useState<string>('');
 
     useEffect(() => {
         fetchRequests();
-    }, [statusFilter]);
+    }, []);
 
     const fetchRequests = async () => {
         try {
             setLoading(true);
-            const response = await api.get(`/api/Borrow/requests${statusFilter ? `?status=${statusFilter}` : ''}`);
+            const response = await api.get('/api/Borrow/requests');
             setRequests(response.data);
             setError(null);
         } catch (err: unknown) {
@@ -78,17 +77,7 @@ const SeeBorrowRequest: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-gray-800">Borrow Requests</h2>
-                <div className="flex gap-4">
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="">All Requests</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
+                <div>
                     <button
                         onClick={fetchRequests}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

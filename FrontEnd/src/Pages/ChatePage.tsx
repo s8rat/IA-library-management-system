@@ -4,6 +4,7 @@ import {
   sendMessage,
   stopConnection,
   ChatHistoryMessage,
+  connection
 } from "../Services/signalR";
 
 export const ChatePage = () => {
@@ -23,14 +24,29 @@ export const ChatePage = () => {
       // On single message
       (msg) => {
         console.log("Received message:", msg);
-        if (isMounted) setMessages((prev) => [...prev, msg]);
+        if (isMounted) {
+          setMessages((prev) => {
+            const newMessages = [...prev, msg];
+            console.log("Updated messages:", newMessages);
+            return newMessages;
+          });
+        }
       },
       // On history
       (msgs) => {
         console.log("Received chat history:", msgs);
-        if (isMounted) setMessages(msgs.reverse());
+        if (isMounted) {
+          const reversedMessages = [...msgs].reverse();
+          console.log("Reversed messages:", reversedMessages);
+          setMessages(reversedMessages);
+        }
       }
-    );
+    ).then(() => {
+      // Request chat history after connection is established
+      if (connection) {
+        connection.invoke("GetChatHistory");
+      }
+    });
 
     return () => {
       isMounted = false;
@@ -95,26 +111,24 @@ export const ChatePage = () => {
             <div
               key={idx}
               className={`flex flex-col max-w-xl ${
-                msg.User === user ? "ml-auto items-end" : "items-start"
+                msg.user === user ? "ml-auto items-end" : "items-start"
               }`}
             >
               <span className="text-xs text-gray-500 mb-1">
-                {msg.User || "Unknown"} •{" "}
-                {msg.Timestamp
-                  ? new Date(msg.Timestamp).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : ""}
+                {msg.user} •{" "}
+                {new Date(msg.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
               <div
                 className={`px-5 py-3 rounded-2xl shadow-md text-base font-medium break-words ${
-                  msg.User === user
+                  msg.user === user
                     ? "bg-blue-600 text-white"
                     : "bg-white text-gray-800 border border-blue-100"
                 }`}
               >
-                {msg.Message}
+                {msg.message}
               </div>
             </div>
           ))}

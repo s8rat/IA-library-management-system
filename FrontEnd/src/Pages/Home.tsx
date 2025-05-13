@@ -10,6 +10,10 @@ export const Home = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5678b2d7fa13a05c1d04b0aa18608866a3a6a918
     useEffect(() => {
         const fetchBooks = async () => {
             try {
@@ -128,23 +132,25 @@ export const Home = () => {
             </section>
 
             {/* Join Club Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-                <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-6 sm:p-8 lg:p-12 text-center shadow-lg">
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
-                        Join Our Reading Community Today
-                    </h2>
-                    <p className="text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
-                        Become a member and enjoy exclusive benefits and access
-                        to our entire collection.
-                    </p>
-                    <Link
-                        to="/register"
-                        className="inline-block bg-white text-blue-600 px-6 sm:px-8 py-2 sm:py-3 rounded-md font-semibold hover:bg-gray-100 transition-all text-base sm:text-lg"
-                    >
-                        Join Now
-                    </Link>
-                </div>
-            </section>
+            {!token && (
+                <section className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+                    <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-6 sm:p-8 lg:p-12 text-center shadow-lg">
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
+                            Join Our Reading Community Today
+                        </h2>
+                        <p className="text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
+                            Become a member and enjoy exclusive benefits and access
+                            to our entire collection.
+                        </p>
+                        <Link
+                            to="/auth/register"
+                            className="inline-block bg-white text-blue-600 px-6 sm:px-8 py-2 sm:py-3 rounded-md font-semibold hover:bg-gray-100 transition-all text-base sm:text-lg"
+                        >
+                            Join Now
+                        </Link>
+                    </div>
+                </section>
+            )}
             {token && (
                 <button
                     onClick={() => navigate("/chat")}

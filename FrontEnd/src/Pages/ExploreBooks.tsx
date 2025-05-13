@@ -9,26 +9,27 @@ export const ExploreBooks = () => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        const fetchBooks = async () => {
-            try {
-                setLoading(true);
-                const response = await api.get('/api/Books');
-                if (Array.isArray(response.data)) {
-                    setBooks(response.data);
-                } else {
-                    console.error('Expected an array of books, but received:', response.data);
-                    setError('Invalid data format received from server');
-                    setBooks([]);
-                }
-            } catch (error) {
-                console.error('Error fetching books:', error);
-                setError('Failed to fetch books. Please try again later.');
+    const fetchBooks = async () => {
+        try {
+            setLoading(true);
+            const response = await api.get('/api/Books');
+            if (Array.isArray(response.data)) {
+                setBooks(response.data);
+            } else {
+                console.error('Expected an array of books, but received:', response.data);
+                setError('Invalid data format received from server');
                 setBooks([]);
-            } finally {
-                setLoading(false);
             }
-        };
+        } catch (error) {
+            console.error('Error fetching books:', error);
+            setError('Failed to fetch books. Please try again later.');
+            setBooks([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchBooks();
     }, []);
 
@@ -74,9 +75,13 @@ export const ExploreBooks = () => {
                     <p className="text-gray-600">No books found matching your search.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredBooks.map((book) => (
-                        <BookCard key={book.id} book={book} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+                    {filteredBooks.map(book => (
+                        <BookCard 
+                            key={book.id} 
+                            book={book} 
+                            onBorrowSuccess={fetchBooks} 
+                        />
                     ))}
                 </div>
             )}

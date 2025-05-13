@@ -5,22 +5,27 @@ import {
   faBook,
   faCrown,
   faSignIn,
+  faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import Sidebar from "../components/admin/Sidebar";
 import SearchBar from "../components/admin/SearchBar";
 import api from "../Services/api";
-import { User } from "../types/user";
+import User from "../types/user";
 import AddUserDialog from "../components/admin/AddUserDialog";
 import UserList from "../components/admin/UserList";
 import BookManagement from "../components/Book/BookManagement";
 import ManageMemberShip from "../components/MemberShip/ManageMemberShip";
 import JoinUS from "../components/admin/JoinUS";
+import useAddLocations from "../components/maps/LocationHandlers";
+import MapView from "../components/maps/MapView";
+import AddLocationDialog from "../components/maps/AddLocationDialog";
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
   { key: "books", icon: faBook, label: "Manage Books" },
   { key: "req", icon: faSignIn, label: "Registration Requests" },
   { key: "memberships", icon: faCrown, label: "Manage Membership plans" },
+  { key: "map", icon: faMapMarkerAlt, label: "Map" },
 ];
 
 const defaultNewUser = {
@@ -46,6 +51,14 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const token = localStorage.getItem("token");
+
+  // States for the map
+
+  const { locations, addLocation, removeLocation } = useAddLocations();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
+    null
+  );
 
   // Add User dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -261,6 +274,40 @@ const AdminDashboard = () => {
     content = <JoinUS containerClassName="w-full"/>; 
   } else if (activeTab === "memberships") {
     content = <ManageMemberShip containerClassName="w-full" />;
+  } else if (activeTab === "map") {
+    content = (
+      <div>
+        <div className="flex gap-4 mb-4">
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+            onClick={() => setIsAddDialogOpen(true)}
+          >
+            Add Location
+          </button>
+          <button
+            className="bg-red-600 text-white px-4 py-2 rounded"
+            disabled={selectedLocationId === null}
+            onClick={() => {
+              if (selectedLocationId !== null)
+                removeLocation(selectedLocationId);
+              setSelectedLocationId(null);
+            }}
+          >
+            Delete Location
+          </button>
+        </div>
+        <MapView
+          locations={locations}
+          onMarkerClick={(id) => setSelectedLocationId(id)}
+          selectedLocationId={selectedLocationId}
+        />
+        <AddLocationDialog
+          open={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          onAdd={addLocation}
+        />
+      </div>
+    );
   }
 
   return (

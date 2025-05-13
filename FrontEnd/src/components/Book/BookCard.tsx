@@ -5,9 +5,10 @@ import BorrowRequestDialog from "./BorrowRequestDialog";
 
 interface BookCardProps {
   book: Book;
+  onBorrowSuccess?: () => void;
 }
 
-export const BookCard = ({ book }: BookCardProps) => {
+export const BookCard = ({ book, onBorrowSuccess }: BookCardProps) => {
   const navigate = useNavigate();
   const [isBorrowDialogOpen, setIsBorrowDialogOpen] = useState(false);
 
@@ -93,8 +94,11 @@ export const BookCard = ({ book }: BookCardProps) => {
         isOpen={isBorrowDialogOpen}
         onClose={() => setIsBorrowDialogOpen(false)}
         onSuccess={() => {
-          // Optionally refresh the book list or update the UI
+          // Refresh the book list and update the UI
           setIsBorrowDialogOpen(false);
+          if (onBorrowSuccess) {
+            onBorrowSuccess();
+          }
         }}
       />
     </>
