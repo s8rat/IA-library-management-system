@@ -57,11 +57,16 @@ export const Navigation = () => {
         { to: "/plans", label: "Our Plans" },
     ];
 
-    // Add role-specific links
+    // Add & role-specific links
     if (user?.role === 'Admin') {
         navLinks.push({ to: "/admin", label: "Admin Dashboard" });
     } else if (user?.role === 'Librarian') {
         navLinks.push({ to: "/Librarian", label: "Librarian Dashboard" });
+    }
+
+    // Remove "Explore Books" and "Our Plans" for Admin & Librarian if logged in
+    if (user && user.role !== 'User') {
+        navLinks.splice(1, 2);
     }
 
     return (
