@@ -40,7 +40,7 @@ const LibrarianRequestSection: React.FC<LibrarianRequestSectionProps> = ({ userR
 
     return (
         <div className="mt-6 p-4 bg-white rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Request Librarian Role</h3>
+            <h3 className="text-lg text-black font-semibold mb-4">Request Librarian Role</h3>
             {submitted ? (
                 <div className="text-green-600">
                     Your request has been submitted successfully. We will review it and get back to you soon.
@@ -48,7 +48,7 @@ const LibrarianRequestSection: React.FC<LibrarianRequestSectionProps> = ({ userR
             ) : (
                 <form onSubmit={handleRequest}>
                     <div className="mb-4">
-                        <label htmlFor="requestMsg" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="requestMsg" className="block text-sm font-medium text-black mb-2">
                             Why do you want to become a librarian?
                         </label>
                         <textarea
@@ -62,7 +62,7 @@ const LibrarianRequestSection: React.FC<LibrarianRequestSectionProps> = ({ userR
                         />
                     </div>
                     {error && (
-                        <div className="text-red-600 mb-4">
+                        <div className="text-red-600 text-black mb-4">
                             {error}
                         </div>
                     )}
