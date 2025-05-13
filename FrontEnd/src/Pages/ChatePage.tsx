@@ -3,56 +3,57 @@ import {
   startConnection,
   sendMessage,
   stopConnection,
-  ChatHistoryMessage,
-  connection
+  ChatHistoryMessage
 } from "../Services/signalR";
 
-export const ChatePage = () => {
+const ChatePage: React.FC = () => {
   const [messages, setMessages] = useState<ChatHistoryMessage[]>([]);
   const [input, setInput] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Replace with your actual user name logic
-  const user = localStorage.getItem("username") || "You";
+  // Get user info from localStorage
+  const username = localStorage.getItem("username");
   const userId = Number(localStorage.getItem("userId"));
 
   useEffect(() => {
+    if (!username || !userId) {
+      console.error("User not authenticated");
+      return;
+    }
+
     let isMounted = true;
 
-    // Start SignalR connection
-    startConnection(
-      // On single message
-      (msg) => {
-        console.log("Received message:", msg);
-        if (isMounted) {
-          setMessages((prev) => {
-            const newMessages = [...prev, msg];
-            console.log("Updated messages:", newMessages);
-            return newMessages;
-          });
-        }
-      },
-      // On history
-      (msgs) => {
-        console.log("Received chat history:", msgs);
-        if (isMounted) {
-          const reversedMessages = [...msgs].reverse();
-          console.log("Reversed messages:", reversedMessages);
-          setMessages(reversedMessages);
-        }
+    const setupConnection = async () => {
+      try {
+        await startConnection(
+          // On single message
+          (msg) => {
+            if (isMounted) {
+              setMessages((prev) => [...prev, msg]);
+            }
+          },
+          // On history
+          (msgs) => {
+            if (isMounted) {
+              setMessages([...msgs].reverse());
+            }
+          }
+        );
+        setIsConnected(true);
+      } catch (error) {
+        console.error("Failed to start connection:", error);
+        setIsConnected(false);
       }
-    ).then(() => {
-      // Request chat history after connection is established
-      if (connection) {
-        connection.invoke("GetChatHistory");
-      }
-    });
+    };
+
+    setupConnection();
 
     return () => {
       isMounted = false;
       stopConnection();
     };
-  }, []);
+  }, [username, userId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -61,12 +62,27 @@ export const ChatePage = () => {
     });
   }, [messages]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
-    sendMessage(userId, input);
-    setInput("");
+    if (!input.trim() || !userId) return;
+
+    try {
+      await sendMessage(userId, input);
+      setInput("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
   };
+
+  if (!username || !userId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Please log in to access the chat</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 pt-10">
@@ -91,50 +107,48 @@ export const ChatePage = () => {
             </h2>
           </div>
           <span className="text-sm opacity-90 font-medium bg-blue-600/70 px-4 py-1 rounded-full shadow">
-            Welcome, {user}
+            Welcome, {username}
           </span>
-          <div className="absolute left-0 top-0 w-full h-3 bg-gradient-to-r from-pink-400 via-fuchsia-500 to-blue-500 rounded-t-3xl animate-marquee" style={{backgroundSize: '200% 100%', animation: 'marquee 4s linear infinite'}} />
-          <style>{`
-            @keyframes marquee {
-              0% { background-position: 0% 50%; }
-              100% { background-position: 100% 50%; }
-            }
-          `}</style>
+          {!isConnected && (
+            <div className="absolute top-0 left-0 w-full h-full bg-red-500/20 flex items-center justify-center">
+              <span className="text-white font-medium">Connecting...</span>
+            </div>
+          )}
         </header>
         <div className="flex-1 overflow-y-auto px-8 py-8 space-y-4 bg-blue-50 max-h-[60vh] min-h-[300px]">
-          {messages.length === 0 && (
+          {messages.length === 0 ? (
             <div className="text-center text-gray-400 italic py-12">
               No messages yet. Start the conversation!
             </div>
-          )}
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex flex-col max-w-xl ${
-                msg.user === user ? "ml-auto items-end" : "items-start"
-              }`}
-            >
-              <span className="text-xs text-gray-500 mb-1">
-                {msg.user} •{" "}
-                {new Date(msg.timestamp).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
+          ) : (
+            messages.map((msg, idx) => (
               <div
-                className={`px-5 py-3 rounded-2xl shadow-md text-base font-medium break-words ${
-                  msg.user === user
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-800 border border-blue-100"
+                key={idx}
+                className={`flex flex-col max-w-xl ${
+                  msg.user === username ? "ml-auto items-end" : "items-start"
                 }`}
               >
-                {msg.message}
+                <span className="text-xs text-gray-500 mb-1">
+                  {msg.user} •{" "}
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+                <div
+                  className={`px-5 py-3 rounded-2xl shadow-md text-base font-medium break-words ${
+                    msg.user === username
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-800 border border-blue-100"
+                  }`}
+                >
+                  {msg.message}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
           <div ref={messagesEndRef} />
         </div>
-        {/* Input Bar */}
         <form
           onSubmit={handleSend}
           className="bg-white flex items-center gap-2 px-6 py-4 border-t rounded-b-3xl"
@@ -145,13 +159,14 @@ export const ChatePage = () => {
             placeholder="Type your message…"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            disabled={!isConnected}
             autoFocus
             maxLength={500}
           />
           <button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-3 rounded-full font-semibold transition text-base shadow-md disabled:opacity-60"
-            disabled={!input.trim()}
+            disabled={!isConnected || !input.trim()}
           >
             Send
           </button>

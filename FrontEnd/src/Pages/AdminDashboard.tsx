@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   faUser,
@@ -16,9 +16,11 @@ import UserList from "../components/admin/UserList";
 import BookManagement from "../components/Book/BookManagement";
 import ManageMemberShip from "../components/MemberShip/ManageMemberShip";
 import JoinUS from "../components/admin/JoinUS";
-import useAddLocations from "../components/maps/LocationHandlers";
-import MapView from "../components/maps/MapView";
 import AddLocationDialog from "../components/maps/AddLocationDialog";
+import locationService, { Location } from "../Services/locationService";
+
+// Lazy load MapView component
+const MapView = lazy(() => import("../components/maps/MapView"));
 
 const sidebarItems = [
   { key: "users", icon: faUser, label: "Manage Users" },
@@ -53,19 +55,17 @@ const AdminDashboard = () => {
   const token = localStorage.getItem("token");
 
   // States for the map
-
-  const { locations, addLocation, removeLocation } = useAddLocations();
+  const [locations, setLocations] = useState<Location[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
-    null
-  );
+  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
+  const [isMapReady, setIsMapReady] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
-  // Add User dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [newUser, setNewUser] = useState<typeof defaultNewUser>({
-    ...defaultNewUser,
-  });
+  const [newUser, setNewUser] = useState<typeof defaultNewUser>({ ...defaultNewUser });
   const [addUserError, setAddUserError] = useState<string | null>(null);
+
+  const [locationPermission, setLocationPermission] = useState<PermissionState>('prompt');
 
   useEffect(() => {
     const loadData = async () => {
@@ -76,38 +76,58 @@ const AdminDashboard = () => {
       try {
         setLoading(true);
         setError(null);
-        let response;
-        switch (activeTab) {
-          case "users":
-            response = await api.get("/api/Users", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            setUsers(response.data);
-            setFilteredUsers(response.data);
-            break;
+        if (activeTab === "users") {
+          const response = await api.get("/api/Users", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setUsers(response.data);
+          setFilteredUsers(response.data);
         }
       } catch (err) {
         setError("Failed to load data. Please try again.");
         console.error("Error loading data:", err);
       } finally {
         setLoading(false);
-        console.log("Finished loading data for tab:", activeTab);
       }
     };
 
     loadData();
   }, [activeTab, navigate, token]);
 
+  // Load locations
+  useEffect(() => {
+    const loadLocations = async () => {
+      try {
+        const data = await locationService.getLocations();
+        setLocations(data);
+      } catch (error) {
+        console.error('Error loading locations:', error);
+        setMapError('Failed to load locations');
+      }
+    };
+
+    if (activeTab === 'map') {
+      loadLocations();
+    }
+  }, [activeTab]);
+
+  // Check location permission status
+  useEffect(() => {
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        setLocationPermission(result.state);
+        result.onchange = () => {
+          setLocationPermission(result.state);
+        };
+      });
+    }
+  }, []);
+
   const handleSearch = (searchTerm: string) => {
     if (activeTab === "users") {
-      const filtered = users.filter(
-        (user) =>
-          user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = users.filter((user) =>
+        [user.username, user.firstName, user.lastName, user.email]
+          .some((field) => field.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setFilteredUsers(filtered);
     }
@@ -117,7 +137,6 @@ const AdminDashboard = () => {
     if (activeTab === "users") setIsAddUserOpen(true);
   };
 
-  // User actions
   const handleEditUser = (user: User) => {
     setEditingUser({ ...user });
     setOriginalUser({ ...user });
@@ -129,70 +148,50 @@ const AdminDashboard = () => {
   };
 
   const handleSaveUser = () => {
-    if (editingUser && originalUser) {
-      const payload = {
-        id: editingUser.id,
-        username: editingUser.username,
-        email: editingUser.email,
-        firstName: editingUser.firstName,
-        lastName: editingUser.lastName,
-        phoneNumber: editingUser.phoneNumber ?? "",
-        role: editingUser.role,
-        ssn: editingUser.ssn,
-        createdAt: editingUser.createdAt,
-      };
-      console.log("handleSaveUser: Saving user with payload:", payload);
+    if (!editingUser || !originalUser) return;
+    const payload = {
+      id: editingUser.id,
+      username: editingUser.username,
+      email: editingUser.email,
+      firstName: editingUser.firstName,
+      lastName: editingUser.lastName,
+      phoneNumber: editingUser.phoneNumber ?? "",
+      role: editingUser.role,
+      ssn: editingUser.ssn,
+      createdAt: editingUser.createdAt,
+    };
 
-      api
-        .put(`/api/Users/${editingUser.id}`, payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          const updated = response.data;
-          console.log("handleSaveUser: User updated successfully:", updated);
-          setUsers(
-            users.map((u) =>
-              u.id === editingUser.id ? { ...u, ...updated } : u
-            )
-          );
-          setFilteredUsers(
-            users.map((u) =>
-              u.id === editingUser.id ? { ...u, ...updated } : u
-            )
-          );
-          setEditingUser(null);
-          setOriginalUser(null);
-        })
-        .catch((error) => {
-          console.error("handleSaveUser: Error updating user:", error);
-          if (error.response) {
-            console.error(
-              "handleSaveUser: Error response data:",
-              error.response.data
-            );
-          }
-          setError(
-            error.response?.data?.message ||
-              error.response?.data?.title ||
-              JSON.stringify(error.response?.data) ||
-              "Error updating user."
-          );
-        });
-    }
+    api.put(`/api/Users/${editingUser.id}`, payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((response) => {
+        const updated = response.data;
+        const updatedUsers = users.map((u) =>
+          u.id === editingUser.id ? { ...u, ...updated } : u
+        );
+        setUsers(updatedUsers);
+        setFilteredUsers(updatedUsers);
+        handleCancelEdit();
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error);
+        setError(
+          error.response?.data?.message ||
+          error.response?.data?.title ||
+          JSON.stringify(error.response?.data) ||
+          "Error updating user."
+        );
+      });
   };
 
   const handleDeleteUser = (id: number) => {
-    api
-      .delete(`/api/Users/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    api.delete(`/api/Users/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then(() => {
-        setUsers(users.filter((u) => u.id !== id));
-        setFilteredUsers(users.filter((u) => u.id !== id));
+        const updatedUsers = users.filter((u) => u.id !== id);
+        setUsers(updatedUsers);
+        setFilteredUsers(updatedUsers);
       })
       .catch((error) => {
         setError(error.response?.data?.message || "Error deleting user.");
@@ -201,7 +200,6 @@ const AdminDashboard = () => {
 
   const handleAddUser = () => {
     setAddUserError(null);
-    // Map to PascalCase for backend
     const payload = {
       Username: newUser.username,
       Password: newUser.password,
@@ -212,103 +210,161 @@ const AdminDashboard = () => {
       SSN: newUser.ssn,
       PhoneNumber: newUser.phoneNumber,
     };
-    api
-      .post("/api/Users", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+
+    api.post("/api/Users", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((response) => {
-        setUsers([...users, response.data]);
-        setFilteredUsers([...users, response.data]);
-        setIsAddUserOpen(false);
+        const updated = [...users, response.data];
+        setUsers(updated);
+        setFilteredUsers(updated);
         setNewUser({ ...defaultNewUser });
+        setIsAddUserOpen(false);
       })
       .catch((error) => {
         setAddUserError(
           error.response?.data?.message ||
-            error.response?.data?.title ||
-            JSON.stringify(error.response?.data) ||
-            "Failed to add user"
+          error.response?.data?.title ||
+          JSON.stringify(error.response?.data) ||
+          "Failed to add user"
         );
       });
   };
 
-  const handlerCloseAddUser = () => {
+  const handleCloseAddUser = () => {
     setNewUser({ ...defaultNewUser });
     setIsAddUserOpen(false);
     setAddUserError(null);
   };
 
-  // Render content for each tab
-  let content = null;
-  if (loading) {
-    content = (
-      <div className="flex justify-center items-center py-8">
-        <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-2"></span>
-        <span className="text-gray-800">Loading...</span>
-      </div>
-    );
-  } else if (activeTab === "users") {
-    content = (
-      <UserList
-        users={filteredUsers}
-        editingUser={editingUser}
-        setEditingUser={setEditingUser}
-        setOriginalUser={setOriginalUser}
-        handleSaveUser={handleSaveUser}
-        handleCancelEdit={handleCancelEdit}
-        handleEditUser={handleEditUser}
-        handleDeleteUser={handleDeleteUser}
-      />
-    );
-  } else if (activeTab === "books") {
-    content = (
-      <BookManagement
-        containerClassName="w-full"
-        searchBarClassName="justify-start"
-        tableClassName="shadow-md"
-      />
-    );
-  } else if (activeTab === "req") {
-    content = <JoinUS containerClassName="w-full"/>; 
-  } else if (activeTab === "memberships") {
-    content = <ManageMemberShip containerClassName="w-full" />;
-  } else if (activeTab === "map") {
-    content = (
-      <div>
-        <div className="flex gap-4 mb-4">
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={() => setIsAddDialogOpen(true)}
-          >
-            Add Location
-          </button>
-          <button
-            className="bg-red-600 text-white px-4 py-2 rounded"
-            disabled={selectedLocationId === null}
-            onClick={() => {
-              if (selectedLocationId !== null)
-                removeLocation(selectedLocationId);
-              setSelectedLocationId(null);
-            }}
-          >
-            Delete Location
-          </button>
+  const handleAddLocation = async (location: { name: string; lat: number; lng: number }) => {
+    try {
+      const newLocation = await locationService.createLocation({
+        name: location.name,
+        latitude: location.lat,
+        longitude: location.lng
+      });
+      setLocations(prev => [...prev, newLocation]);
+      setIsAddDialogOpen(false);
+    } catch (error) {
+      console.error('Error adding location:', error);
+      setMapError('Failed to add location');
+    }
+  };
+
+  const handleDeleteLocation = async (id: number) => {
+    try {
+      await locationService.deleteLocation(id);
+      setLocations(prev => prev.filter(loc => loc.id !== id));
+      setSelectedLocationId(null);
+    } catch (error) {
+      console.error('Error deleting location:', error);
+      setMapError('Failed to delete location');
+    }
+  };
+
+  const renderTabContent = () => {
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center py-8">
+          <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-2"></span>
+          <span className="text-gray-800">Loading...</span>
         </div>
-        <MapView
-          locations={locations}
-          onMarkerClick={(id) => setSelectedLocationId(id)}
-          selectedLocationId={selectedLocationId}
-        />
-        <AddLocationDialog
-          open={isAddDialogOpen}
-          onClose={() => setIsAddDialogOpen(false)}
-          onAdd={addLocation}
-        />
-      </div>
-    );
-  }
+      );
+    }
+
+    switch (activeTab) {
+      case "users":
+        return (
+          <UserList
+            users={filteredUsers}
+            editingUser={editingUser}
+            setEditingUser={setEditingUser}
+            setOriginalUser={setOriginalUser}
+            handleSaveUser={handleSaveUser}
+            handleCancelEdit={handleCancelEdit}
+            handleEditUser={handleEditUser}
+            handleDeleteUser={handleDeleteUser}
+          />
+        );
+      case "books":
+        return <BookManagement containerClassName="w-full" />;
+      case "req":
+        return <JoinUS containerClassName="w-full" />;
+      case "memberships":
+        return <ManageMemberShip containerClassName="w-full" />;
+      case "map":
+        return (
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                onClick={() => setIsAddDialogOpen(true)}
+              >
+                Add Location
+              </button>
+              <button
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={selectedLocationId === null}
+                onClick={() => {
+                  if (selectedLocationId !== null) {
+                    handleDeleteLocation(selectedLocationId);
+                  }
+                }}
+              >
+                {selectedLocationId ? `Delete Selected Location` : 'Select a Location to Delete'}
+              </button>
+            </div>
+            {selectedLocationId && (
+              <div className="p-4 bg-blue-100 text-blue-700 rounded-lg">
+                Click on the map to deselect the current location
+              </div>
+            )}
+            {locationPermission === 'denied' && (
+              <div className="p-4 bg-yellow-100 text-yellow-700 rounded-lg">
+                Location access is denied. Please enable location access in your browser settings to see your current location on the map.
+              </div>
+            )}
+            {mapError && (
+              <div className="p-4 bg-red-100 text-red-700 rounded-lg">
+                {mapError}
+              </div>
+            )}
+            <div className="relative">
+              {!isMapReady && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-10">
+                  <div className="text-gray-500">Loading map...</div>
+                </div>
+              )}
+              <Suspense fallback={
+                <div className="w-full h-[70vh] rounded-lg shadow border flex items-center justify-center bg-gray-100">
+                  <div className="text-gray-500">Loading map...</div>
+                </div>
+              }>
+                <MapView
+                  locations={locations.map(loc => ({
+                    id: loc.id,
+                    lat: loc.latitude,
+                    lng: loc.longitude,
+                    name: loc.name
+                  }))}
+                  onMarkerClick={setSelectedLocationId}
+                  selectedLocationId={selectedLocationId}
+                  onMapReady={() => setIsMapReady(true)}
+                />
+              </Suspense>
+            </div>
+            <AddLocationDialog
+              open={isAddDialogOpen}
+              onClose={() => setIsAddDialogOpen(false)}
+              onAdd={handleAddLocation}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -317,7 +373,7 @@ const AdminDashboard = () => {
           open={isAddUserOpen}
           newUser={newUser}
           setNewUser={setNewUser}
-          onClose={handlerCloseAddUser}
+          onClose={handleCloseAddUser}
           onSubmit={handleAddUser}
           addUserError={addUserError}
         />
@@ -329,25 +385,27 @@ const AdminDashboard = () => {
           onSelect={setActiveTab}
         />
         <main className="flex-1 px-10 py-8">
-          <div className="flex items-center mb-6 gap-2">
-            {activeTab !== "books" && activeTab !== "memberships" && activeTab !== "req" && (
-              <SearchBar
-                onAdd={handleAddClick}
-                onSearch={handleSearch}
-                placeholder={
-                  activeTab === "users" ? "Search users..." : "Search..."
-                }
-              />
-            )}
-          </div>
+          {(activeTab === "users" || activeTab === "map") && (
+            <div className="flex items-center mb-6 gap-2">
+              {activeTab === "users" && (
+                <SearchBar
+                  onAdd={handleAddClick}
+                  onSearch={handleSearch}
+                  placeholder="Search users..."
+                />
+              )}
+            </div>
+          )}
+
           {error && (
             <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
               {error}
             </div>
           )}
+
           <div className="bg-white rounded-xl shadow-md border p-6">
-            <div className="flex flex-col gap-4 max-h-[420px] overflow-y-auto pr-2">
-              {content}
+            <div className="flex flex-col gap-4 max-h-full overflow-y-auto pr-2">
+              {renderTabContent()}
             </div>
           </div>
         </main>

@@ -12,6 +12,7 @@ namespace BackEnd.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<Location> Locations { get; set; }
         public DbSet<BorrowRequest> BorrowRequests { get; set; }
         public DbSet<BorrowRecord> BorrowRecords { get; set; }
         public DbSet<LibrarianRequest> LibrarianRequests { get; set; }
@@ -101,6 +102,18 @@ namespace BackEnd.Data
                 .WithMany()
                 .HasForeignKey(cm => cm.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Location>()
+                .Property(l => l.Name)
+                .IsRequired();
+
+            modelBuilder.Entity<Location>()
+                .Property(l => l.Latitude)
+                .IsRequired();
+
+            modelBuilder.Entity<Location>()
+                .Property(l => l.Longitude)
+                .IsRequired();
 
             SeedData(modelBuilder);
         }
