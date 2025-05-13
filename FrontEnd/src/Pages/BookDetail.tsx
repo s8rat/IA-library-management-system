@@ -26,6 +26,18 @@ export const BookDetail = () => {
         }
     };
 
+    const listenToDescription = () => {
+        if (book?.description) {
+            const utterance = new SpeechSynthesisUtterance(book.description);
+            utterance.lang = 'en-US'; // Set the language
+            utterance.rate = 1; // Set the speed of speech (1 is normal)
+            utterance.pitch = 1; // Set the pitch of the voice
+            speechSynthesis.speak(utterance);
+        } else {
+            console.error('No description available to read.');
+        }
+    }
+
     useEffect(() => {
         fetchBook();
     }, [id]);  // eslint-disable-line react-hooks/exhaustive-deps
@@ -118,7 +130,7 @@ export const BookDetail = () => {
                             <button 
                                 className={`w-full mt-6 px-6 py-4 rounded-xl font-medium text-lg transition-all transform hover:scale-105 ${
                                     book.available 
-                                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl' 
+                                        ? 'bg-secondary hover:bg-zinc-950 transition duration-300 text-white shadow-lg hover:shadow-xl' 
                                         : 'bg-gray-300 cursor-not-allowed text-gray-600'
                                 }`}
                                 disabled={!book.available}
@@ -138,9 +150,9 @@ export const BookDetail = () => {
                         </div>
                         
                         {/* Right column with book details */}
-                        <div className="space-y-6">
+                        <div className="px-6">
                             {/* Book metadata */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                                 {book.isbn && (
                                     <div className="flex items-start">
                                         <div className="text-blue-500 mt-1 mr-3 font-bold">📕</div>
@@ -185,7 +197,10 @@ export const BookDetail = () => {
                             {/* Description */}
                             {book.description && (
                                 <div className="mt-8">
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Description</h3>
+                                    <div className='flex justify-between items-center px-5'>
+                                        <h3 className="text-lg font-semibold text-gray-800">Description</h3>
+                                        <button className='bg-secondary hover:bg-zinc-950 transition duration-300' onClick={listenToDescription}>Listen to description</button>
+                                    </div>
                                     <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
                                         <p className="text-gray-700 leading-relaxed">{book.description}</p>
                                     </div>
