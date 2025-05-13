@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace BackEnd.Hubs
 {
@@ -41,47 +42,60 @@ namespace BackEnd.Hubs
                     User = user,
                     Message = message,
                     Timestamp = DateTime.UtcNow,
-                    GroupName = "Global" // Indicate it's a global message
+                    GroupName = "Global"
                 };
                 _context.ChatMessages.Add(chatMessage);
                 await _context.SaveChangesAsync();
 
-                // Broadcast the message to all clients
-                await Clients.All.SendAsync("ReceiveMessage", user.Username, message);
-            }
-            catch (DbUpdateException dbEx)
-            {
-                // Handle database update errors
-                await Clients.Caller.SendAsync("Error", "A database error occurred while saving the message.");
-                Console.Error.WriteLine($"Database error: {dbEx.Message}");
+                // Broadcast the message to all clients with the correct timestamp
+                await Clients.All.SendAsync("ReceiveMessage", user.Username, message, chatMessage.Timestamp.ToString("o"));
             }
             catch (Exception ex)
             {
-                // Handle general errors
+                Console.Error.WriteLine($"Error sending message: {ex.Message}");
+                Console.Error.WriteLine($"Stack trace: {ex.StackTrace}");
                 await Clients.Caller.SendAsync("Error", ex.Message);
-                Console.Error.WriteLine($"Error: {ex.Message}");
             }
         }
 
-
         public async Task GetChatHistory()
         {
-            var messages = await _context.ChatMessages
-                .Include(m => m.User) // Ensure the User navigation property is loaded
-                .OrderByDescending(m => m.Timestamp)
-                .Take(1000)
-                .Select(m => new
+            try
+            {
+                var messages = await _context.ChatMessages
+                    .Include(m => m.User)
+                    .OrderByDescending(m => m.Timestamp)
+                    .Take(1000)
+                    .Select(m => new
+                    {
+                        user = m.User.Username,
+                        message = m.Message,
+                        timestamp = m.Timestamp.ToString("o")
+                    })
+                    .ToListAsync();
+
+                if (!messages.Any())
                 {
-                    User = m.User != null ? m.User.Username : "Unknown", // Handle null User
-                    Message = !string.IsNullOrWhiteSpace(m.Message) ? m.Message : "No message", // Handle null or empty Message
-                    Timestamp = m.Timestamp != default ? m.Timestamp.ToString("o") : null // Handle invalid Timestamp
-                })
-                .ToListAsync();
+                    Console.WriteLine("No chat messages found in database");
+                }
+                else
+                {
+                    Console.WriteLine($"Retrieved {messages.Count} chat messages");
+                    foreach (var msg in messages)
+                    {
+                        Console.WriteLine($"Message: {msg.user} - {msg.message} - {msg.timestamp}");
+                    }
+                }
 
-            // Send the messages to the client
-            await Clients.Caller.SendAsync("ReceiveChatHistory", messages);
+                await Clients.Caller.SendAsync("ReceiveChatHistory", messages);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error getting chat history: {ex.Message}");
+                Console.Error.WriteLine($"Stack trace: {ex.StackTrace}");
+                await Clients.Caller.SendAsync("Error", "Failed to retrieve chat history");
+            }
         }
-
 
         // Send a message to a specific group
         //public async Task SendMessageToGroup(string groupName, string user, string message)
