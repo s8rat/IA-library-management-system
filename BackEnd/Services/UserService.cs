@@ -138,6 +138,8 @@ namespace BackEnd.Services
 
             if (!string.IsNullOrWhiteSpace(updateUserDTO.PhoneNumber))
                 user.PhoneNumber = updateUserDTO.PhoneNumber;
+            else 
+                user.PhoneNumber = null;  // Set to null if not provided
 
             if (!string.IsNullOrWhiteSpace(updateUserDTO.Role))
                 user.Role = updateUserDTO.Role;

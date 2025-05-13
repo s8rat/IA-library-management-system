@@ -244,7 +244,7 @@ namespace BackEnd.Controllers
         /// <param name="approverId">Approver user ID</param>
         /// <returns>Rejected membership record</returns>
         [HttpPut("reject/{userMembershipId}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Librarian")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserMembership))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

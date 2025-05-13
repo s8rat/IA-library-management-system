@@ -107,7 +107,6 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
       // Get userId from localStorage
       const userId = localStorage.getItem('userId');
 
-      console.log(userId);
       if (!userId) {
         setError('User not logged in');
         setSubmitting(false);
@@ -121,6 +120,7 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
         return;
       }
 
+      // Only send the required data for the request
       const requestData = {
         userId: parseInt(userId),
         membershipId: selectedPlan,
@@ -135,7 +135,7 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
       };
 
       await api.post('/api/Membership/request', requestData);
-      setSuccess('Request sent to librarian for approval.');
+      setSuccess('Request sent to librarian for approval. Your current plan will remain active until the new plan is approved.');
       if (onRequestSent) onRequestSent();
     } catch (err: unknown) {
       const apiError = err as ApiError;

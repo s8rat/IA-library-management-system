@@ -122,8 +122,6 @@ namespace BackEnd.Services
                 // Check if user already has an active membership
                 var existingMembership = await _dbContext.UserMemberships
                     .FirstOrDefaultAsync(um => um.UserId == userId && um.IsActive && !um.IsCanceled);
-                if (existingMembership != null)
-                    throw new Exception("User already has an active membership");
 
                 // Validate family plan
                 if (membership.IsFamilyPlan)
@@ -159,16 +157,11 @@ namespace BackEnd.Services
                     UserId = userId,
                     MembershipId = membershipId,
                     ParentUserId = parentUserId,
-                    Status =  "Pending" ,
-                    IsActive = !membership.RequiresApproval,
-                   
+                    Status = "Pending",
+                    IsActive = false, // Always start as inactive until approved
+                    StartDate = DateTime.UtcNow,
+                    EndDate = DateTime.UtcNow.AddDays(membership.DurationInDays)
                 };
-
-                if (!membership.RequiresApproval)
-                {
-                    request.StartDate = DateTime.UtcNow;
-                    request.EndDate = DateTime.UtcNow.AddDays(membership.DurationInDays);
-                }
 
                 _dbContext.UserMemberships.Add(request);
                 await _dbContext.SaveChangesAsync();
@@ -195,11 +188,27 @@ namespace BackEnd.Services
                 if (request == null || request.Status != "Pending")
                     return null;
 
+                // Find and cancel the existing active membership if any
+                var existingMembership = await _dbContext.UserMemberships
+                    .FirstOrDefaultAsync(um => 
+                        um.UserId == request.UserId && 
+                        um.IsActive && 
+                        !um.IsCanceled && 
+                        um.UserMembershipId != userMembershipId);
+
+                if (existingMembership != null)
+                {
+                    existingMembership.IsCanceled = true;
+                    existingMembership.IsActive = false;
+                    existingMembership.EndDate = DateTime.UtcNow;
+                    _dbContext.UserMemberships.Update(existingMembership);
+                }
+
+                // Activate the new membership
                 request.Status = "Approved";
                 request.IsActive = true;
                 request.StartDate = DateTime.UtcNow;
                 request.EndDate = DateTime.UtcNow.AddDays(request.Membership.DurationInDays);
-                
 
                 await _dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -218,15 +227,45 @@ namespace BackEnd.Services
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
+                // First check if the approver is a librarian
+                var approver = await _dbContext.Users
+                    .FirstOrDefaultAsync(u => u.Id == approverId);
+
+                if (approver == null)
+                    throw new UnauthorizedAccessException("Approver not found");
+
+                if (approver.Role != "Librarian" && approver.Role != "Admin")
+                    throw new UnauthorizedAccessException("Only librarians and admins can reject membership requests");
+
                 var request = await _dbContext.UserMemberships
+                    .Include(um => um.Membership)
                     .FirstOrDefaultAsync(um => um.UserMembershipId == userMembershipId);
 
-                if (request == null || request.Status != "Pending")
-                    return null;
+                if (request == null)
+                    throw new Exception("Membership request not found");
 
+                if (request.Status != "Pending")
+                    throw new Exception("Can only reject pending membership requests");
+
+                // Only mark the rejected request as inactive and canceled
                 request.Status = "Rejected";
                 request.IsActive = false;
-                
+                request.IsCanceled = true;
+
+                // Ensure any existing active membership remains active
+                var existingMembership = await _dbContext.UserMemberships
+                    .FirstOrDefaultAsync(um => 
+                        um.UserId == request.UserId && 
+                        um.IsActive && 
+                        !um.IsCanceled && 
+                        um.UserMembershipId != userMembershipId);
+
+                if (existingMembership != null)
+                {
+                    existingMembership.IsActive = true;
+                    existingMembership.IsCanceled = false;
+                    _dbContext.UserMemberships.Update(existingMembership);
+                }
 
                 await _dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
