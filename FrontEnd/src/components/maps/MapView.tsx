@@ -19,7 +19,7 @@ interface Location {
 
 interface MapViewProps {
   locations?: Location[];
-  onMarkerClick?: (id: number | null) => void;
+  onMarkerClick?: (id: number) => void;
   selectedLocationId?: number | null;
   onMapReady?: () => void;
 }
@@ -76,13 +76,9 @@ const MapView: React.FC<MapViewProps> = ({
         const feature = map.forEachFeatureAtPixel(evt.pixel, (feature) => feature);
         if (feature) {
           const locationId = feature.get('id');
-          // Only trigger for library locations (which have an id)
-          if (locationId) {
+          if (locationId) { // Only trigger for library locations, not current location
             onMarkerClick?.(locationId);
           }
-        } else {
-          // If clicking on empty space, deselect the current location
-          onMarkerClick?.(null);
         }
       });
 
@@ -140,15 +136,15 @@ const MapView: React.FC<MapViewProps> = ({
 
     currentLocationSource.addFeature(feature);
 
-    // Always center map on current location when it's available and no location is selected
-    if (mapInstanceRef.current && !selectedLocationId) {
+    // Always center map on current location when it's available
+    if (mapInstanceRef.current) {
       mapInstanceRef.current.getView().animate({
         center: fromLonLat([currentLocation.lng, currentLocation.lat]),
         zoom: 13,
         duration: 1000,
       });
     }
-  }, [currentLocation, selectedLocationId]);
+  }, [currentLocation]);
 
   // Update library location markers
   useEffect(() => {
@@ -168,9 +164,7 @@ const MapView: React.FC<MapViewProps> = ({
       feature.setStyle(
         new Style({
           image: new Icon({
-            src: isSelected 
-              ? "https://maps.google.com/mapfiles/ms/icons/red-dot.png" // Red marker for selected location
-              : "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png", // Default marker for unselected
+            src: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
             scale: isSelected ? 2 : 1.5,
             anchor: [0.5, 1],
           }),
@@ -180,18 +174,16 @@ const MapView: React.FC<MapViewProps> = ({
       vectorSource.addFeature(feature);
     });
 
-    // Only center on selected location if one is selected
-    if (selectedLocationId) {
-      const selectedLocation = locations.find(loc => loc.id === selectedLocationId);
-      if (selectedLocation && mapInstanceRef.current) {
-        mapInstanceRef.current.getView().animate({
-          center: fromLonLat([selectedLocation.lng, selectedLocation.lat]),
-          zoom: 15, // Zoom in closer for selected location
-          duration: 1000,
-        });
-      }
+    // Only center on first location if there's no current location
+    if (locations.length > 0 && !currentLocation) {
+      const firstLocation = locations[0];
+      mapInstanceRef.current?.getView().animate({
+        center: fromLonLat([firstLocation.lng, firstLocation.lat]),
+        zoom: 13,
+        duration: 1000,
+      });
     }
-  }, [locations, selectedLocationId]);
+  }, [locations, selectedLocationId, currentLocation]);
 
   return (
     <div className="w-full h-[70vh] rounded-xl shadow-md border overflow-hidden" ref={mapRef}></div>

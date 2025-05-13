@@ -47,12 +47,12 @@ namespace BackEnd.Controllers
 
         [Authorize]
         [HttpPost("request-librarian")]
-        public async Task<IActionResult> RequestLibrarianRole()
+        public async Task<IActionResult> RequestLibrarianRole([FromBody] LibrarianRequestDTO request)
         {
             try
             {
                 var userId = long.Parse(User.FindFirst("userId").Value);
-                var result = await _authService.RequestLibrarianRole(userId);
+                var result = await _authService.RequestLibrarianRole(userId, request.RequestMessage);
                 return Ok(new { success = result });
             }
             catch (Exception ex)

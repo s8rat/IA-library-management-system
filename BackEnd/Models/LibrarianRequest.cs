@@ -16,8 +16,12 @@ namespace BackEnd.Models
 
         public DateTime RequestDate { get; set; } = DateTime.UtcNow;
 
+        //[Required]
+        public string Status { get; set; } = "Pending";// "Pending", "Approved", "Rejected"
+
         [Required]
-        public string Status { get; set; } // "Pending", "Approved", "Rejected"
+        [StringLength(500)]
+        public string RequestMessage { get; set; }
     }
 
 }
