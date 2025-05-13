@@ -24,6 +24,7 @@ namespace BackEnd.Services
                     UserId = lr.UserId,
                     Username = lr.User.Username,
                     RequestDate = lr.RequestDate,
+                    RequestMessage = lr.RequestMessage,
                     Status = lr.Status
                 })
                 .ToListAsync();
@@ -65,6 +66,7 @@ namespace BackEnd.Services
                 UserId = request.UserId,
                 Username = user.Username,
                 RequestDate = request.RequestDate,
+                RequestMessage = request.RequestMessage,
                 Status = request.Status
             };
         }
@@ -95,6 +97,7 @@ namespace BackEnd.Services
                 UserId = request.UserId,
                 Username = request.User.Username,
                 RequestDate = request.RequestDate,
+                RequestMessage = request.RequestMessage,
                 Status = request.Status
             };
         }

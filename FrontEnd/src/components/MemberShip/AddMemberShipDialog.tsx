@@ -15,7 +15,6 @@ const defaultNewMembership: Membership = {
   durationInDays: 30,
   price: undefined,
   description: "",
-  isFamilyPlan: false,
   maxFamilyMembers: undefined,
   requiresApproval: false,
 };
@@ -26,7 +25,9 @@ const MemberShipDialog: React.FC<MemberShipDialogProps> = ({
   onAdd,
   addMembershipError,
 }) => {
-  const [newMembership, setNewMembership] = useState<Membership>({ ...defaultNewMembership });
+  const [newMembership, setNewMembership] = useState<Membership>({
+    ...defaultNewMembership,
+  });
 
   if (!open) return null;
 
@@ -143,48 +144,6 @@ const MemberShipDialog: React.FC<MemberShipDialogProps> = ({
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
               />
             </div>
-            {/* Family Plan */}
-            <div>
-              <label className="block text-sm font-semibold text-blue-900 mb-1">
-                Family Plan
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={newMembership.isFamilyPlan}
-                  onChange={(e) =>
-                    setNewMembership({
-                      ...newMembership,
-                      isFamilyPlan: e.target.checked,
-                    })
-                  }
-                  className="mr-2"
-                />
-                <span>Is Family Plan?</span>
-              </div>
-            </div>
-            {/* Max Family Members */}
-            {newMembership.isFamilyPlan && (
-              <div>
-                <label className="block text-sm font-semibold text-blue-900 mb-1">
-                  Max Family Members
-                </label>
-                <input
-                  type="number"
-                  value={newMembership.maxFamilyMembers ?? ""}
-                  onChange={(e) =>
-                    setNewMembership({
-                      ...newMembership,
-                      maxFamilyMembers: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-blue-900 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                  min={1}
-                />
-              </div>
-            )}
             {/* Requires Approval */}
             <div>
               <label className="block text-sm font-semibold text-blue-900 mb-1">

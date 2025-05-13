@@ -76,7 +76,7 @@ namespace BackEnd.Services
             };
         }
 
-        public async Task<bool> RequestLibrarianRole(long userId)
+        public async Task<bool> RequestLibrarianRole(long userId, string requestMessage)
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
@@ -101,7 +101,8 @@ namespace BackEnd.Services
             {
                 UserId = userId,
                 RequestDate = DateTime.UtcNow,
-                Status = "Pending"
+                Status = "Pending",
+                RequestMessage = requestMessage
             };
 
             _context.LibrarianRequests.Add(request);

@@ -6,7 +6,7 @@ interface LibrarianRequest {
     userId: number;
     username: string;
     requestDate: string;
-    requestMsg: string;
+    requestMessage: string;
     status: string;
 }
 
@@ -38,6 +38,7 @@ const JoinUS = ({ containerClassName = "" }: JoinUSProps) => {
             setError(null);
             const res = await api.get('/api/Librarian/requests?status=Pending');
             setRequests(res.data);
+            console.log(res.data);
         } catch (err: unknown) {
             const apiError = err as ApiError;
             setError(apiError.response?.data?.message || 'Failed to fetch librarian requests');
@@ -184,7 +185,19 @@ const JoinUS = ({ containerClassName = "" }: JoinUSProps) => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="max-w-lg">
-                                                    <p className="text-sm text-gray-900 line-clamp-2">{request.requestMsg}</p>
+                                                    <div className="group relative">
+                                                        <p className="text-sm text-gray-900 line-clamp-2 cursor-pointer hover:text-blue-600 transition-colors">
+                                                            {request.requestMessage}
+                                                        </p>
+                                                        <div className="absolute left-0 top-full mt-2 w-96 p-4 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                                                            <div className="flex flex-col">
+                                                                <h4 className="text-sm font-semibold text-gray-700 mb-2">Request Message:</h4>
+                                                                <p className="text-sm text-black whitespace-pre-wrap bg-gray-50 p-3 rounded border border-gray-100">
+                                                                    {request.requestMessage}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">

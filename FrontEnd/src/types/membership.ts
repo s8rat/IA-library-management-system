@@ -5,7 +5,6 @@ export interface Membership {
   durationInDays: number;
   price?: number | undefined;
   description?: string;
-  isFamilyPlan: boolean;
   maxFamilyMembers?: number | undefined;
   requiresApproval: boolean;
 }

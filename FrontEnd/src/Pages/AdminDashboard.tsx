@@ -57,15 +57,20 @@ const AdminDashboard = () => {
   // States for the map
   const [locations, setLocations] = useState<Location[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
+    null
+  );
   const [isMapReady, setIsMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [newUser, setNewUser] = useState<typeof defaultNewUser>({ ...defaultNewUser });
+  const [newUser, setNewUser] = useState<typeof defaultNewUser>({
+    ...defaultNewUser,
+  });
   const [addUserError, setAddUserError] = useState<string | null>(null);
 
-  const [locationPermission, setLocationPermission] = useState<PermissionState>('prompt');
+  const [locationPermission, setLocationPermission] =
+    useState<PermissionState>("prompt");
 
   useEffect(() => {
     const loadData = async () => {
@@ -101,12 +106,12 @@ const AdminDashboard = () => {
         const data = await locationService.getLocations();
         setLocations(data);
       } catch (error) {
-        console.error('Error loading locations:', error);
-        setMapError('Failed to load locations');
+        console.error("Error loading locations:", error);
+        setMapError("Failed to load locations");
       }
     };
 
-    if (activeTab === 'map') {
+    if (activeTab === "map") {
       loadLocations();
     }
   }, [activeTab]);
@@ -114,7 +119,7 @@ const AdminDashboard = () => {
   // Check location permission status
   useEffect(() => {
     if (navigator.permissions && navigator.permissions.query) {
-      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+      navigator.permissions.query({ name: "geolocation" }).then((result) => {
         setLocationPermission(result.state);
         result.onchange = () => {
           setLocationPermission(result.state);
@@ -126,8 +131,9 @@ const AdminDashboard = () => {
   const handleSearch = (searchTerm: string) => {
     if (activeTab === "users") {
       const filtered = users.filter((user) =>
-        [user.username, user.firstName, user.lastName, user.email]
-          .some((field) => field.toLowerCase().includes(searchTerm.toLowerCase()))
+        [user.username, user.firstName, user.lastName, user.email].some(
+          (field) => field.toLowerCase().includes(searchTerm.toLowerCase())
+        )
       );
       setFilteredUsers(filtered);
     }
@@ -155,15 +161,16 @@ const AdminDashboard = () => {
       email: editingUser.email,
       firstName: editingUser.firstName,
       lastName: editingUser.lastName,
-      phoneNumber: editingUser.phoneNumber ?? "",
+      phoneNumber: editingUser.phoneNumber?.trim() || null,
       role: editingUser.role,
       ssn: editingUser.ssn,
       createdAt: editingUser.createdAt,
     };
 
-    api.put(`/api/Users/${editingUser.id}`, payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    api
+      .put(`/api/Users/${editingUser.id}`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
         const updated = response.data;
         const updatedUsers = users.map((u) =>
@@ -177,17 +184,18 @@ const AdminDashboard = () => {
         console.error("Error updating user:", error);
         setError(
           error.response?.data?.message ||
-          error.response?.data?.title ||
-          JSON.stringify(error.response?.data) ||
-          "Error updating user."
+            error.response?.data?.title ||
+            JSON.stringify(error.response?.data) ||
+            "Error updating user."
         );
       });
   };
 
   const handleDeleteUser = (id: number) => {
-    api.delete(`/api/Users/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    api
+      .delete(`/api/Users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then(() => {
         const updatedUsers = users.filter((u) => u.id !== id);
         setUsers(updatedUsers);
@@ -211,9 +219,10 @@ const AdminDashboard = () => {
       PhoneNumber: newUser.phoneNumber,
     };
 
-    api.post("/api/Users", payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    api
+      .post("/api/Users", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
         const updated = [...users, response.data];
         setUsers(updated);
@@ -224,9 +233,9 @@ const AdminDashboard = () => {
       .catch((error) => {
         setAddUserError(
           error.response?.data?.message ||
-          error.response?.data?.title ||
-          JSON.stringify(error.response?.data) ||
-          "Failed to add user"
+            error.response?.data?.title ||
+            JSON.stringify(error.response?.data) ||
+            "Failed to add user"
         );
       });
   };
@@ -237,29 +246,33 @@ const AdminDashboard = () => {
     setAddUserError(null);
   };
 
-  const handleAddLocation = async (location: { name: string; lat: number; lng: number }) => {
+  const handleAddLocation = async (location: {
+    name: string;
+    lat: number;
+    lng: number;
+  }) => {
     try {
       const newLocation = await locationService.createLocation({
         name: location.name,
         latitude: location.lat,
-        longitude: location.lng
+        longitude: location.lng,
       });
-      setLocations(prev => [...prev, newLocation]);
+      setLocations((prev) => [...prev, newLocation]);
       setIsAddDialogOpen(false);
     } catch (error) {
-      console.error('Error adding location:', error);
-      setMapError('Failed to add location');
+      console.error("Error adding location:", error);
+      setMapError("Failed to add location");
     }
   };
 
   const handleDeleteLocation = async (id: number) => {
     try {
       await locationService.deleteLocation(id);
-      setLocations(prev => prev.filter(loc => loc.id !== id));
+      setLocations((prev) => prev.filter((loc) => loc.id !== id));
       setSelectedLocationId(null);
     } catch (error) {
-      console.error('Error deleting location:', error);
-      setMapError('Failed to delete location');
+      console.error("Error deleting location:", error);
+      setMapError("Failed to delete location");
     }
   };
 
@@ -312,7 +325,9 @@ const AdminDashboard = () => {
                   }
                 }}
               >
-                {selectedLocationId ? `Delete Selected Location` : 'Select a Location to Delete'}
+                {selectedLocationId
+                  ? `Delete Selected Location`
+                  : "Select a Location to Delete"}
               </button>
             </div>
             {selectedLocationId && (
@@ -320,9 +335,10 @@ const AdminDashboard = () => {
                 Click on the map to deselect the current location
               </div>
             )}
-            {locationPermission === 'denied' && (
+            {locationPermission === "denied" && (
               <div className="p-4 bg-yellow-100 text-yellow-700 rounded-lg">
-                Location access is denied. Please enable location access in your browser settings to see your current location on the map.
+                Location access is denied. Please enable location access in your
+                browser settings to see your current location on the map.
               </div>
             )}
             {mapError && (
@@ -336,17 +352,19 @@ const AdminDashboard = () => {
                   <div className="text-gray-500">Loading map...</div>
                 </div>
               )}
-              <Suspense fallback={
-                <div className="w-full h-[70vh] rounded-lg shadow border flex items-center justify-center bg-gray-100">
-                  <div className="text-gray-500">Loading map...</div>
-                </div>
-              }>
+              <Suspense
+                fallback={
+                  <div className="w-full h-[70vh] rounded-lg shadow border flex items-center justify-center bg-gray-100">
+                    <div className="text-gray-500">Loading map...</div>
+                  </div>
+                }
+              >
                 <MapView
-                  locations={locations.map(loc => ({
+                  locations={locations.map((loc) => ({
                     id: loc.id,
                     lat: loc.latitude,
                     lng: loc.longitude,
-                    name: loc.name
+                    name: loc.name,
                   }))}
                   onMarkerClick={setSelectedLocationId}
                   selectedLocationId={selectedLocationId}
@@ -366,6 +384,13 @@ const AdminDashboard = () => {
     }
   };
 
+  // State for mobile sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {activeTab === "users" && (
@@ -378,33 +403,46 @@ const AdminDashboard = () => {
           addUserError={addUserError}
         />
       )}
-      <div className="flex flex-1">
+      <div className="flex flex-1 relative">
         <Sidebar
           items={sidebarItems}
           activeKey={activeTab}
           onSelect={setActiveTab}
+          isMobileOpen={isSidebarOpen}
+          onMobileClose={() => setIsSidebarOpen(false)}
         />
-        <main className="flex-1 px-10 py-8">
-          {(activeTab === "users" || activeTab === "map") && (
-            <div className="flex items-center mb-6 gap-2">
-              {activeTab === "users" && (
-                <SearchBar
-                  onAdd={handleAddClick}
-                  onSearch={handleSearch}
-                  placeholder="Search users..."
-                />
-              )}
-            </div>
-          )}
+        <main className="flex-1 px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:py-8 w-full">
+          {/* Search bar and mobile menu button */}
+          <div className="w-full">
+            {activeTab === "users" ? (
+              <SearchBar
+                onAdd={handleAddClick}
+                onSearch={handleSearch}
+                placeholder="Search users..."
+                onToggleSidebar={toggleSidebar}
+              />
+            ) : (
+              <div className="flex items-center mb-6 gap-2">
+                <button
+                  className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border bg-white shadow"
+                  onClick={toggleSidebar}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">
               {error}
             </div>
           )}
 
-          <div className="bg-white rounded-xl shadow-md border p-6">
-            <div className="flex flex-col gap-4 max-h-full overflow-y-auto pr-2">
+          <div className="bg-white rounded-xl shadow-md border p-3 sm:p-4 md:p-6 overflow-hidden">
+            <div className="flex flex-col gap-4 max-h-full overflow-y-auto">
               {renderTabContent()}
             </div>
           </div>

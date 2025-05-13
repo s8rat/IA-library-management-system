@@ -56,10 +56,6 @@ export const Librarian = () => {
     setTouchStartX(0);
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
   // Board configurations
   const boards = [
     {
@@ -111,40 +107,54 @@ export const Librarian = () => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Mobile Menu Button */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-20 p-2 rounded-lg bg-blue-600 text-white"
-        onClick={toggleSidebar}
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-        </svg>
-      </button>
+      {/* Mobile Menu Button - Sticky (hidden when sidebar is open) */}
+      <div className={`md:hidden sticky top-4 left-4 z-50 float-left ml-4 transition-opacity duration-200 ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <button
+          className="p-3 rounded-lg bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+          onClick={() => setIsSidebarOpen(true)}
+          aria-label="Open menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+        </button>
+      </div>
 
       {/* Sidebar */}
       <nav className={`
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         transition-transform duration-200 ease-out
         fixed md:static
-        w-72 z-10
+        w-72 z-50
         h-screen md:h-auto
+        top-0 left-0
         bg-blue-50
         md:translate-x-0
         flex flex-col
         overflow-y-auto
-        shadow-lg
+        shadow-xl
       `}>
-        <div className="w-full py-4 flex flex-col gap-2">
-          <div className="px-6 pb-2 text-xs text-gray-500 font-semibold tracking-widest uppercase">
-            Navigation
-          </div>
+        {/* Navigation Header with Close Button */}
+        <div className="flex items-center justify-between p-4 border-b border-blue-100">
+          <h2 className="text-lg font-bold text-blue-800">NAVIGATION</h2>
+          <button 
+            className="md:hidden p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Close menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="w-full py-2 flex flex-col gap-1">
           {boards.map((board, idx) => (
             <button
               key={board.name}
-              className={`w-11/12 mx-auto mb-2 p-4 rounded-lg text-left flex items-center transition-all duration-200 font-semibold group shadow-sm border border-transparent ${
+              className={`w-11/12 mx-auto mb-1 p-3 rounded-lg text-left flex items-center transition-all duration-200 font-semibold group shadow-sm border border-transparent ${
                 selected === idx
-                  ? "bg-blue-600 text-white shadow border-blue-700 scale-[1.02]"
-                  : "bg-white text-blue-700 hover:bg-blue-100 hover:border-blue-300"
+                  ? "bg-blue-600 text-white shadow-md border-blue-700 scale-[1.02]"
+                  : "bg-white text-blue-700 hover:bg-blue-100 hover:border-blue-300 hover:scale-[1.01]"
               }`}
               onClick={() => {
                 setSelected(idx);
@@ -166,7 +176,7 @@ export const Librarian = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-6 lg:p-8 mt-16 md:mt-0">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 pt-16 md:pt-6 md:mt-0">
         <div className="w-full h-full bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="w-full h-full">
             {boards[selected].content}

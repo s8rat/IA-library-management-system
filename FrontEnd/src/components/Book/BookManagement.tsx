@@ -188,8 +188,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
   );
 
   return (
-    <div className={containerClassName}>
-      {" "}
+    <div className={`px-2 sm:px-4 py-4 ${containerClassName}`}>
       <BookAddDialog
         open={isAddDialogOpen}
         onClose={() => {
@@ -210,7 +209,7 @@ const BookManagement: React.FC<BookManagementProps> = ({
         newBookImage={newBookImage}
         setNewBookImage={setNewBookImage}
         addError={addError}
-      />{" "}
+      />
       <BookEditDialog
         open={!!editingBook}
         onClose={() => {
@@ -224,24 +223,26 @@ const BookManagement: React.FC<BookManagementProps> = ({
         editError={editError}
         setEditBookImage={setEditBookImage}
       />
-      <BookSearchBar
-        search={search}
-        setSearch={setSearch}
-        onAdd={() => {
-          setIsAddDialogOpen(true);
-          if (onAddClick) {
-            onAddClick();
-          }
-        }}
-        className={searchBarClassName}
-      />
-      <BookTable
-        books={filteredBooks}
-        handleEditBook={handleEditBook}
-        handleDeleteBook={handleDeleteBook}
-        className={tableClassName}
-        customActions={customActions}
-      />
+      <div className="max-w-7xl mx-auto">
+        <BookSearchBar
+          search={search}
+          setSearch={setSearch}
+          onAdd={() => {
+            setIsAddDialogOpen(true);
+            if (onAddClick) {
+              onAddClick();
+            }
+          }}
+          className={`mb-4 ${searchBarClassName}`}
+        />
+        <BookTable
+          books={filteredBooks}
+          handleEditBook={handleEditBook}
+          handleDeleteBook={handleDeleteBook}
+          className={tableClassName}
+          customActions={customActions}
+        />
+      </div>
     </div>
   );
 };
