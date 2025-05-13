@@ -155,7 +155,7 @@ const AdminDashboard = () => {
       email: editingUser.email,
       firstName: editingUser.firstName,
       lastName: editingUser.lastName,
-      phoneNumber: editingUser.phoneNumber ?? "",
+      phoneNumber: editingUser.phoneNumber?.trim() || null,
       role: editingUser.role,
       ssn: editingUser.ssn,
       createdAt: editingUser.createdAt,
