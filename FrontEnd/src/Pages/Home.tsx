@@ -10,10 +10,7 @@ export const Home = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 5678b2d7fa13a05c1d04b0aa18608866a3a6a918
     useEffect(() => {
         const fetchBooks = async () => {
             try {
