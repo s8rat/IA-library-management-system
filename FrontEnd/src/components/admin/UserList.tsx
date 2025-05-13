@@ -140,29 +140,29 @@ const UserList: React.FC<UserListProps> = ({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <span className="text-sm font-medium text-gray-800">
                   Username:
                 </span>
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-gray-900 break-all">
                   {user.username}
                 </span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <span className="text-sm font-medium text-gray-800">Name:</span>
-                <span className="text-gray-900">
+                <span className="text-gray-900 break-all">
                   {user.firstName} {user.lastName}
                 </span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <span className="text-sm font-medium text-gray-800">
                   Email:
                 </span>
-                <span className="text-gray-900">{user.email}</span>
+                <span className="text-gray-900 break-all">{user.email}</span>
               </div>
             </div>
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <span className="text-sm font-medium text-gray-800">Role:</span>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -176,15 +176,15 @@ const UserList: React.FC<UserListProps> = ({
                   {user.role}
                 </span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <span className="text-sm font-medium text-gray-800">
                   Phone:
                 </span>
-                <span className="text-gray-900">
+                <span className="text-gray-900 break-all">
                   {user.phoneNumber || "N/A"}
                 </span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <span className="text-sm font-medium text-gray-800">
                   Created:
                 </span>
@@ -193,16 +193,16 @@ const UserList: React.FC<UserListProps> = ({
                 </span>
               </div>
             </div>
-            <div className="col-span-2 flex justify-end space-x-2">
+            <div className="col-span-1 md:col-span-2 flex flex-wrap justify-center md:justify-end gap-2">
               <button
                 onClick={() => handleEditUser(user)}
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 font-medium w-full sm:w-auto"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDeleteUser(user.id)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium"
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 font-medium w-full sm:w-auto"
               >
                 Delete
               </button>
