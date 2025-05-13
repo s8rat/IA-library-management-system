@@ -50,11 +50,20 @@ internal class Program
             options.AddDefaultPolicy(policy =>
             {
                 policy
-                      .WithOrigins("http://localhost:5173")
+                      .WithOrigins("http://localhost:5173", "http://localhost:3000")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
             });
+        });
+
+        // Configure SignalR
+        builder.Services.AddSignalR(options =>
+        {
+            options.EnableDetailedErrors = true;
+            options.MaximumReceiveMessageSize = 102400; // 100 KB
+            options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+            options.KeepAliveInterval = TimeSpan.FromSeconds(10);
         });
 
         // JWT Authentication
