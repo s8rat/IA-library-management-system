@@ -23,7 +23,6 @@ interface Membership {
   description?: string;
   isFamilyPlan: boolean;
   maxFamilyMembers?: number;
-  requiresApproval: boolean;
   createdAt: string;
 }
 
@@ -132,7 +131,6 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
         description: selectedPlanData.description,
         isFamilyPlan: selectedPlanData.isFamilyPlan,
         maxFamilyMembers: selectedPlanData.maxFamilyMembers,
-        requiresApproval: selectedPlanData.requiresApproval,
         parentUserId: selectedPlanData.isFamilyPlan ? parseInt(userId) : null
       };
 
@@ -271,11 +269,6 @@ const UserSelectPlanDialouge: React.FC<{ onRequestSent?: () => void }> = ({ onRe
                       {plan.isFamilyPlan && (
                         <div className="text-gray-800 col-span-full">
                           <span className="font-semibold">Family Plan:</span> Up to {plan.maxFamilyMembers} members
-                        </div>
-                      )}
-                      {plan.requiresApproval && (
-                        <div className="text-gray-800 col-span-full">
-                          <span className="font-medium text-amber-600">* Requires librarian approval</span>
                         </div>
                       )}
                     </div>
