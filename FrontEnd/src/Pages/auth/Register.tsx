@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../Components/UI/InputField";
-import TelInput from "../../components/UI/TelInput";
 import api from "../../Services/api";
 import { AxiosError } from "axios";
 
@@ -55,12 +54,6 @@ const Register = () => {
     }));
   };
 
-  const handlePhoneChange = (phoneNumber: string) => {
-    setFormData(prev => ({
-      ...prev,
-      phoneNumber
-    }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,7 +141,23 @@ const Register = () => {
             error={errors.Email?.[0]}
           />
 
-          <TelInput onPhoneChange={handlePhoneChange} error={errors.PhoneNumber?.[0]} />
+          <InputField
+            label="Phone Number"
+            name="phoneNumber"
+            type="tel"
+            placeholder="+20xxxxxxxxxx"
+            value={formData.phoneNumber ? `+20${formData.phoneNumber.replace(/^0/, '')}` : ''}
+            onChange={(e) => {
+              let value = e.target.value.replace(/^\+20/, '').replace(/\D/g, '');
+              value = value.slice(0, 10);
+              setFormData(prev => ({
+                ...prev,
+                phoneNumber: value.startsWith('0') ? value : `0${value}`
+              }));
+            }}
+            required
+            error={errors.PhoneNumber?.[0]}
+          />
 
           <InputField
             label="National ID"

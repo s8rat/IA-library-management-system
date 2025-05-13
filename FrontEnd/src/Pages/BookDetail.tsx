@@ -12,22 +12,23 @@ export const BookDetail = () => {
     const [error, setError] = useState<string | null>(null);
     const [showBorrowDialog, setShowBorrowDialog] = useState(false);
 
+    const fetchBook = async () => {
+        try {
+            const response = await axios.get(`/api/Books/${id}`);
+            setBook(response.data);
+            setError(null); // Clear any previous errors
+        } catch (err) {
+            console.error('Error fetching book:', err);
+            const errorMessage = axios.isAxiosError(err) && err.response?.data?.message
+                ? err.response.data.message
+                : 'Failed to fetch book details. Please try again later.';
+            setError(errorMessage);
+        }
+    };
+
     useEffect(() => {
-        const fetchBook = async () => {
-            try {
-                const response = await axios.get(`/api/Books/${id}`);
-                setBook(response.data);
-                setError(null); // Clear any previous errors
-            } catch (err) {
-                console.error('Error fetching book:', err);
-                const errorMessage = axios.isAxiosError(err) && err.response?.data?.message
-                    ? err.response.data.message
-                    : 'Failed to fetch book details. Please try again later.';
-                setError(errorMessage);
-            }
-        };
         fetchBook();
-    }, [id]);
+    }, [id]);  // eslint-disable-line react-hooks/exhaustive-deps
 
     if (error) {
         return (
@@ -204,7 +205,11 @@ export const BookDetail = () => {
                     bookTitle={book.title}
                     isOpen={showBorrowDialog}
                     onClose={() => setShowBorrowDialog(false)}
-                    onSuccess={() => setShowBorrowDialog(false)}
+                    onSuccess={() => {
+                        setShowBorrowDialog(false);
+                        // Refresh book data after successful borrow request
+                        fetchBook();
+                    }}
                 />
             )}
         </div>

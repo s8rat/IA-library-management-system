@@ -79,7 +79,7 @@ namespace BackEnd.Controllers
         /// <param name="dto">Membership details</param>
         /// <returns>Created membership</returns>
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Librarian")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Membership))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -109,7 +109,7 @@ namespace BackEnd.Controllers
         /// <param name="dto">Updated membership details</param>
         /// <returns>Updated membership</returns>
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Librarian")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Membership))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -143,7 +143,7 @@ namespace BackEnd.Controllers
         /// <param name="id">Membership ID</param>
         /// <returns>No content if successful</returns>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Librarian")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

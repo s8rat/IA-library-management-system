@@ -8,11 +8,12 @@ interface InputFieldProps {
     name: string;
     className?: string;
     value: string;
+    placeholder?: string;
     onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
     error?: string;
 }
 
-const InputField = ({ label, type, name, value, required, className, onChange, error } : InputFieldProps) => {
+const InputField = ({ label, type, name, value, required, className, placeholder, onChange, error } : InputFieldProps) => {
     return (
         <TextField
             required={required}
@@ -20,6 +21,7 @@ const InputField = ({ label, type, name, value, required, className, onChange, e
             type={type}
             name={name}
             value={value}
+            placeholder={placeholder}
             className={` ${className}`}
             onChange={onChange}
             error={!!error}
