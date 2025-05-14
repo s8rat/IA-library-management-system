@@ -10,10 +10,10 @@ namespace BackEnd.Models
         public int UserMembershipId { get; set; }
 
         [Required]
-        public long UserId { get; set; }
+        public long? UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
 
         [Required]
         public int MembershipId { get; set; }

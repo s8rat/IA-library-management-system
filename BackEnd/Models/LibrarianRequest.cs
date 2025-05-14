@@ -11,8 +11,8 @@ namespace BackEnd.Models
         public long Id { get; set; }
 
         [ForeignKey("User")]
-        public long UserId { get; set; }
-        public User User { get; set; }
+        public long? UserId { get; set; }
+        public User? User { get; set; }
 
         public DateTime RequestDate { get; set; } = DateTime.UtcNow;
 

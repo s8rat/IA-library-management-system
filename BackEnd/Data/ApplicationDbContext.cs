@@ -48,7 +48,7 @@ namespace BackEnd.Data
                 .HasOne(br => br.User)
                 .WithMany(u => u.BorrowRequests)
                 .HasForeignKey(br => br.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<BorrowRequest>()
                 .HasOne(br => br.Book)
@@ -61,7 +61,7 @@ namespace BackEnd.Data
                 .HasOne(br => br.User)
                 .WithMany(u => u.BorrowRecords)
                 .HasForeignKey(br => br.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<BorrowRecord>()
                 .HasOne(br => br.Book)
@@ -70,38 +70,38 @@ namespace BackEnd.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Configure UserMembership
+            // Configure UserMembership - UPDATED SECTION
             modelBuilder.Entity<UserMembership>()
                 .HasOne(um => um.User)
                 .WithMany(u => u.UserMemberships)
                 .HasForeignKey(um => um.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserMembership>()
                 .HasOne(um => um.Membership)
                 .WithMany(m => m.UserMemberships)
                 .HasForeignKey(um => um.MembershipId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<UserMembership>()
-                .HasOne(um => um.ParentUser)
-                .WithMany(u => u.FamilyMembers)
-                .HasForeignKey(um => um.ParentUserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<UserMembership>()
+            //    .HasOne(um => um.ParentUser)
+            //    .WithMany(u => u.FamilyMembers)
+            //    .HasForeignKey(um => um.ParentUserId)
+            //    .OnDelete(DeleteBehavior.NoAction);
 
             // Configure LibrarianRequest
             modelBuilder.Entity<LibrarianRequest>()
                 .HasOne(lr => lr.User)
                 .WithMany(u => u.LibrarianRequests)
                 .HasForeignKey(lr => lr.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configure ChatMessage
             modelBuilder.Entity<ChatMessage>()
                 .HasOne(cm => cm.User)
                 .WithMany()
                 .HasForeignKey(cm => cm.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Location>()
                 .Property(l => l.Name)

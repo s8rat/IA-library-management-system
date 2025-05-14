@@ -303,7 +303,7 @@ namespace BackEnd.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -527,7 +527,7 @@ namespace BackEnd.Migrations
                     b.HasOne("BackEnd.Models.User", "User")
                         .WithMany("BorrowRecords")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Book");
@@ -546,7 +546,7 @@ namespace BackEnd.Migrations
                     b.HasOne("BackEnd.Models.User", "User")
                         .WithMany("BorrowRequests")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Book");
@@ -559,7 +559,7 @@ namespace BackEnd.Migrations
                     b.HasOne("BackEnd.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -570,8 +570,7 @@ namespace BackEnd.Migrations
                     b.HasOne("BackEnd.Models.User", "User")
                         .WithMany("LibrarianRequests")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -581,18 +580,17 @@ namespace BackEnd.Migrations
                     b.HasOne("Membership", "Membership")
                         .WithMany("UserMemberships")
                         .HasForeignKey("MembershipId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BackEnd.Models.User", "ParentUser")
                         .WithMany("FamilyMembers")
-                        .HasForeignKey("ParentUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ParentUserId");
 
                     b.HasOne("BackEnd.Models.User", "User")
                         .WithMany("UserMemberships")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Membership");

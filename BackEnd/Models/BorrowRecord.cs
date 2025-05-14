@@ -11,7 +11,7 @@ namespace BackEnd.Models
 
         [ForeignKey("User")]
         public long UserId { get; set; }
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
 
         [ForeignKey("Book")]
         public long? BookId { get; set; }

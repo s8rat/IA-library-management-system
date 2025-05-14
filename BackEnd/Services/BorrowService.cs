@@ -269,6 +269,8 @@ namespace BackEnd.Services
                 throw new Exception("Book has already been returned");
             }
 
+          
+
             record.Status = "Returned";
             record.ReturnDate = DateTime.UtcNow;
             _context.BorrowRecords.Update(record);
